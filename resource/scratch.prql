@@ -1,0 +1,24 @@
+from otb_table
+left_join some_other_table [otb_id=some_id]
+select [
+    otb_name,
+    some_other_name,
+    price,
+    qty
+]
+filter "price > 0"
+derive [
+    total_price : price * qty  | sum
+    qty_mod : qty * (1 + tax/(32*100)) + 0.05
+    thrifty : 32 * (qty_mod - qty) + 100 + total_price * 0.05
+]
+filter "qty_mod > (200 + total_price * 0.05)"
+filter "thrifty <= 200"
+aggregate by: [otb_name,some_other_name] [
+    sum price,
+    average price,
+    sum qty,
+    count
+]
+sort price
+take 25

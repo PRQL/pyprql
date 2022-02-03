@@ -1,0 +1,61 @@
+    start: (cte)? from
+
+    cte: "table" NAME "=" "(" from ")"
+    from: "from" NAME (join)? query
+
+    query: (select | derive | filter | sort | take| aggregate)*
+    join: ("join"|"left_join")+ name "[" name ("=" name)? "]"
+
+    aggregate: "aggregate" "by" ":"? "[" group_by"]" "[" aggregate_body "]"
+    group_by: name ("," name)*
+    aggregate_body: (NAME ":"  STRING)? ( "," (NAME ":"  STRING))*
+
+
+    take: "take" INT
+
+    filter: ("filter" whole_line )+
+    whole_line: /(.*?)[\n\r]/s
+    sort: "sort" whole_line
+
+
+    select: ("select" select_fields)+
+    select_fields: ("[" [(name ",")*] name "]")* (name*)
+
+    derive: ("derive" ( "[" derive_line+ "]" | derive_line ))+
+    derive_line: name ":" expression (",")?
+
+    expression:  eq ( "|" eq)*
+
+    ?eq: gt | gt "=" gt
+    ?gt: sum | sum ">" sum | lt | gte | lte
+    ?lt:  sum "<" sum
+    ?lte:  sum "<=" sum
+    ?gte:  sum ">=" sum
+    ?sum: product | sum "+" product | diff
+    ?diff: sum "-" product
+    ?product: atom | product "*" atom | division
+    ?division: product "/" atom
+    ?atom: "(" expression ")" | value
+
+    value: NAME | STRING | NUMBER | SIGNED_NUMBER | FLOAT | SIGNED_FLOAT
+    name: NAME ( "." NAME)*
+
+    FSTRING: "f" STRING
+    COMMENT: /#[^\n]*/
+    OP_ADD: "+"
+    OP_SUB: "-"
+    OP_MUL: "*"
+    OP_DIV: "/"
+    OP_MOD: "%"
+    OP_EQ: "="
+    OP_NE: "!="
+    OP_LT: "<"
+    OP_GT: ">"
+    OP_LE: "<="
+    OP_GE: ">="
+    OP_COLON: ":"
+
+    %import python (NAME, STRING, INTEGER, DEC_NUMBER,HEX_NUMBER,BIN_NUMBER,OCT_NUMBER,FLOAT_NUMBER,IMAG_NUMBER)
+    %import common (WS,INT,SIGNED_INT,NUMBER,SIGNED_NUMBER,FLOAT,SIGNED_FLOAT)
+    %ignore WS
+    %ignore COMMENT

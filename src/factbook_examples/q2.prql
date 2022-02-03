@@ -1,0 +1,3 @@
+from facts
+derive min_population: "MIN(population)"
+take 5
