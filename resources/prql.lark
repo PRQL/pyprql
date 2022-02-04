@@ -8,12 +8,12 @@
 
     aggregate: "aggregate" "by" ":"? "[" group_by"]" "[" aggregate_body "]"
     group_by: name ("," name)*
-    aggregate_body: (NAME ":"  STRING)? ( "," (NAME ":"  STRING))*
+    aggregate_body: ( (NAME ":")?  _line)? ( "," ((NAME ":")?  _line))*
 
-
+    _line: (FSTRING|func_call)
     take: "take" INT
 
-    filter: ("filter" whole_line )+
+    filter: ("filter" (whole_line|ESCAPED_STRING) )+
     whole_line: /(.*?)[\n\r]/s
     sort: "sort" whole_line
 
@@ -25,6 +25,7 @@
     derive_line: name ":" expression (",")?
 
     expression:  eq ( "|" eq)*
+    func_call: NAME NAME | NAME NAME NAME | "count"
 
     ?eq: gt | gt "=" gt
     ?gt: sum | sum ">" sum | lt | gte | lte
@@ -56,6 +57,6 @@
     OP_COLON: ":"
 
     %import python (NAME, STRING, INTEGER, DEC_NUMBER,HEX_NUMBER,BIN_NUMBER,OCT_NUMBER,FLOAT_NUMBER,IMAG_NUMBER)
-    %import common (WS,INT,SIGNED_INT,NUMBER,SIGNED_NUMBER,FLOAT,SIGNED_FLOAT)
+    %import common (WS,INT,SIGNED_INT,NUMBER,SIGNED_NUMBER,FLOAT,SIGNED_FLOAT,ESCAPED_STRING)
     %ignore WS
     %ignore COMMENT

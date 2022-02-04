@@ -1,2 +1,6 @@
+# sql
+#SELECT *
+#  FROM facts
+#LIMIT 5;
 from facts
 take 5

@@ -1,0 +1,7 @@
+#SELECT name
+#FROM facts
+#WHERE name != "World"
+#and population > (SELECT AVG(population) FROM facts WHERE name != "World")
+from facts
+select name
+take 5

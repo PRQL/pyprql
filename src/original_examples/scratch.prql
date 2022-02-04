@@ -15,10 +15,10 @@ derive [
 filter "qty_mod > (200 + total_price * 0.05)"
 filter "thrifty <= 200"
 aggregate by: [otb_name,some_other_name] [
-    sum price,
-    average price,
-    sum qty,
-    count
+    total_price: sum price,
+    average_price: average price,
+    total_qty: sum qty,
+    total_count: count
 ]
 sort price
 take 25

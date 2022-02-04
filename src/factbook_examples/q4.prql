@@ -1,0 +1,8 @@
+#SELECT AVG(population)
+#FROM facts
+#WHERE name != "World";
+
+from facts
+derive avg_pop: "AVG(population)"
+derive avg_area: "AVG(area)"
+filter 'name != "World"'
