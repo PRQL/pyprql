@@ -8,6 +8,7 @@ if __name__ == '__main__':
         f'/{base_path}/q1.prql',
         f'/{base_path}/q2.prql',
         f'/{base_path}/q3.prql',
+        f'/{base_path}/q3b.prql',
         f'/{base_path}/q4.prql',
         f'/{base_path}/q5.prql'
     ]
@@ -28,9 +29,12 @@ if __name__ == '__main__':
             tree = parse(text)
 
             # pretty_print(tree)
-            sql = tree_to_sql(tree)
-            rows = cur.execute(sql)
-            columns = [d[0] for d in rows.description]
-            print(columns)
-            for row in rows:
-                print(row)
+            try:
+                sql = tree_to_sql(tree)
+                rows = cur.execute(sql)
+                columns = [d[0] for d in rows.description]
+                print(columns)
+                for row in rows:
+                    print(row)
+            except Exception as e:
+                print(f'Error: {e}')

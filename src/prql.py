@@ -122,7 +122,14 @@ class AggregateBody(_Ast, ast_utils.AsList):
 @dataclass
 class Aggregate(_Statement):
     group_by: GroupBy
-    aggregate_body: AggregateBody
+    aggregate_body: AggregateBody = None
+
+    def __init__(self, group_by, aggregate_body=None):
+        self.group_by = group_by
+        self.aggregate_body = aggregate_body
+        if self.aggregate_body is None:
+            self.aggregate_body = self.group_by
+            self.group_by = None
 
     def __str__(self):
         return f'aggregate: \n\t\taggregates: {self.aggregate_body}\n\t\tgroup_by: {self.group_by}'
@@ -333,7 +340,7 @@ def pretty_print(start: Start, do_print: bool = True) -> str:
 
 
 @enforce_types
-def tree_to_str(tree: Union[Tree, Token, _Ast,str]) -> str:
+def tree_to_str(tree: Union[Tree, Token, _Ast, str]) -> str:
     if isinstance(tree, Tree):
         # print(f'TREE={tree.data}')
         if tree.data == 'whole_line':
@@ -386,7 +393,7 @@ def tree_to_sql(tree: Start) -> str:
     join_name = ''
     join_short = ''
     if join:
-        join_name = join.name 
+        join_name = join.name
         join_short = f'{str(join.name)[0:3]}'
         join_str = f'INNER JOIN {join.name} ON {from_short}.{join.value} = {join_short}.{join.right_id}'
         join_from_str = f',{join.name} {join_short}'
@@ -406,7 +413,7 @@ def tree_to_sql(tree: Start) -> str:
         # rich.print(agg)
         for i in range(0, len(agg.aggregate_body.statements), 2):
             name = agg.aggregate_body.statements[i]
-            if i+1 < len(agg.aggregate_body.statements):
+            if i + 1 < len(agg.aggregate_body.statements):
                 query = agg.aggregate_body.statements[i + 1]
                 agg_str += f", {query} as {name}"
             else:
@@ -433,7 +440,7 @@ def tree_to_sql(tree: Start) -> str:
 
     derives = get_operation(ops.operations, prql.Derive, return_all=True)
     derives_str = ''
-    #rich.print(derives)
+    # rich.print(derives)
     if derives:
         for d in derives:
             for line in d.fields:

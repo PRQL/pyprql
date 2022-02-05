@@ -1,0 +1,12 @@
+#SELECT name
+#FROM facts
+#WHERE population = (SELECT MIN(population) FROM facts);
+
+value min_pop = (
+    from facts
+    aggregate [ min population ]
+)
+
+from facts
+select name
+filter population = min_pop
