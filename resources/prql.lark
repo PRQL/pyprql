@@ -2,7 +2,7 @@
 
     value_def: "value" NAME "=" "(" from ")"
     cte: "table" NAME "=" "(" from ")"
-    from: "from" NAME (join)?  query
+    from: "from" NAME "|"? (join)? "|"? query
 
     query: (select | derive | filter | sort | take| aggregate)*
     join: ("join"|"left_join")+ name "[" name ("=" name)? "]"
@@ -14,9 +14,9 @@
     _line: (STRING|FSTRING|func_call)
     take: "take" INT
 
-    filter: ("filter" (expression|ESCAPED_STRING)* )+
-    whole_line: /(.*?)[\n\r]/s
-    sort: "sort" whole_line
+    filter: ("filter" (expression|ESCAPED_STRING)* )+ | ("filter" "[" (expression|ESCAPED_STRING)* "]")+
+    whole_line: /(.*?)[|\n\r]/
+    sort: "sort" whole_line|STRING|FSTRING
 
 
     select: ("select" select_fields)+
@@ -32,7 +32,7 @@
     func_body: _line ("," _line)*
     func_call: "count" | NAME NAME
 
-    ?eq: gt | gt "=" gt
+    eq: gt | gt "=" gt
     ?gt: sum | sum ">" sum | lt | gte | lte
     ?lt:  sum "<" sum
     ?lte:  sum "<=" sum

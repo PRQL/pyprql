@@ -5,12 +5,11 @@ from prql import parse, tree_to_sql, read_file, script_path
 if __name__ == '__main__':
     base_path = '/factbook_examples'
     file_names = [
-        f'/{base_path}/q1.prql',
-        f'/{base_path}/q2.prql',
-        f'/{base_path}/q3.prql',
+        # f'/{base_path}/q1.prql',
+        # f'/{base_path}/q2.prql',
+        # f'/{base_path}/q3.prql',
         f'/{base_path}/q3b.prql',
-        f'/{base_path}/q4.prql',
-        f'/{base_path}/q5.prql'
+        f'/{base_path}/sql/simple_join.prql',
     ]
     # f'{base_path}test_query2.prql',f'{base_path}test_query1.prql',
 
@@ -37,4 +36,4 @@ if __name__ == '__main__':
                 for row in rows:
                     print(row)
             except Exception as e:
-                print(f'Error: {e}')
+                print(f'\n\nError: {e}\n\n')

@@ -1,0 +1,1 @@
+from cities | join facts [ facts.id = cities.facts_id ] | sort cities.name | take 15

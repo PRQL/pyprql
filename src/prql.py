@@ -3,6 +3,7 @@ import sys
 from dataclasses import dataclass
 from typing import List, Union, Type
 
+import rich
 from enforce_typing import enforce_types
 from lark import Lark, ast_utils, Transformer, Token
 from lark.tree import Tree
@@ -26,6 +27,18 @@ class Value(_Ast):
     value: str
 
     def __str__(self):
+        # if self.value.startswith('f"'):
+        #     return self.value[2:-1]
+        #
+        # if self.value.startswith("f'"):
+        #     return self.value[2:-1]
+        #
+        # if self.value.startswith('"'):
+        #     return self.value[1:-1]
+        #
+        # if self.value.startswith("'"):
+        #     return self.value[1:-1]
+
         return str(self.value)
 
 
@@ -38,7 +51,7 @@ class Name(_Ast, ast_utils.AsList):
 
 
 @dataclass
-class Expression(_Ast, ast_utils.AsList):
+class Expression(_Statement, ast_utils.AsList):
     # Corresponds to expression in the grammar
     statements: List[_Statement]
 
@@ -72,7 +85,7 @@ class Join(_Statement):
 
 
 @dataclass()
-class SelectFields(_Ast, ast_utils.AsList):
+class SelectFields(_Statement, ast_utils.AsList):
     fields: List[Name]
 
     def __str__(self):
@@ -95,7 +108,19 @@ class DeriveLine(_Statement):
 
 
 @dataclass
-class GroupBy(_Ast, ast_utils.AsList):
+class Eq(_Statement):
+    lhs: Expression
+    rhs: Expression = None
+
+    def __str__(self):
+        if self.rhs is None:
+            return f"{self.lhs}"
+        else:
+            return f"{self.lhs} = {self.rhs}"
+
+
+@dataclass
+class GroupBy(_Statement, ast_utils.AsList):
     fields: List[str]
 
     def __str__(self):
@@ -112,7 +137,7 @@ class NamePair(_Statement):
 
 
 @dataclass
-class AggregateBody(_Ast, ast_utils.AsList):
+class AggregateBody(_Statement, ast_utils.AsList):
     statements: List[NamePair]
 
     def __str__(self):
@@ -136,7 +161,7 @@ class Aggregate(_Statement):
 
 
 @dataclass
-class Derive(_Ast, ast_utils.AsList):
+class Derive(_Statement, ast_utils.AsList):
     fields: List[DeriveLine]
 
     def __str__(self):
@@ -171,33 +196,8 @@ class Take(_Statement):
         return f'take: {self.qty}'
 
 
-def get_op_str(op):
-    if op == 'gt':
-        return '>'
-    elif op == 'lt':
-        return '<'
-    elif op == 'eq':
-        return '='
-    elif op == 'neq':
-        return '!='
-    elif op == 'gte':
-        return '>='
-    elif op == 'sum':
-        return '+'
-    elif op == 'diff':
-        return '-'
-    elif op == 'product':
-        return '*'
-    elif op == 'division':
-        return '/'
-    elif op == 'lte':
-        return '<='
-    else:
-        return str(op)
-
-
 @dataclass
-class Filter(_Ast, ast_utils.AsList):
+class Filter(_Statement, ast_utils.AsList):
     fields: List[str]
 
     def to_sql(self):
@@ -225,7 +225,7 @@ class Filter(_Ast, ast_utils.AsList):
 
 
 @dataclass
-class Query(_Ast, ast_utils.AsList):
+class Query(_Statement, ast_utils.AsList):
     operations: List[_Statement]
 
 
@@ -309,12 +309,41 @@ class ToAst(Transformer):
         # Remove quotation marks
         return s[1:-1]
 
+    def FSTRING(self, s):
+        return s[2:-1]
+
 
 @enforce_types
 def read_file(filename: str, path: str = script_path) -> str:
     with open(path + filename, "r") as f:
         x = f.read()
     return x
+
+
+@enforce_types
+def get_op_str(op: str) -> str:
+    if op == 'gt':
+        return '>'
+    elif op == 'lt':
+        return '<'
+    elif op == 'eq':
+        return '='
+    elif op == 'neq':
+        return '!='
+    elif op == 'gte':
+        return '>='
+    elif op == 'sum':
+        return '+'
+    elif op == 'diff':
+        return '-'
+    elif op == 'product':
+        return '*'
+    elif op == 'division':
+        return '/'
+    elif op == 'lte':
+        return '<='
+    else:
+        return str(op)
 
 
 @enforce_types
@@ -344,7 +373,7 @@ def tree_to_str(tree: Union[Tree, Token, _Ast, str]) -> str:
     if isinstance(tree, Tree):
         # print(f'TREE={tree.data}')
         if tree.data == 'whole_line':
-            return tree.children[0].replace('\n', '').replace('\r', '')
+            return tree.children[0].replace('\n', '').replace('\r', '').rstrip('|')
         else:
             msg = str(f' {get_op_str(tree.data.value)} ').join([tree_to_str(c) for c in tree.children])
             return f'({msg})'
@@ -395,7 +424,22 @@ def tree_to_sql(tree: Start) -> str:
     if join:
         join_name = join.name
         join_short = f'{str(join.name)[0:3]}'
-        join_str = f'INNER JOIN {join.name} ON {from_short}.{join.value} = {join_short}.{join.right_id}'
+        join_value = replace_with_short_version(str(join.value), str(_from.name), from_short, str(join.name),
+                                                join_short)
+        right_id = replace_with_short_version(str(join.right_id), str(_from.name), from_short, str(join.name),
+                                              join_short)
+        if from_short in str(join_value):
+            on_statement = str(join_value)
+        else:
+            on_statement = str(from_short) + "." + str(join_value)
+
+        over_statement = ""
+        if join_short in right_id:
+            over_statement = str(right_id)
+        else:
+            over_statement = str(join_short) + "." + str(right_id)
+
+        join_str = f'JOIN {join.name} ON {on_statement} = {over_statement}'
         join_from_str = f',{join.name} {join_short}'
         select_str = replace_with_short_version(select_str, str(_from.name), from_short, str(join.name), join_short)
 
@@ -421,17 +465,16 @@ def tree_to_sql(tree: Start) -> str:
         # agg_str = f", {agg_str}"
         agg_str = replace_with_short_version(agg_str, str(_from.name), from_short, join_name, join_short)
 
-    filter = get_operation(ops.operations, prql.Filter)
+    filters = get_operation(ops.operations, prql.Filter, return_all=True)
     filter_str = ''
-    if filter:
-        clause = str(filter.to_sql()).encode('utf-8').decode('unicode_escape')
-        if clause[0] == '"':
-            clause = clause[1:]
-        if clause[-1] == '"':
-            clause = clause[:-1]
-        clause = replace_with_short_version(clause, str(_from.name), from_short, join_name, join_short)
-        filter_str = f'WHERE {clause}'
-
+    for filter in filters:
+        if filter:
+            rich.print(filter)
+            for f in filter.fields:
+                filter_str += str(f) + ' AND '
+    filter_str = filter_str.rstrip(' AND ')
+    if not filter_str:
+        filter_str = '1=1'
     sort = get_operation(ops.operations, prql.Sort, last_match=True)
     order_by = ''
     if sort:
@@ -455,7 +498,7 @@ def tree_to_sql(tree: Start) -> str:
         select_str = '*,'
     if select_str == '[]':
         select_str = '*'
-
-    sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_from_str} {join_str} {filter_str} {group_by_str} {order_by} {limit_str}'
+    print(f' here => {order_by}')
+    sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by} {limit_str}'
     print(sql)
     return sql
