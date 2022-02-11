@@ -2,7 +2,7 @@ import os
 import sys
 from dataclasses import dataclass
 from math import ceil
-from typing import List, Union, Type
+from typing import List, Union, Type, Any
 
 import rich
 from enforce_typing import enforce_types
@@ -19,7 +19,12 @@ class _Ast(ast_utils.Ast):
 
 
 class _Statement(_Ast):
-    pass
+
+    @enforce_types
+    def assign_field(self, clazz: Type, values: List[Any]):
+        for v in values:
+            if isinstance(v, clazz):
+                return v
 
 
 @dataclass
@@ -27,18 +32,6 @@ class Value(_Ast):
     value: str
 
     def __str__(self):
-        # if self.value.startswith('f"'):
-        #     return self.value[2:-1]
-        #
-        # if self.value.startswith("f'"):
-        #     return self.value[2:-1]
-        #
-        # if self.value.startswith('"'):
-        #     return self.value[1:-1]
-        #
-        # if self.value.startswith("'"):
-        #     return self.value[1:-1]
-
         return str(self.value)
 
 
@@ -52,7 +45,6 @@ class Name(_Ast, ast_utils.AsList):
 
 @dataclass
 class Expression(_Statement, ast_utils.AsList):
-    # Corresponds to expression in the grammar
     statements: List[_Statement]
 
     def __str__(self):
@@ -68,7 +60,6 @@ class Expression(_Statement, ast_utils.AsList):
 
 @dataclass
 class PipedCall(_Statement):
-    # Corresponds to set_var in the grammar
     parm1: Name
     func_body: Tree
 
@@ -78,7 +69,6 @@ class PipedCall(_Statement):
 
 @dataclass
 class Join(_Statement):
-    # Corresponds to join in the grammar
     name: Name
     left_id: Name
     right_id: Name = None
@@ -97,7 +87,6 @@ class SelectFields(_Statement, ast_utils.AsList):
 
 @dataclass
 class Select(_Statement):
-    # Corresponds to select in the grammar
     fields: SelectFields
 
     def __str__(self):
@@ -210,17 +199,6 @@ class Filter(_Statement, ast_utils.AsList):
             msg += f'\n\t\t{tree_to_str(f)}'
         return msg.replace("\n", "").replace("\r", "").replace("\t", "")
 
-    # def __str__(self):
-    #     ret = 'filter:\n\t\t'
-    #     for idx, f in enumerate(self.fields):
-    #         if isinstance(f, Expression):
-    #             op_tree = f.statements[0]
-    #             ret += f'{tree_to_str(op_tree)}\n\t\t'
-    #
-    #         else:
-    #             ret += f'filter: {f},{type(f)}'
-    #     return ret[0:-3]  # cut out the last newline
-
     def __str__(self):
         msg = 'filter:'
         for idx, f in enumerate(self.fields):
@@ -235,22 +213,16 @@ class Pipes(_Statement, ast_utils.AsList):
 
 @dataclass
 class From(_Statement):
-    # Corresponds to from in the grammar
     name: str
     pipes: Pipes = None
     join: Join = None
 
     def __init__(self, name, pipes=None, join=None):
-        # This is dumb as shit but I cant figure out how to tell lark to use named parameters and the join is optional :shrug:
         self.name = name
-        if isinstance(pipes, Pipes):
-            self.pipes = pipes
-        if isinstance(join, Pipes):
-            self.pipes = join
-        if isinstance(pipes, Join):
-            self.join = pipes
-        if isinstance(join, Join):
-            self.join = join
+        values = [pipes, join]
+
+        self.pipes = self.assign_field(Pipes, values)
+        self.join = self.assign_field(Join, values)
 
     def get_pipes(self):
         return self.pipes
@@ -286,12 +258,19 @@ class FuncDef(_Statement):
 
 
 @dataclass
+class ValueDef(_Statement):
+    name: Name
+    func_args: FuncArgs
+    two: str
+
+
+@dataclass
 class FuncBody(_Statement, ast_utils.AsList):
     fields: List[str]
 
 
 @dataclass
-class Cte(_Statement):
+class WithDef(_Statement):
     name: Name
     _from: From
 
@@ -302,28 +281,23 @@ class Cte(_Statement):
 @dataclass
 class Start(_Statement):
     # Corresponds to start in the grammar
-    cte: Cte = None
+    with_def: WithDef = None
     _from: From = None
     value_def: str = None
     func_def: str = None
 
-    def __init__(self, cte=None, _from=None):
-        self.cte = cte
-        # So ghetto here, see From for why
-        if isinstance(_from, From):
-            self._from = _from
-        if isinstance(cte, From):
-            self._from = cte
-        if isinstance(_from, Cte):
-            self.cte = _from
-        if isinstance(cte, Cte):
-            self.cte = cte
+    def __init__(self, with_def=None, _from=None, value_def=None, func_def=None):
+        values = [with_def, _from, value_def, func_def]
+        self.with_def = self.assign_field(WithDef, values)
+        self._from = self.assign_field(From, values)
+        self.value_def = self.assign_field(ValueDef, values)
+        self.func_def = self.assign_field(FuncDef, values)
 
     def get_from(self):
         return self._from
 
     def get_cte(self):
-        return self.cte
+        return self.with_def
 
 
 class ToAst(Transformer):

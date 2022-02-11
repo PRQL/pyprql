@@ -1,7 +1,7 @@
-    start: (cte)? (value_def*) (func_def)* from
+    start: (with_def)? (value_def*) (func_def)* from
 
     value_def: "value" NAME "=" "(" from ")"
-    cte: "table" NAME "=" "(" from ")"
+    with_def: "table" NAME "=" "(" from ")"
     from: "from" NAME "|"? (join)? "|"? pipes
 
     pipes.2: ((select | derive | filter | sort | take| aggregate) ("|")?)*
