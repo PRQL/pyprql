@@ -7,6 +7,5 @@ func min column table = (
 )
 from facts
 select name
-#filter "population = (SELECT MIN(population) FROM facts)"
 filter population = population | min facts
-take 15
+take 3

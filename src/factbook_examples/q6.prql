@@ -1,5 +1,7 @@
 #SELECT cities.name            as city,
 #       facts.name             as country,
+#       facts.area             as country_area,
+#       facts.birth_rate - facts.death_rate as population_growth,
 #       SUM(facts.population)  as country_pop,
 #       SUM(cities.population) as city_pop
 #FROM facts
@@ -8,15 +10,18 @@
 #ORDER BY city_pop DESC
 #LIMIT 15
 
+
 from facts
 join cities [id=facts_id]
 derive [
     city: "cities.name",
-    country: "facts.name"
+    country: "facts.name",
+    country_area: "facts.area",
+    population_growth: "facts.birth_rate - facts.death_rate",
 ]
 aggregate by:[code] [
     country_pop: "SUM(facts.population)",
     city_pop: "SUM(cities.population)"
 ]
 sort "city_pop desc"
-take 15
+take 6

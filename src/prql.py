@@ -228,7 +228,7 @@ class Filter(_Statement, ast_utils.AsList):
 
 
 @dataclass
-class Query(_Statement, ast_utils.AsList):
+class Pipes(_Statement, ast_utils.AsList):
     operations: List[_Statement]
 
 
@@ -236,23 +236,23 @@ class Query(_Statement, ast_utils.AsList):
 class From(_Statement):
     # Corresponds to from in the grammar
     name: str
-    query: Query = None
+    pipes: Pipes = None
     join: Join = None
 
-    def __init__(self, name, query=None, join=None):
+    def __init__(self, name, pipes=None, join=None):
         # This is dumb as shit but I cant figure out how to tell lark to use named parameters and the join is optional :shrug:
         self.name = name
-        if isinstance(query, Query):
-            self.query = query
-        if isinstance(join, Query):
-            self.query = join
-        if isinstance(query, Join):
-            self.join = query
+        if isinstance(pipes, Pipes):
+            self.pipes = pipes
+        if isinstance(join, Pipes):
+            self.pipes = join
+        if isinstance(pipes, Join):
+            self.join = pipes
         if isinstance(join, Join):
             self.join = join
 
-    def get_query(self):
-        return self.query
+    def get_pipes(self):
+        return self.pipes
 
     def get_join(self):
         return self.join
@@ -264,7 +264,7 @@ class From(_Statement):
         join = self.get_join()
         if join is not None:
             ret += f'\t{join}\n'
-        for op in self.get_query().operations:
+        for op in self.get_pipes().operations:
             ret += f'\t{str(op)}\n'
         return ret
 
@@ -468,7 +468,7 @@ class SQLGenerator(object):
 
         from_str = self.from_long + ' ' + self.from_short
 
-        ops = self._from.get_query()
+        ops = self._from.get_pipes()
         selects = get_operation(ops.operations, prql.Select, return_all=True)
         agg = get_operation(ops.operations, prql.Aggregate)
         take = get_operation(ops.operations, prql.Take)
@@ -484,8 +484,7 @@ class SQLGenerator(object):
 
         join = self._join
         if join:
-            if verbose:
-                rich.print(join)
+
             left_id = self.replace_tables(str(join.left_id))
             right_id = self.replace_tables(str(join.right_id))
             join_short = self.join_short
@@ -500,8 +499,6 @@ class SQLGenerator(object):
 
         if agg:
 
-            if verbose:
-                rich.print(agg)
 
             if agg.group_by is not None:
                 group_by_str = f'GROUP BY {self.replace_tables(str(agg.group_by))}'
@@ -509,8 +506,8 @@ class SQLGenerator(object):
             for i in range(0, len(agg.aggregate_body.statements), 2):
                 name = agg.aggregate_body.statements[i]
                 if i + 1 < len(agg.aggregate_body.statements):
-                    query = agg.aggregate_body.statements[i + 1]
-                    agg_str += f", {query} as {name}"
+                    pipes = agg.aggregate_body.statements[i + 1]
+                    agg_str += f", {pipes} as {name}"
                 else:
                     agg_str += f", {name}"
             agg_str = self.replace_tables(agg_str)
@@ -519,8 +516,6 @@ class SQLGenerator(object):
             limit_str = f'LIMIT {take.qty}'
 
         if filters:
-            if verbose:
-                rich.print(filters)
 
             for filter in filters:
                 if filter:
@@ -529,8 +524,6 @@ class SQLGenerator(object):
             filter_str = filter_str.rstrip(' AND ')
 
         if derives:
-            if verbose:
-                rich.print(derives)
 
             for d in derives:
                 for line in d.fields:
@@ -559,7 +552,7 @@ class SQLGenerator(object):
 #     from_str = f'{_from.name}'
 #     from_short = from_str[0:3]
 #     from_str += f' {from_short}'
-#     ops = _from.get_query()
+#     ops = _from.get_pipes()
 #     select = get_operation(ops.operations, prql.Select)
 #     select_str = str(select)
 #     join = _from.get_join()
@@ -606,8 +599,8 @@ class SQLGenerator(object):
 #         for i in range(0, len(agg.aggregate_body.statements), 2):
 #             name = agg.aggregate_body.statements[i]
 #             if i + 1 < len(agg.aggregate_body.statements):
-#                 query = agg.aggregate_body.statements[i + 1]
-#                 agg_str += f", {query} as {name}"
+#                 pipes = agg.aggregate_body.statements[i + 1]
+#                 agg_str += f", {pipes} as {name}"
 #             else:
 #                 agg_str += f", {name}"
 #         # agg_str = f", {agg_str}"

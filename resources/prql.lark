@@ -2,9 +2,9 @@
 
     value_def: "value" NAME "=" "(" from ")"
     cte: "table" NAME "=" "(" from ")"
-    from: "from" NAME "|"? (join)? "|"? query
+    from: "from" NAME "|"? (join)? "|"? pipes
 
-    query.2: ((select | derive | filter | sort | take| aggregate) ("|")?)*
+    pipes.2: ((select | derive | filter | sort | take| aggregate) ("|")?)*
     join: ("join"|"left_join")+ name "[" name ("=" name)? "]"
 
     aggregate: "aggregate" ("by" ":"? "[" group_by"]")? "[" aggregate_body "]"

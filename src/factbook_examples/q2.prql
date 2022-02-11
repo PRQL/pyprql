@@ -1,4 +1,2 @@
 #SELECT MIN(population) as min_population FROM facts;
-from facts
-derive min_population: "MIN(population)"
-take 5
+from facts | derive [ min_population: "MIN(population)" ] | take 4
