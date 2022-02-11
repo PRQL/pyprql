@@ -31,7 +31,7 @@
     func_args: ((NAME " ")* NAME)*
     func_body: _line ("," _line)*
     func_call: "count" | NAME value
-    piped_call: NAME "|" func_call
+    piped_call: NAME ("." NAME)* "|" func_call
 
     eq: gt | gt "=" gt
     ?gt: sum | sum ">" sum | lt | gte | lte

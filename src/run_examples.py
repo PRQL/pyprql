@@ -3,16 +3,16 @@ import sqlite3
 from prql import parse, read_file, script_path, SQLGenerator
 
 if __name__ == '__main__':
-    base_path = '/factbook_examples'
+    base_path = 'examples'
     file_names = [
-        f'/{base_path}/q1.prql',
-        f'/{base_path}/q2.prql',
+        #f'/{base_path}/q1.prql',
+        #f'/{base_path}/q2.prql',
         f'/{base_path}/q3.prql',
-        f'/{base_path}/q3b.prql',
-        f'/{base_path}/q4.prql',
-        f'/{base_path}/q5.prql',
-        f'/{base_path}/q6.prql'
-
+        #f'/{base_path}/q3b.prql',
+        #f'/{base_path}/q4.prql',
+        #f'/{base_path}/q5.prql',
+        #f'/{base_path}/q6.prql',
+        #f'/{base_path}/cte1.prql'
     ]
 
     expected_results = {
@@ -25,8 +25,8 @@ if __name__ == '__main__':
         f'/{base_path}/q6.prql': 6
     }
 
-    db_path = script_path + f'{base_path}/factbook.db'
-
+    db_path = script_path + f'/{base_path}/factbook.db'
+    print(f'Using database: {db_path}')
     con = sqlite3.connect(db_path)
     cur = con.cursor()
 
@@ -38,8 +38,8 @@ if __name__ == '__main__':
             tree = parse(text)
             sql_generator = SQLGenerator(tree)
             try:
-                sql = sql_generator.generate(verbose=False)
-                print(f'Result: \n{sql}\n' + '~' * 80 + '\n')
+                sql = sql_generator.generate(verbose=True)
+                print(f'PRQL->SQL: {sql}\n' + '~' * 80 + '\n')
 
                 rows = cur.execute(sql)
                 columns = [d[0] for d in rows.description]

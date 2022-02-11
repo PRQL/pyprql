@@ -10,8 +10,6 @@ from icecream import ic
 from lark import Lark, ast_utils, Transformer, Token
 from lark.tree import Tree
 
-import prql
-
 this_module = sys.modules[__name__]
 script_path = os.path.dirname(__file__)
 
@@ -69,10 +67,13 @@ class Expression(_Statement, ast_utils.AsList):
 
 
 @dataclass
-class SetVar(_Statement):
+class PipedCall(_Statement):
     # Corresponds to set_var in the grammar
-    name: str
-    value: Value
+    parm1: Name
+    func_body: Tree
+
+    def __str__(self):
+        return tree_to_sql(self.func_body)
 
 
 @dataclass
@@ -270,6 +271,26 @@ class From(_Statement):
 
 
 @dataclass
+class FuncArgs(_Statement, ast_utils.AsList):
+    fields: List[str] = None
+
+    def __str__(self):
+        return ",".join([str(x) for x in {self.fields}])
+
+
+@dataclass
+class FuncDef(_Statement):
+    name: Name
+    func_args: FuncArgs
+    two: str
+
+
+@dataclass
+class FuncBody(_Statement, ast_utils.AsList):
+    fields: List[str]
+
+
+@dataclass
 class Cte(_Statement):
     name: Name
     _from: From
@@ -283,6 +304,8 @@ class Start(_Statement):
     # Corresponds to start in the grammar
     cte: Cte = None
     _from: From = None
+    value_def: str = None
+    func_def: str = None
 
     def __init__(self, cte=None, _from=None):
         self.cte = cte
@@ -295,9 +318,6 @@ class Start(_Statement):
             self.cte = _from
         if isinstance(cte, Cte):
             self.cte = cte
-
-        if not isinstance(self.cte, Cte):
-            self.cte = None
 
     def get_from(self):
         return self._from
@@ -469,11 +489,11 @@ class SQLGenerator(object):
         from_str = self.from_long + ' ' + self.from_short
 
         ops = self._from.get_pipes()
-        selects = get_operation(ops.operations, prql.Select, return_all=True)
-        agg = get_operation(ops.operations, prql.Aggregate)
-        take = get_operation(ops.operations, prql.Take)
-        filters = get_operation(ops.operations, prql.Filter, return_all=True)
-        derives = get_operation(ops.operations, prql.Derive, return_all=True)
+        selects = get_operation(ops.operations, Select, return_all=True)
+        agg = get_operation(ops.operations, Aggregate)
+        take = get_operation(ops.operations, Take)
+        filters = get_operation(ops.operations, Filter, return_all=True)
+        derives = get_operation(ops.operations, Derive, return_all=True)
 
         if verbose:
             rich.print(self.tree)
@@ -484,7 +504,6 @@ class SQLGenerator(object):
 
         join = self._join
         if join:
-
             left_id = self.replace_tables(str(join.left_id))
             right_id = self.replace_tables(str(join.right_id))
             join_short = self.join_short
@@ -498,7 +517,6 @@ class SQLGenerator(object):
             join_str = f'JOIN {join.name} {join_short} ON {on_statement} = {over_statement}'
 
         if agg:
-
 
             if agg.group_by is not None:
                 group_by_str = f'GROUP BY {self.replace_tables(str(agg.group_by))}'
@@ -553,7 +571,7 @@ class SQLGenerator(object):
 #     from_short = from_str[0:3]
 #     from_str += f' {from_short}'
 #     ops = _from.get_pipes()
-#     select = get_operation(ops.operations, prql.Select)
+#     select = get_operation(ops.operations, Select)
 #     select_str = str(select)
 #     join = _from.get_join()
 #     join_from_str = ''
@@ -582,11 +600,11 @@ class SQLGenerator(object):
 #         join_from_str = f''  # ,{join.name} {join_short}'
 #         select_str = replace_with_short_version(select_str, str(_from.name), from_short, str(join.name), join_short)
 #
-#     agg = get_operation(ops.operations, prql.Aggregate)
+#     agg = get_operation(ops.operations, Aggregate)
 #     group_by_str = ''
 #     agg_str = ''
 #     limit_str = ''
-#     take = get_operation(ops.operations, prql.Take)
+#     take = get_operation(ops.operations, Take)
 #     if take:
 #         limit_str = f'LIMIT {take.qty}'
 #     if agg:
@@ -606,7 +624,7 @@ class SQLGenerator(object):
 #         # agg_str = f", {agg_str}"
 #         agg_str = replace_with_short_version(agg_str, str(_from.name), from_short, join_name, join_short)
 #
-#     filters = get_operation(ops.operations, prql.Filter, return_all=True)
+#     filters = get_operation(ops.operations, Filter, return_all=True)
 #     filter_str = ''
 #     for filter in filters:
 #         if filter:
@@ -616,13 +634,13 @@ class SQLGenerator(object):
 #     filter_str = filter_str.rstrip(' AND ')
 #     if not filter_str:
 #         filter_str = '1=1'
-#     sort = get_operation(ops.operations, prql.Sort, last_match=True)
+#     sort = get_operation(ops.operations, Sort, last_match=True)
 #     order_by = ''
 #     if sort:
 #         order_by = f'ORDER BY {str(tree_to_str(sort.name))}'
 #         order_by = replace_with_short_version(order_by, str(_from.name), from_short, join_name, join_short)
 #
-#     derives = get_operation(ops.operations, prql.Derive, return_all=True)
+#     derives = get_operation(ops.operations, Derive, return_all=True)
 #     derives_str = ''
 #     # rich.print(derives)
 #     if derives:
@@ -646,5 +664,7 @@ class SQLGenerator(object):
 #     return sql
 
 @enforce_types
-def tree_to_sql(tree: Start) -> str:
-    return SQLGenerator(tree).generate()
+def tree_to_sql(tree: Tree) -> str:
+    if tree.data == 'func_call':
+        return "YEAH"
+    return "TREE_NOT_FOUND"
