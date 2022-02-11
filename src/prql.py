@@ -1,10 +1,12 @@
 import os
 import sys
 from dataclasses import dataclass
+from math import ceil
 from typing import List, Union, Type
 
 import rich
 from enforce_typing import enforce_types
+from icecream import ic
 from lark import Lark, ast_utils, Transformer, Token
 from lark.tree import Tree
 
@@ -77,11 +79,11 @@ class SetVar(_Statement):
 class Join(_Statement):
     # Corresponds to join in the grammar
     name: Name
-    value: Name
+    left_id: Name
     right_id: Name = None
 
     def __str__(self):
-        return f"join: {self.name} on {self.value} {' = ' + self.right_id.name if self.right_id else ''}"
+        return f"join: {self.name} on {self.left_id} {' = ' + self.right_id.name if self.right_id else ''}"
 
 
 @dataclass()
@@ -199,6 +201,7 @@ class Take(_Statement):
 @dataclass
 class Filter(_Statement, ast_utils.AsList):
     fields: List[str]
+    name: str = "filter"
 
     def to_sql(self):
         msg = ''
@@ -312,6 +315,12 @@ class ToAst(Transformer):
     def FSTRING(self, s):
         return s[2:-1]
 
+    def ESCAPED_STRING(self, s):
+        return s[1:-1].replace('\\"', '"').replace("\\'", "'")
+
+    def NEWLINE(self, s):
+        return s
+
 
 @enforce_types
 def read_file(filename: str, path: str = script_path) -> str:
@@ -347,7 +356,8 @@ def get_op_str(op: str) -> str:
 
 
 @enforce_types
-def parse(text: str) -> Start:
+def parse(_text: str) -> Start:
+    text = _text + '\n'
     parser = Lark(read_file('/../resources/prql.lark'), start="start", parser="lalr", transformer=ToAst())
     tree = parser.parse(text)
     transformer = ast_utils.create_transformer(this_module, ToAst())
@@ -381,7 +391,10 @@ def tree_to_str(tree: Union[Tree, Token, _Ast, str]) -> str:
         return str(tree)
 
 
-def get_operation(ops: List[_Statement], class_type: Type[_Statement], last_match: bool = False,
+@enforce_types
+def get_operation(ops: List[_Statement],
+                  class_type: Type[_Statement],
+                  last_match: bool = False,
                   return_all: bool = False) -> List[_Statement]:
     l = ops
     ret = []
@@ -403,102 +416,242 @@ def replace_with_short_version(s, from_long, from_short, join_long, join_short):
     return s
 
 
+def shorten(s, n=4):
+    l = len(s)
+    c = ceil(l / n)
+    return s[0:l:c]
+
+
+class SQLGenerator(object):
+
+    @enforce_types
+    def __init__(self, tree: Start):
+        self.tree = tree
+        self.join_long = None
+        self.join_short = None
+        self.from_long = None
+        self.from_short = None
+
+        self._from = tree.get_from()
+        self._join = self._from.get_join()
+
+        self.from_long = str(self._from.name)
+        self.from_short = shorten(self.from_long)
+        if self._join:
+            self.join_long = str(self._join.name)
+            self.join_short = shorten(self.join_long)
+
+    @enforce_types
+    def replace_tables(self, s: str) -> str:
+        s = s.replace(f'{self.from_long}.', f'{self.from_short}.')
+        if self.join_long:
+            s = s.replace(f'{self.join_long}.', f'{self.join_short}.')
+        return s
+
+    @enforce_types
+    def generate(self, verbose: bool = True) -> str:
+        # The SQL template is in the form
+        # SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by} {limit_str}'
+
+        # We will be creating these strings to form the final SQL,
+        # We will do it in order so that we can reference them
+        select_str = ''
+        agg_str = ''
+        derives_str = ''
+        from_str = ''
+        join_str = ''
+        filter_str = ''
+        group_by_str = ''
+        order_by = ''
+        limit_str = ''
+        ###
+
+        from_str = self.from_long + ' ' + self.from_short
+
+        ops = self._from.get_query()
+        selects = get_operation(ops.operations, prql.Select, return_all=True)
+        agg = get_operation(ops.operations, prql.Aggregate)
+        take = get_operation(ops.operations, prql.Take)
+        filters = get_operation(ops.operations, prql.Filter, return_all=True)
+        derives = get_operation(ops.operations, prql.Derive, return_all=True)
+
+        if verbose:
+            rich.print(self.tree)
+            ic(selects, agg, take, filters, derives)
+
+        for select in selects:
+            select_str += self.replace_tables(str(select))
+
+        join = self._join
+        if join:
+            if verbose:
+                rich.print(join)
+            left_id = self.replace_tables(str(join.left_id))
+            right_id = self.replace_tables(str(join.right_id))
+            join_short = self.join_short
+
+            # left_id = left_id.replace(self.from_long, '').replace(self.from_short, '')
+            on_statement = self.from_short + "." + left_id
+
+            # right_id = right_id.replace(self.from_long, '').replace(self.from_short, '')
+            over_statement = join_short + "." + right_id
+
+            join_str = f'JOIN {join.name} {join_short} ON {on_statement} = {over_statement}'
+
+        if agg:
+
+            if verbose:
+                rich.print(agg)
+
+            if agg.group_by is not None:
+                group_by_str = f'GROUP BY {self.replace_tables(str(agg.group_by))}'
+
+            for i in range(0, len(agg.aggregate_body.statements), 2):
+                name = agg.aggregate_body.statements[i]
+                if i + 1 < len(agg.aggregate_body.statements):
+                    query = agg.aggregate_body.statements[i + 1]
+                    agg_str += f", {query} as {name}"
+                else:
+                    agg_str += f", {name}"
+            agg_str = self.replace_tables(agg_str)
+
+        if take:
+            limit_str = f'LIMIT {take.qty}'
+
+        if filters:
+            if verbose:
+                rich.print(filters)
+
+            for filter in filters:
+                if filter:
+                    for f in filter.fields:
+                        filter_str += str(f) + ' AND '
+            filter_str = filter_str.rstrip(' AND ')
+
+        if derives:
+            if verbose:
+                rich.print(derives)
+
+            for d in derives:
+                for line in d.fields:
+                    derives_str += f'{self.replace_tables(str(line.expression))} as {line.name} ,'
+            derives_str = "," + derives_str.rstrip(",")
+
+        if not select_str:
+            select_str = '*'
+        if not filter_str:
+            filter_str = '1=1'
+
+        sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by} {limit_str}'
+        # print(sql)
+        return sql
+
+
+#
+# @enforce_types
+# def tree_to_sql(tree: Start) -> str:
+#     # return tree_to_str(tree)
+#     # ret = str(tree)
+#     # return ret
+#     # first get the select fields
+#     _from = tree.get_from()
+#
+#     from_str = f'{_from.name}'
+#     from_short = from_str[0:3]
+#     from_str += f' {from_short}'
+#     ops = _from.get_query()
+#     select = get_operation(ops.operations, prql.Select)
+#     select_str = str(select)
+#     join = _from.get_join()
+#     join_from_str = ''
+#     join_str = ''
+#     join_name = ''
+#     join_short = ''
+#     if join:
+#         join_name = join.name
+#         join_short = f'{str(join.name)[0:3]}'
+#         join_value = replace_with_short_version(str(join.left_id), str(_from.name), from_short, str(join.name),
+#                                                 join_short)
+#         right_id = replace_with_short_version(str(join.right_id), str(_from.name), from_short, str(join.name),
+#                                               join_short)
+#         if from_short in str(join_value):
+#             on_statement = str(join_value)
+#         else:
+#             on_statement = str(from_short) + "." + str(join_value)
+#
+#         over_statement = ""
+#         if join_short in right_id:
+#             over_statement = str(right_id)
+#         else:
+#             over_statement = str(join_short) + "." + str(right_id)
+#
+#         join_str = f'JOIN {join.name} {join_short} ON {on_statement} = {over_statement}'
+#         join_from_str = f''  # ,{join.name} {join_short}'
+#         select_str = replace_with_short_version(select_str, str(_from.name), from_short, str(join.name), join_short)
+#
+#     agg = get_operation(ops.operations, prql.Aggregate)
+#     group_by_str = ''
+#     agg_str = ''
+#     limit_str = ''
+#     take = get_operation(ops.operations, prql.Take)
+#     if take:
+#         limit_str = f'LIMIT {take.qty}'
+#     if agg:
+#         group_by_str = ''  #
+#         if agg.group_by is not None:
+#             group_by_str = f'GROUP BY {agg.group_by}'
+#         group_by_str = replace_with_short_version(group_by_str, str(_from.name), from_short, join_name, join_short)
+#
+#         # rich.print(agg)
+#         for i in range(0, len(agg.aggregate_body.statements), 2):
+#             name = agg.aggregate_body.statements[i]
+#             if i + 1 < len(agg.aggregate_body.statements):
+#                 query = agg.aggregate_body.statements[i + 1]
+#                 agg_str += f", {query} as {name}"
+#             else:
+#                 agg_str += f", {name}"
+#         # agg_str = f", {agg_str}"
+#         agg_str = replace_with_short_version(agg_str, str(_from.name), from_short, join_name, join_short)
+#
+#     filters = get_operation(ops.operations, prql.Filter, return_all=True)
+#     filter_str = ''
+#     for filter in filters:
+#         if filter:
+#             rich.print(filter)
+#             for f in filter.fields:
+#                 filter_str += str(f) + ' AND '
+#     filter_str = filter_str.rstrip(' AND ')
+#     if not filter_str:
+#         filter_str = '1=1'
+#     sort = get_operation(ops.operations, prql.Sort, last_match=True)
+#     order_by = ''
+#     if sort:
+#         order_by = f'ORDER BY {str(tree_to_str(sort.name))}'
+#         order_by = replace_with_short_version(order_by, str(_from.name), from_short, join_name, join_short)
+#
+#     derives = get_operation(ops.operations, prql.Derive, return_all=True)
+#     derives_str = ''
+#     # rich.print(derives)
+#     if derives:
+#         for d in derives:
+#             for line in d.fields:
+#                 derives_str += f'{line.expression} as {line.name} ,'
+#         # derives_str = f'{derives}'
+#         derives_str = "," + derives_str.rstrip(",")
+#     if select_str is None or select_str == 'None' or not select_str or select_str == '[]':
+#         select_str = '*,'
+#     # if select_str == '[]' and agg_str:
+#     #     select_str = ''
+#     # if select_str == '[]' and derives_str:
+#     #     select_str = '*,'
+#     # if select_str == '[]':
+#     #     select_str = '*'
+#     # if agg_str:
+#     select_str = select_str.lstrip(",").rstrip(",")
+#     sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by} {limit_str}'
+#     print(sql)
+#     return sql
+
 @enforce_types
 def tree_to_sql(tree: Start) -> str:
-    # return tree_to_str(tree)
-    # ret = str(tree)
-    # return ret
-    # first get the select fields
-    _from = tree.get_from()
-    from_str = f'{_from.name}'
-    from_short = from_str[0:3]
-    from_str += f' {from_short}'
-    ops = _from.get_query()
-    select = get_operation(ops.operations, prql.Select)
-    select_str = str(select)
-    join = _from.get_join()
-    join_from_str = ''
-    join_str = ''
-    join_name = ''
-    join_short = ''
-    if join:
-        join_name = join.name
-        join_short = f'{str(join.name)[0:3]}'
-        join_value = replace_with_short_version(str(join.value), str(_from.name), from_short, str(join.name),
-                                                join_short)
-        right_id = replace_with_short_version(str(join.right_id), str(_from.name), from_short, str(join.name),
-                                              join_short)
-        if from_short in str(join_value):
-            on_statement = str(join_value)
-        else:
-            on_statement = str(from_short) + "." + str(join_value)
-
-        over_statement = ""
-        if join_short in right_id:
-            over_statement = str(right_id)
-        else:
-            over_statement = str(join_short) + "." + str(right_id)
-
-        join_str = f'JOIN {join.name} ON {on_statement} = {over_statement}'
-        join_from_str = f',{join.name} {join_short}'
-        select_str = replace_with_short_version(select_str, str(_from.name), from_short, str(join.name), join_short)
-
-    agg = get_operation(ops.operations, prql.Aggregate)
-    group_by_str = ''
-    agg_str = ''
-    limit_str = ''
-    take = get_operation(ops.operations, prql.Take)
-    if take:
-        limit_str = f'LIMIT {take.qty}'
-    if agg:
-        group_by_str = f'GROUP BY {agg.group_by}'
-        group_by_str = replace_with_short_version(group_by_str, str(_from.name), from_short, join_name, join_short)
-
-        # rich.print(agg)
-        for i in range(0, len(agg.aggregate_body.statements), 2):
-            name = agg.aggregate_body.statements[i]
-            if i + 1 < len(agg.aggregate_body.statements):
-                query = agg.aggregate_body.statements[i + 1]
-                agg_str += f", {query} as {name}"
-            else:
-                agg_str += f", {name}"
-        # agg_str = f", {agg_str}"
-        agg_str = replace_with_short_version(agg_str, str(_from.name), from_short, join_name, join_short)
-
-    filters = get_operation(ops.operations, prql.Filter, return_all=True)
-    filter_str = ''
-    for filter in filters:
-        if filter:
-            rich.print(filter)
-            for f in filter.fields:
-                filter_str += str(f) + ' AND '
-    filter_str = filter_str.rstrip(' AND ')
-    if not filter_str:
-        filter_str = '1=1'
-    sort = get_operation(ops.operations, prql.Sort, last_match=True)
-    order_by = ''
-    if sort:
-        order_by = f'ORDER BY {str(tree_to_str(sort.name))}'
-        order_by = replace_with_short_version(order_by, str(_from.name), from_short, join_name, join_short)
-
-    derives = get_operation(ops.operations, prql.Derive, return_all=True)
-    derives_str = ''
-    # rich.print(derives)
-    if derives:
-        for d in derives:
-            for line in d.fields:
-                derives_str += f'{line.expression} as {line.name} ,'
-        # derives_str = f'{derives}'
-        derives_str = derives_str.rstrip(",")
-    if select_str is None or select_str == 'None' or not select_str:
-        select_str = '*'
-    if select_str == '[]' and agg_str:
-        select_str = ''
-    if select_str == '[]' and derives_str:
-        select_str = '*,'
-    if select_str == '[]':
-        select_str = '*'
-    print(f' here => {order_by}')
-    sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by} {limit_str}'
-    print(sql)
-    return sql
+    return SQLGenerator(tree).generate()

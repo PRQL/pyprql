@@ -9,7 +9,5 @@ value min_pop = (
 
 from facts
 select name
-filter [
-    population = min_pop
-    'code != "aa"'
-]
+filter "code != \"aa\""
+take 5

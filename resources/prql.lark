@@ -4,7 +4,7 @@
     cte: "table" NAME "=" "(" from ")"
     from: "from" NAME "|"? (join)? "|"? query
 
-    query: (select | derive | filter | sort | take| aggregate)*
+    query.2: ((select | derive | filter | sort | take| aggregate) ("|")?)*
     join: ("join"|"left_join")+ name "[" name ("=" name)? "]"
 
     aggregate: "aggregate" ("by" ":"? "[" group_by"]")? "[" aggregate_body "]"
@@ -14,9 +14,9 @@
     _line: (STRING|FSTRING|func_call)
     take: "take" INT
 
-    filter: ("filter" (expression|ESCAPED_STRING)* )+ | ("filter" "[" (expression|ESCAPED_STRING)* "]")+
+    filter: "filter" (ESCAPED_STRING|expression)?
     whole_line: /(.*?)[|\n\r]/
-    sort: "sort" whole_line|STRING|FSTRING
+    sort: "sort" (ESCAPED_STRING|name)
 
 
     select: ("select" select_fields)+
@@ -25,12 +25,13 @@
     derive: ("derive" ( "[" derive_line+ "]" | derive_line ))+
     derive_line: name ":" expression (",")?
 
-    expression:  eq ( "|" eq)*
+    expression:  eq
 
     func_def: "func" NAME (func_args)? "=" "(" func_body ")"
     func_args: ((NAME " ")* NAME)*
     func_body: _line ("," _line)*
-    func_call: "count" | NAME NAME
+    func_call: "count" | NAME value
+    piped_call: NAME "|" func_call
 
     eq: gt | gt "=" gt
     ?gt: sum | sum ">" sum | lt | gte | lte
@@ -41,7 +42,7 @@
     ?diff: sum "-" product
     ?product: atom | product "*" atom | division
     ?division: product "/" atom
-    ?atom: "|" expression | "(" expression ")" | value
+    ?atom: "(" expression ")" | value | piped_call
 
     value: NAME | STRING | NUMBER | SIGNED_NUMBER | FLOAT | SIGNED_FLOAT | FSTRING
     name: NAME ( "." NAME)*

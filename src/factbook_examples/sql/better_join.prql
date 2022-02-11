@@ -1,26 +1,22 @@
-SELECT cities.name            as city,
-       facts.name             as country,
-       SUM(facts.population)  as country_pop,
-       SUM(cities.population) as city_pop
-FROM facts
-         INNER JOIN cities on cities.facts_id = facts.id
-GROUP BY code
-ORDER BY city_pop DESC
-LIMIT 15
-
-func SUM s [
-    f"SUM(s)"
-]
+#SELECT cities.name            as city,
+#       facts.name             as country,
+#       SUM(facts.population)  as country_pop,
+#       SUM(cities.population) as city_pop
+#FROM facts
+#         INNER JOIN cities on cities.facts_id = facts.id
+#GROUP BY code
+#ORDER BY city_pop DESC
+#LIMIT 15
 
 from facts
-join cities on [id,facts_id]
+join cities [id=facts_id]
 derive [
-    city: cities.name,
-    country: facts.name
+    city: "cities.name",
+    country: "facts.name"
 ]
 aggregate by:[code] [
-    country_pop: "SUM(facts.population),
-    city_pop: cities.population | SUM
+    country_pop: "SUM(facts.population)",
+    city_pop: "SUM(cities.population)"
 ]
-sort city_pop desc
+sort "city_pop desc"
 take 15

@@ -1,9 +1,4 @@
-#SELECT MIN(population) as min_population
-#FROM facts;
-
+#SELECT MIN(population) as min_population FROM facts;
 from facts
-derive [
-    min_population: "MIN(population)",
-    max_population: "MAX(population)"
-]
+derive min_population: "MIN(population)"
 take 5
