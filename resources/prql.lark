@@ -1,5 +1,6 @@
-    start: (with_def)? (value_def*) (func_def)* from
+    start: (with_def)* (value_defs)* (func_def)* from
 
+    value_defs: (value_def)*
     value_def: "value" NAME "=" "(" from ")"
     with_def: "table" NAME "=" "(" from ")"
     from: "from" NAME "|"? (join)? "|"? pipes

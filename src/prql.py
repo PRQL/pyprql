@@ -18,7 +18,24 @@ class _Ast(ast_utils.Ast):
     pass
 
 
+@enforce_types
+def get_leaf(start, name):
+    assert (isinstance(start, Start))
+    start.value_defs
+
+
 class _Statement(_Ast):
+
+    @enforce_types
+    def replace_variables(self, s, start):
+        for idx, v in enumerate(start.value_defs.fields):
+            if str(v.name) == str(s):
+                if isinstance(v, ValueDef):
+                    return str(v.value_body)
+            # print(f'f-->{v}')
+        # print('here')
+
+        # print(f'replacing {type(start)}')
 
     @enforce_types
     def assign_field(self, clazz: Type, values: List[Any]):
@@ -62,9 +79,6 @@ class Expression(_Statement, ast_utils.AsList):
 class PipedCall(_Statement):
     parm1: Name
     func_body: Tree
-
-    def __str__(self):
-        return tree_to_sql(self.func_body)
 
 
 @dataclass
@@ -254,14 +268,17 @@ class FuncArgs(_Statement, ast_utils.AsList):
 class FuncDef(_Statement):
     name: Name
     func_args: FuncArgs
-    two: str
+
+
+@dataclass
+class ValueDefs(_Statement, ast_utils.AsList):
+    fields: List[str]
 
 
 @dataclass
 class ValueDef(_Statement):
     name: Name
-    func_args: FuncArgs
-    two: str
+    value_body: From
 
 
 @dataclass
@@ -283,14 +300,14 @@ class Start(_Statement):
     # Corresponds to start in the grammar
     with_def: WithDef = None
     _from: From = None
-    value_def: str = None
-    func_def: str = None
+    value_defs: ValueDef = None
+    func_def: FuncDef = None
 
     def __init__(self, with_def=None, _from=None, value_def=None, func_def=None):
         values = [with_def, _from, value_def, func_def]
         self.with_def = self.assign_field(WithDef, values)
         self._from = self.assign_field(From, values)
-        self.value_def = self.assign_field(ValueDef, values)
+        self.value_defs = self.assign_field(ValueDefs, values)
         self.func_def = self.assign_field(FuncDef, values)
 
     def get_from(self):
@@ -404,46 +421,42 @@ def get_operation(ops: List[_Statement],
     return ret
 
 
-def replace_with_short_version(s, from_long, from_short, join_long, join_short):
-    s = s.replace(f'{from_long}.', f'{from_short}.')
-    s = s.replace(f'{join_long}.', f'{join_short}.')
-    return s
-
-
 def shorten(s, n=4):
     l = len(s)
     c = ceil(l / n)
     return s[0:l:c]
 
 
-class SQLGenerator(object):
+def replace_tables_standalone(from_long, from_short, join_long, join_short, s) -> str:
+    s = s.replace(f'{from_long}.', f'{from_short}.')
+    if join_long:
+        s = s.replace(f'{join_long}.', f'{join_short}.')
+    return s
 
-    @enforce_types
-    def __init__(self, tree: Start):
-        self.tree = tree
-        self.join_long = None
-        self.join_short = None
-        self.from_long = None
-        self.from_short = None
 
-        self._from = tree.get_from()
-        self._join = self._from.get_join()
+def wrap_replace_tables(from_long, from_short, join_long, join_short):
+    def a(x):
+        return replace_tables_standalone(from_long, from_short, join_long, join_short, x)
 
-        self.from_long = str(self._from.name)
-        self.from_short = shorten(self.from_long)
-        if self._join:
-            self.join_long = str(self._join.name)
-            self.join_short = shorten(self.join_long)
+    return a
 
-    @enforce_types
-    def replace_tables(self, s: str) -> str:
-        s = s.replace(f'{self.from_long}.', f'{self.from_short}.')
-        if self.join_long:
-            s = s.replace(f'{self.join_long}.', f'{self.join_short}.')
-        return s
 
-    @enforce_types
-    def generate(self, verbose: bool = True) -> str:
+def tree_to_sql(rule, start):
+    tree = start
+    verbose = True
+    print(f"INSGANCE={type(rule)},{rule}")
+    if isinstance(rule, From):
+        _from = rule
+        _join = _from.get_join()
+
+        from_long = str(_from.name)
+        from_short = shorten(from_long)
+        join_long = ''
+        join_short = ''
+        if _join:
+            join_long = str(_join.name)
+            join_short = shorten(join_long)
+        replace_tables = wrap_replace_tables(from_long, from_short, join_long, join_short)
         # The SQL template is in the form
         # SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by} {limit_str}'
 
@@ -460,9 +473,9 @@ class SQLGenerator(object):
         limit_str = ''
         ###
 
-        from_str = self.from_long + ' ' + self.from_short
+        from_str = from_long + ' ' + from_short
 
-        ops = self._from.get_pipes()
+        ops = _from.get_pipes()
         selects = get_operation(ops.operations, Select, return_all=True)
         agg = get_operation(ops.operations, Aggregate)
         take = get_operation(ops.operations, Take)
@@ -470,30 +483,30 @@ class SQLGenerator(object):
         derives = get_operation(ops.operations, Derive, return_all=True)
 
         if verbose:
-            rich.print(self.tree)
+            rich.print(tree)
             ic(selects, agg, take, filters, derives)
 
         for select in selects:
-            select_str += self.replace_tables(str(select))
+            select_str += replace_tables(str(select))
 
-        join = self._join
+        join = _join
         if join:
-            left_id = self.replace_tables(str(join.left_id))
-            right_id = self.replace_tables(str(join.right_id))
-            join_short = self.join_short
+            left_id = replace_tables(str(join.left_id))
+            right_id = replace_tables(str(join.right_id))
+            join_short = join_short
 
-            # left_id = left_id.replace(self.from_long, '').replace(self.from_short, '')
-            on_statement = self.from_short + "." + left_id
+            # left_id = left_id.replace(from_long, '').replace(from_short, '')
+            on_statement = from_short + "." + left_id
 
-            # right_id = right_id.replace(self.from_long, '').replace(self.from_short, '')
-            over_statement = join_short + "." + right_id
+            # right_id = right_id.replace(from_long, '').replace(from_short, '')
+            right_side = join_short + "." + right_id
 
-            join_str = f'JOIN {join.name} {join_short} ON {on_statement} = {over_statement}'
+            join_str = f'JOIN {join.name} {join_short} ON {on_statement} = {right_side}'
 
         if agg:
 
             if agg.group_by is not None:
-                group_by_str = f'GROUP BY {self.replace_tables(str(agg.group_by))}'
+                group_by_str = f'GROUP BY {replace_tables(str(agg.group_by))}'
 
             for i in range(0, len(agg.aggregate_body.statements), 2):
                 name = agg.aggregate_body.statements[i]
@@ -502,8 +515,8 @@ class SQLGenerator(object):
                     agg_str += f", {pipes} as {name}"
                 else:
                     agg_str += f", {name}"
-            agg_str = self.replace_tables(agg_str)
-
+            agg_str = replace_tables(agg_str)
+            agg_str = agg_str.rstrip(',').lstrip(',')
         if take:
             limit_str = f'LIMIT {take.qty}'
 
@@ -512,133 +525,57 @@ class SQLGenerator(object):
             for filter in filters:
                 if filter:
                     for f in filter.fields:
-                        filter_str += str(f) + ' AND '
+                        filter_str += tree_to_sql(f, start) + ' AND '
             filter_str = filter_str.rstrip(' AND ')
 
         if derives:
 
             for d in derives:
                 for line in d.fields:
-                    derives_str += f'{self.replace_tables(str(line.expression))} as {line.name} ,'
+                    derives_str += f'{replace_tables(str(line.expression))} as {line.name} ,'
             derives_str = "," + derives_str.rstrip(",")
 
-        if not select_str:
+        if not select_str and not agg_str:
             select_str = '*'
+        elif not select_str and agg_str:
+            select_str = ''
+        elif not select_str and derives_str:
+            select_str = '*'
+        elif not select_str and derives_str:
+            select_str = ''
+        select_str = select_str.rstrip(',').lstrip(',')
         if not filter_str:
             filter_str = '1=1'
 
         sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by} {limit_str}'
         # print(sql)
         return sql
+    elif isinstance(rule, Expression):
+        expr = rule
+        msg = ''
+        for s in expr.statements:
+            msg += tree_to_sql(s, start)
+        return msg
+    elif isinstance(rule, Tree):
+        raise Exception("Not implemented")
+    elif isinstance(rule, Eq):
+        # s.lhs = self.replace_variables(s.lhs, start)
+        s = rule
+        msg = ''
+        if s.lhs:
+            msg += tree_to_sql(s.lhs, start)
+        if s.rhs:
+            msg += ' = ' + tree_to_sql(s.rhs, start)
+        return msg
+    elif isinstance(rule, Value):
+        # Here is where we dp variable expansion and function execution .
+        # If its a table or value, we generate the SQL.  If its a function, we execute it
+        val = str(rule)
+        for table in start.value_defs.fields:
+            if table.name == val:
+                return "(" + tree_to_sql(table.value_body, start) + ")"
 
-
-#
-# @enforce_types
-# def tree_to_sql(tree: Start) -> str:
-#     # return tree_to_str(tree)
-#     # ret = str(tree)
-#     # return ret
-#     # first get the select fields
-#     _from = tree.get_from()
-#
-#     from_str = f'{_from.name}'
-#     from_short = from_str[0:3]
-#     from_str += f' {from_short}'
-#     ops = _from.get_pipes()
-#     select = get_operation(ops.operations, Select)
-#     select_str = str(select)
-#     join = _from.get_join()
-#     join_from_str = ''
-#     join_str = ''
-#     join_name = ''
-#     join_short = ''
-#     if join:
-#         join_name = join.name
-#         join_short = f'{str(join.name)[0:3]}'
-#         join_value = replace_with_short_version(str(join.left_id), str(_from.name), from_short, str(join.name),
-#                                                 join_short)
-#         right_id = replace_with_short_version(str(join.right_id), str(_from.name), from_short, str(join.name),
-#                                               join_short)
-#         if from_short in str(join_value):
-#             on_statement = str(join_value)
-#         else:
-#             on_statement = str(from_short) + "." + str(join_value)
-#
-#         over_statement = ""
-#         if join_short in right_id:
-#             over_statement = str(right_id)
-#         else:
-#             over_statement = str(join_short) + "." + str(right_id)
-#
-#         join_str = f'JOIN {join.name} {join_short} ON {on_statement} = {over_statement}'
-#         join_from_str = f''  # ,{join.name} {join_short}'
-#         select_str = replace_with_short_version(select_str, str(_from.name), from_short, str(join.name), join_short)
-#
-#     agg = get_operation(ops.operations, Aggregate)
-#     group_by_str = ''
-#     agg_str = ''
-#     limit_str = ''
-#     take = get_operation(ops.operations, Take)
-#     if take:
-#         limit_str = f'LIMIT {take.qty}'
-#     if agg:
-#         group_by_str = ''  #
-#         if agg.group_by is not None:
-#             group_by_str = f'GROUP BY {agg.group_by}'
-#         group_by_str = replace_with_short_version(group_by_str, str(_from.name), from_short, join_name, join_short)
-#
-#         # rich.print(agg)
-#         for i in range(0, len(agg.aggregate_body.statements), 2):
-#             name = agg.aggregate_body.statements[i]
-#             if i + 1 < len(agg.aggregate_body.statements):
-#                 pipes = agg.aggregate_body.statements[i + 1]
-#                 agg_str += f", {pipes} as {name}"
-#             else:
-#                 agg_str += f", {name}"
-#         # agg_str = f", {agg_str}"
-#         agg_str = replace_with_short_version(agg_str, str(_from.name), from_short, join_name, join_short)
-#
-#     filters = get_operation(ops.operations, Filter, return_all=True)
-#     filter_str = ''
-#     for filter in filters:
-#         if filter:
-#             rich.print(filter)
-#             for f in filter.fields:
-#                 filter_str += str(f) + ' AND '
-#     filter_str = filter_str.rstrip(' AND ')
-#     if not filter_str:
-#         filter_str = '1=1'
-#     sort = get_operation(ops.operations, Sort, last_match=True)
-#     order_by = ''
-#     if sort:
-#         order_by = f'ORDER BY {str(tree_to_str(sort.name))}'
-#         order_by = replace_with_short_version(order_by, str(_from.name), from_short, join_name, join_short)
-#
-#     derives = get_operation(ops.operations, Derive, return_all=True)
-#     derives_str = ''
-#     # rich.print(derives)
-#     if derives:
-#         for d in derives:
-#             for line in d.fields:
-#                 derives_str += f'{line.expression} as {line.name} ,'
-#         # derives_str = f'{derives}'
-#         derives_str = "," + derives_str.rstrip(",")
-#     if select_str is None or select_str == 'None' or not select_str or select_str == '[]':
-#         select_str = '*,'
-#     # if select_str == '[]' and agg_str:
-#     #     select_str = ''
-#     # if select_str == '[]' and derives_str:
-#     #     select_str = '*,'
-#     # if select_str == '[]':
-#     #     select_str = '*'
-#     # if agg_str:
-#     select_str = select_str.lstrip(",").rstrip(",")
-#     sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by} {limit_str}'
-#     print(sql)
-#     return sql
-
-@enforce_types
-def tree_to_sql(tree: Tree) -> str:
-    if tree.data == 'func_call':
-        return "YEAH"
-    return "TREE_NOT_FOUND"
+        return val
+    else:
+        raise Exception(f"No sql for {type(rule)}")
+        # return str(rule)

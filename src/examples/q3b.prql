@@ -4,8 +4,10 @@
 
 value min_pop = (
     from facts
-    aggregate [ min population ]
+    aggregate [ min_population: "MIN(population)" ]
+    take 1
 )
+
 
 from facts
 select name

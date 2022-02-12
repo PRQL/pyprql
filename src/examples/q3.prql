@@ -2,9 +2,11 @@
 #FROM facts
 #WHERE population = (SELECT MIN(population) FROM facts);
 
-func min column table = (
-    f"{column} = (SELECT MIN({column}) FROM {table})"
-)
+#func min column table = (
+#    f"{column} = (SELECT MIN({column}) FROM {table})"
+#)
+
+
 from facts
 select name
 filter population = population | min facts
