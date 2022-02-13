@@ -570,7 +570,7 @@ def execute_function(f: FuncCall, start: Start, symbol_table: Dict[str, _Ast]) -
 
 
 @enforce_types
-def tree_to_sql(
+def prql_to_sql(
         rule: Union[_Ast, lark.lexer.Token],
         start: Start,
         symbol_table: dict = None,
@@ -664,32 +664,7 @@ def tree_to_sql(
                         if f.func_args is not None:
                             agg_str += f'{str(f)} as {f.name}_{f.func_args},'
                     i += 1
-            # for i in range(0,len(agg.aggregate_body.statements)):
-            #     x = agg.aggregate_body.statements[i]
-            #     print(f"TYPE={type(x)},{x}")
-            #     # We assume this is a named variable if its a token
-            #     if isinstance(x,lark.lexer.Token):
-            #         f =  agg.aggregate_body.statements[i+1]
-            #         i+=1
-            #         agg_str += f"{tree_to_sql(f,start)} as {x}"
-            #
-            #         print('\n\n\n\nMAKE THIS INTO A WHILE LOOP ONLY WAY TO MUTATE i IN THIS SCOPE\n\n\n\n')
-            # for i in range(0, len(agg.aggregate_body.statements), 2):
-            #     name = agg.aggregate_body.statements[i]
-            #     if i + 1 < len(agg.aggregate_body.statements):
-            #         tree = agg.aggregate_body.statements[i + 1]
-            #         if isinstance(tree,lark.lexer.Token):
-            #             tree = agg.aggregate_body.statements[i + 2]
-            #             i+=1
-            #             print(type(tree), "tree=", tree)
-            #             pipes = tree_to_sql(tree, start)
-            #             agg_str += f", {pipes} as {name}"
-            #         else:
-            #             print(type(tree),"tree=",tree)
-            #             pipes = tree_to_sql(tree,start)
-            #             agg_str += f", {pipes} as {name}"
-            #     else:
-            #         agg_str += f", {name}"
+
             agg_str = replace_tables(agg_str)
             agg_str = agg_str.rstrip(',').lstrip(',')
         if take:
@@ -699,7 +674,7 @@ def tree_to_sql(
             for filter in filters:
                 if filter:
                     for f in filter.fields:
-                        filter_str += tree_to_sql(f, start, symbol_table) + ' AND '
+                        filter_str += prql_to_sql(f, start, symbol_table) + ' AND '
             filter_str = filter_str.rstrip(' AND ')
 
         if derives:
@@ -736,7 +711,7 @@ def tree_to_sql(
         expr = rule
         msg = ''
         for s in expr.statements:
-            msg += tree_to_sql(s, start, symbol_table)
+            msg += prql_to_sql(s, start, symbol_table)
         return msg
     elif isinstance(rule, Tree):
         print(f'TREE={tree.data}')
@@ -753,22 +728,22 @@ def tree_to_sql(
         msg = ''
         operator = rule.op
         if s.lhs:
-            msg += tree_to_sql(s.lhs, start, symbol_table)
+            msg += prql_to_sql(s.lhs, start, symbol_table)
         if s.rhs:
-            msg += operator + tree_to_sql(s.rhs, start, symbol_table)
+            msg += operator + prql_to_sql(s.rhs, start, symbol_table)
         return msg
     elif isinstance(rule, PipedCall):
         pipe: PipedCall = rule
         msg = ''
         pipe.func_body.parm1 = pipe.parm1
-        msg += tree_to_sql(pipe.func_body, start, symbol_table)
+        msg += prql_to_sql(pipe.func_body, start, symbol_table)
 
         # msg = f'{pipe.func_body}({pipe.parm1})'
         return msg
     elif isinstance(rule, FuncCall):
         f = rule
         if f.parm1:
-            msg = ',' + tree_to_sql(f.parm1, start, symbol_table)
+            msg = ',' + prql_to_sql(f.parm1, start, symbol_table)
         if f.name in symbol_table:
             msg = execute_function(f, start, symbol_table)
 
@@ -780,7 +755,7 @@ def tree_to_sql(
         if start.value_defs:
             for table in start.value_defs.fields:
                 if table.name == val:
-                    return "(" + tree_to_sql(table.value_body, start, symbol_table) + ")"
+                    return "(" + prql_to_sql(table.value_body, start, symbol_table) + ")"
 
         return val
     else:

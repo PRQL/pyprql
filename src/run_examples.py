@@ -1,6 +1,6 @@
 import sqlite3
 
-from prql import parse, read_file, script_path, tree_to_sql
+from prql import parse, read_file, script_path, prql_to_sql
 
 if __name__ == '__main__':
     base_path = '/../tests/factbook_examples'
@@ -17,7 +17,7 @@ if __name__ == '__main__':
             tree = parse(text)
 
             # try:
-            sql = tree_to_sql(tree._from, tree)
+            sql = prql_to_sql(tree._from, tree)
             print(f'PRQL->SQL: {sql}\n' + '~' * 80 + '\n')
 
             rows = cur.execute(sql)

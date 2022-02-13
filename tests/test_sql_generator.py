@@ -1,7 +1,7 @@
 import sqlite3
 import unittest
 
-from prql import parse, read_file, tree_to_sql
+from prql import parse, read_file, prql_to_sql
 
 
 class TestSQLGenerator(unittest.TestCase):
@@ -17,13 +17,13 @@ class TestSQLGenerator(unittest.TestCase):
 
     def test_factbook_q1(self):
         text = self.get_query('q1.prql')
-        self.run_query(text,1)
+        self.run_query(text, 1)
 
     def run_query(self, text, expected):
         print(text.replace('\n\n', '\n'))
         print('-' * 40)
         tree = parse(text)
-        sql = tree_to_sql(tree._from, tree, verbose=False)
+        sql = prql_to_sql(tree._from, tree, verbose=False)
         print(sql)
         rows = self.cur.execute(sql)
         columns = [d[0] for d in rows.description]
@@ -33,12 +33,12 @@ class TestSQLGenerator(unittest.TestCase):
 
     def test_factbook_q2(self):
         text = self.get_query('q2.prql')
-        self.run_query(text,2)
-
+        self.run_query(text, 2)
 
     def test_factbook_q3(self):
         text = self.get_query('q3.prql')
-        self.run_query(text,3)
+        self.run_query(text, 3)
+
 
 if __name__ == '__main__':
     unittest.main()
