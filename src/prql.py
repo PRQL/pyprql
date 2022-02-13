@@ -531,7 +531,8 @@ def get_operation(ops: List[_Statement],
     return ret
 
 
-def shorten(s, n=4):
+@enforce_types
+def shorten(s: str, n: int = 4):
     l = len(s)
     c = ceil(l / n)
     return s[0:l:c]
@@ -564,9 +565,24 @@ def build_symbol_table(start: Start) -> Dict[str, _Ast]:
 
 
 @enforce_types
-def execute_function(f: FuncCall, start: Start, symbol_table: Dict[str, _Ast]) -> str:
+def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
     print('EXECUTING ' + str(f.name))
-    return 'HERE_MANG'
+    msg = 'NOT_FINISHED_YET --- '
+    name = str(f.name)
+    func_def: FuncDef = symbol_table[name]
+    # Execute line by line the function
+    for line in func_def.func_body.fields:
+        # First just text replcaement ,
+        if type(line) == str:
+            args = {}
+            vals = [f.parm1, f.func_args]
+            for i in range(0, len(func_def.func_args.fields)):
+                n = str(func_def.func_args.fields[i])
+                args[n] = vals[i]
+            ic(args)
+            msg = line.format(**args)
+
+    return msg
 
 
 @enforce_types
@@ -656,8 +672,14 @@ def prql_to_sql(
                         name = first
                         i += 1
                         func_call = agg.aggregate_body.statements[i]
-                        if func_call.func_args is not None:
-                            agg_str += f'{func_call} as {name}'
+
+                        if isinstance(func_call, FuncCall):
+                            if func_call.func_args is not None:
+                                agg_str += f'{func_call} as {name},'
+                        elif isinstance(func_call, str):
+                            agg_str += f'{func_call} as {name},'
+                        else:
+                            raise Exception('Unknown type for aggregate body ')
                         # print('ASSIGNMENT! : ', first)
                     elif isinstance(first, FuncCall):
                         f = first
@@ -743,11 +765,11 @@ def prql_to_sql(
     elif isinstance(rule, FuncCall):
         f = rule
         if f.parm1:
-            msg = ',' + prql_to_sql(f.parm1, start, symbol_table)
+            v = ',' + prql_to_sql(f.parm1, start, symbol_table)
+            msg = str(f.name) + f'({v})'
         if f.name in symbol_table:
-            msg = execute_function(f, start, symbol_table)
-
-        return str(f.name) + f'({msg})'
+            msg = execute_function(f, symbol_table)
+        return msg
     elif isinstance(rule, Value):
         # Here is where we dp variable expansion and function execution .
         # If its a table or value, we generate the SQL.  If its a function, we execute it

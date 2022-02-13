@@ -23,7 +23,7 @@ class TestSQLGenerator(unittest.TestCase):
         print(text.replace('\n\n', '\n'))
         print('-' * 40)
         tree = parse(text)
-        sql = prql_to_sql(tree._from, tree, verbose=False)
+        sql = prql_to_sql(tree._from, tree, verbose=True)
         print(sql)
         rows = self.cur.execute(sql)
         columns = [d[0] for d in rows.description]
@@ -37,7 +37,25 @@ class TestSQLGenerator(unittest.TestCase):
 
     def test_factbook_q3(self):
         text = self.get_query('q3.prql')
-        self.run_query(text, 3)
+        self.run_query(text, 1)
+
+    def test_factbook_q3b(self):
+        text = self.get_query('q3b.prql')
+        self.run_query(text, 1)
+
+    def test_factbook_q4(self):
+        text = self.get_query('q4.prql')
+        self.run_query(text, 4)
+
+    def test_factbook_q5(self):
+        text = self.get_query('q5.prql')
+        self.run_query(text, 5)
+
+    def test_factbook_q6(self):
+        text = self.get_query('q6.prql')
+        self.run_query(text, 6)
+
+
 
 
 if __name__ == '__main__':

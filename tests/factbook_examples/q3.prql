@@ -3,7 +3,7 @@
 #WHERE population = (SELECT MIN(population) FROM facts);
 
 func  min_value column table = (
-    f"{column} = (SELECT MIN({column}) FROM {table})"
+    f"(SELECT MIN({column}) FROM {table})"
 )
 
 from facts

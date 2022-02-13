@@ -33,7 +33,8 @@
     func_def: "func" NAME (func_args)? "=" "(" func_body ")"
     func_args: ((NAME " ")* NAME)*
     func_body: _line ("," _line)*
-    func_call: "count" | NAME value
+    func_call: "count" | NAME | NAME value | NAME value value | NAME value value value
+
     piped_call: NAME ("." NAME)* "|" func_call
 
     eq: gt | gt "=" gt | neq
