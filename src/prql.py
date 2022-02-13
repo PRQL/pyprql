@@ -2,8 +2,9 @@ import os
 import sys
 from dataclasses import dataclass
 from math import ceil
-from typing import List, Union, Type, Any
+from typing import List, Union, Type, Any, Dict
 
+import lark
 import rich
 from enforce_typing import enforce_types
 from icecream import ic
@@ -114,15 +115,114 @@ class DeriveLine(_Statement):
 
 
 @dataclass
-class Eq(_Statement):
+class Operator(_Statement):
+
+    def get_op(self):
+        return self.op
+
+    def __str__(self):
+        if self.rhs is None:
+            return f"{self.lhs}"
+        else:
+            return f"{self.lhs} {self.op} {self.rhs}"
+
+
+@dataclass
+class Neq(Operator):
     lhs: Expression
     rhs: Expression = None
+    op: str = '!='
+
+    def __str__(self):
+        if self.rhs is None:
+            return f"{self.lhs}"
+        else:
+            return f"{self.lhs} != {self.rhs}"
+
+
+@dataclass
+class Eq(Operator):
+    lhs: Expression
+    rhs: Expression = None
+    op: str = '='
 
     def __str__(self):
         if self.rhs is None:
             return f"{self.lhs}"
         else:
             return f"{self.lhs} = {self.rhs}"
+
+
+@dataclass
+class Diff(Operator):
+    lhs: Expression
+    rhs: Expression = None
+    op: str = '-'
+
+
+@dataclass
+class Lt(_Statement):
+    lhs: Expression
+    rhs: Expression = None
+    op: str = '<'
+
+    def __str__(self):
+        if self.rhs is None:
+            return f"{self.lhs}"
+        else:
+            return f"{self.lhs} < {self.rhs}"
+
+
+@dataclass
+class Lte(_Statement):
+    lhs: Expression
+    rhs: Expression = None
+    op: str = '<='
+
+    def __str__(self):
+        if self.rhs is None:
+            return f"{self.lhs}"
+        else:
+            return f"{self.lhs} <= {self.rhs}"
+
+
+@dataclass
+class Sum(_Statement):
+    lhs: Expression
+    rhs: Expression = None
+    op: str = '+'
+
+    def __str__(self):
+        if self.rhs is None:
+            return f"{self.lhs}"
+        else:
+            return f"{self.lhs} + {self.rhs}"
+
+
+@dataclass
+class Gt(_Statement):
+    lhs: Expression
+    rhs: Expression = None
+    op: str = '>'
+
+    def __str__(self):
+        if self.rhs is None:
+            return f"{self.lhs}"
+        else:
+            return f"{self.lhs} > {self.rhs}"
+
+
+@dataclass
+class Gte(_Statement):
+    lhs: Expression
+    rhs: Expression = None
+    op: str = '>='
+
+    def __str__(self):
+        if self.rhs is None:
+            return f"{self.lhs}"
+        else:
+            return f"{self.lhs} >= {self.rhs}"
 
 
 @dataclass
@@ -139,7 +239,7 @@ class NamePair(_Statement):
     name2: str = "all"
 
     def __str__(self):
-        return f'{self.name1} {self.name2}'
+        return f'{self.name1}({self.name2}) as {self.name1}_{self.name2}'
 
 
 @dataclass
@@ -207,12 +307,6 @@ class Filter(_Statement, ast_utils.AsList):
     fields: List[str]
     name: str = "filter"
 
-    def to_sql(self):
-        msg = ''
-        for idx, f in enumerate(self.fields):
-            msg += f'\n\t\t{tree_to_str(f)}'
-        return msg.replace("\n", "").replace("\r", "").replace("\t", "")
-
     def __str__(self):
         msg = 'filter:'
         for idx, f in enumerate(self.fields):
@@ -265,14 +359,25 @@ class FuncArgs(_Statement, ast_utils.AsList):
 
 
 @dataclass
-class FuncDef(_Statement):
-    name: Name
-    func_args: FuncArgs
+class FuncBody(_Statement, ast_utils.AsList):
+    fields: List[str]
 
 
 @dataclass
-class ValueDefs(_Statement, ast_utils.AsList):
-    fields: List[str]
+class FuncDef(_Statement):
+    name: Name
+    func_args: FuncArgs
+    func_body: FuncBody = None
+
+
+@dataclass
+class FuncCall(_Statement):
+    name: Name = None
+    func_args: FuncArgs = None
+    parm1: Any = None
+
+    def __str__(self):
+        return f'{self.name}({str(self.func_args)})'
 
 
 @dataclass
@@ -282,8 +387,13 @@ class ValueDef(_Statement):
 
 
 @dataclass
-class FuncBody(_Statement, ast_utils.AsList):
-    fields: List[str]
+class ValueDefs(_Statement, ast_utils.AsList):
+    fields: List[ValueDef]
+
+
+@dataclass
+class FuncDefs(_Statement, ast_utils.AsList):
+    fields: List[FuncDef]
 
 
 @dataclass
@@ -300,15 +410,15 @@ class Start(_Statement):
     # Corresponds to start in the grammar
     with_def: WithDef = None
     _from: From = None
-    value_defs: ValueDef = None
-    func_def: FuncDef = None
+    value_defs: ValueDefs = None
+    func_defs: FuncDefs = None
 
     def __init__(self, with_def=None, _from=None, value_def=None, func_def=None):
         values = [with_def, _from, value_def, func_def]
         self.with_def = self.assign_field(WithDef, values)
         self._from = self.assign_field(From, values)
         self.value_defs = self.assign_field(ValueDefs, values)
-        self.func_def = self.assign_field(FuncDef, values)
+        self.func_defs = self.assign_field(FuncDefs, values)
 
     def get_from(self):
         return self._from
@@ -441,22 +551,39 @@ def wrap_replace_tables(from_long, from_short, join_long, join_short):
     return a
 
 
-def tree_to_sql(rule, start):
-    tree = start
-    verbose = True
-    print(f"INSGANCE={type(rule)},{rule}")
-    if isinstance(rule, From):
-        _from = rule
-        _join = _from.get_join()
+@enforce_types
+def build_symbol_table(start: Start) -> Dict[str, _Ast]:
+    table = {}
+    for n in start.value_defs.fields:
+        table[str(n.name)] = n
+    for n in start.func_defs.fields:
+        table[str(n.name)] = n
 
-        from_long = str(_from.name)
-        from_short = shorten(from_long)
-        join_long = ''
-        join_short = ''
-        if _join:
-            join_long = str(_join.name)
-            join_short = shorten(join_long)
-        replace_tables = wrap_replace_tables(from_long, from_short, join_long, join_short)
+    ic(table)
+    return table
+
+
+@enforce_types
+def execute_function(f: FuncCall, start: Start, symbol_table: Dict[str, _Ast]) -> str:
+    print('EXECUTING ' + str(f.name))
+    return 'HERE_MANG'
+
+
+@enforce_types
+def tree_to_sql(
+        rule: Union[_Ast, lark.lexer.Token],
+        start: Start,
+        symbol_table: dict = None,
+        verbose: bool = True):
+    tree = start
+
+    if not symbol_table:
+        symbol_table = build_symbol_table(tree)
+
+    if isinstance(rule, lark.lexer.Token):
+        return str(rule)
+
+    if isinstance(rule, From):
         # The SQL template is in the form
         # SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by} {limit_str}'
 
@@ -469,9 +596,21 @@ def tree_to_sql(rule, start):
         join_str = ''
         filter_str = ''
         group_by_str = ''
-        order_by = ''
+        order_by_str = ''
         limit_str = ''
         ###
+
+        _from = rule
+        _join = _from.get_join()
+
+        from_long = str(_from.name)
+        from_short = shorten(from_long)
+        join_long = ''
+        join_short = ''
+        if _join:
+            join_long = str(_join.name)
+            join_short = shorten(join_long)
+        replace_tables = wrap_replace_tables(from_long, from_short, join_long, join_short)
 
         from_str = from_long + ' ' + from_short
 
@@ -508,28 +647,62 @@ def tree_to_sql(rule, start):
             if agg.group_by is not None:
                 group_by_str = f'GROUP BY {replace_tables(str(agg.group_by))}'
 
-            for i in range(0, len(agg.aggregate_body.statements), 2):
-                name = agg.aggregate_body.statements[i]
-                if i + 1 < len(agg.aggregate_body.statements):
-                    pipes = agg.aggregate_body.statements[i + 1]
-                    agg_str += f", {pipes} as {name}"
-                else:
-                    agg_str += f", {name}"
+            upper = len(agg.aggregate_body.statements)
+            i = 0
+            while i < upper:
+                first = agg.aggregate_body.statements[i]
+                if first is not None:
+                    if isinstance(first, lark.lexer.Token):
+                        name = first
+                        i += 1
+                        func_call = agg.aggregate_body.statements[i]
+                        if func_call.func_args is not None:
+                            agg_str += f'{func_call} as {name}'
+                        # print('ASSIGNMENT! : ', first)
+                    elif isinstance(first, FuncCall):
+                        f = first
+                        if f.func_args is not None:
+                            agg_str += f'{str(f)} as {f.name}_{f.func_args},'
+                    i += 1
+            # for i in range(0,len(agg.aggregate_body.statements)):
+            #     x = agg.aggregate_body.statements[i]
+            #     print(f"TYPE={type(x)},{x}")
+            #     # We assume this is a named variable if its a token
+            #     if isinstance(x,lark.lexer.Token):
+            #         f =  agg.aggregate_body.statements[i+1]
+            #         i+=1
+            #         agg_str += f"{tree_to_sql(f,start)} as {x}"
+            #
+            #         print('\n\n\n\nMAKE THIS INTO A WHILE LOOP ONLY WAY TO MUTATE i IN THIS SCOPE\n\n\n\n')
+            # for i in range(0, len(agg.aggregate_body.statements), 2):
+            #     name = agg.aggregate_body.statements[i]
+            #     if i + 1 < len(agg.aggregate_body.statements):
+            #         tree = agg.aggregate_body.statements[i + 1]
+            #         if isinstance(tree,lark.lexer.Token):
+            #             tree = agg.aggregate_body.statements[i + 2]
+            #             i+=1
+            #             print(type(tree), "tree=", tree)
+            #             pipes = tree_to_sql(tree, start)
+            #             agg_str += f", {pipes} as {name}"
+            #         else:
+            #             print(type(tree),"tree=",tree)
+            #             pipes = tree_to_sql(tree,start)
+            #             agg_str += f", {pipes} as {name}"
+            #     else:
+            #         agg_str += f", {name}"
             agg_str = replace_tables(agg_str)
             agg_str = agg_str.rstrip(',').lstrip(',')
         if take:
             limit_str = f'LIMIT {take.qty}'
 
         if filters:
-
             for filter in filters:
                 if filter:
                     for f in filter.fields:
-                        filter_str += tree_to_sql(f, start) + ' AND '
+                        filter_str += tree_to_sql(f, start, symbol_table) + ' AND '
             filter_str = filter_str.rstrip(' AND ')
 
         if derives:
-
             for d in derives:
                 for line in d.fields:
                     derives_str += f'{replace_tables(str(line.expression))} as {line.name} ,'
@@ -546,34 +719,68 @@ def tree_to_sql(rule, start):
         select_str = select_str.rstrip(',').lstrip(',')
         if not filter_str:
             filter_str = '1=1'
-
-        sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by} {limit_str}'
+        if verbose:
+            ic(select_str,
+               agg_str,
+               derives_str,
+               from_str,
+               join_str,
+               filter_str,
+               group_by_str,
+               order_by_str,
+               limit_str)
+        sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by_str} {limit_str}'
         # print(sql)
         return sql
     elif isinstance(rule, Expression):
         expr = rule
         msg = ''
         for s in expr.statements:
-            msg += tree_to_sql(s, start)
+            msg += tree_to_sql(s, start, symbol_table)
         return msg
     elif isinstance(rule, Tree):
-        raise Exception("Not implemented")
-    elif isinstance(rule, Eq):
+        print(f'TREE={tree.data}')
+        tree = rule
+        if tree.data == 'whole_line':
+            return tree.children[0].replace('\n', '').replace('\r', '').rstrip('|')
+        else:
+            msg = str(f' {get_op_str(tree.data.value)} ').join([tree_to_str(c) for c in tree.children])
+            return f'({msg})'
+    elif isinstance(rule, Eq) or isinstance(rule, Gt) or isinstance(rule, Neq) \
+            or isinstance(rule, Lt) or isinstance(rule, Gte) or isinstance(rule, Lte):
         # s.lhs = self.replace_variables(s.lhs, start)
         s = rule
         msg = ''
+        operator = rule.op
         if s.lhs:
-            msg += tree_to_sql(s.lhs, start)
+            msg += tree_to_sql(s.lhs, start, symbol_table)
         if s.rhs:
-            msg += ' = ' + tree_to_sql(s.rhs, start)
+            msg += operator + tree_to_sql(s.rhs, start, symbol_table)
         return msg
+    elif isinstance(rule, PipedCall):
+        pipe: PipedCall = rule
+        msg = ''
+        pipe.func_body.parm1 = pipe.parm1
+        msg += tree_to_sql(pipe.func_body, start, symbol_table)
+
+        # msg = f'{pipe.func_body}({pipe.parm1})'
+        return msg
+    elif isinstance(rule, FuncCall):
+        f = rule
+        if f.parm1:
+            msg = ',' + tree_to_sql(f.parm1, start, symbol_table)
+        if f.name in symbol_table:
+            msg = execute_function(f, start, symbol_table)
+
+        return str(f.name) + f'({msg})'
     elif isinstance(rule, Value):
         # Here is where we dp variable expansion and function execution .
         # If its a table or value, we generate the SQL.  If its a function, we execute it
         val = str(rule)
-        for table in start.value_defs.fields:
-            if table.name == val:
-                return "(" + tree_to_sql(table.value_body, start) + ")"
+        if start.value_defs:
+            for table in start.value_defs.fields:
+                if table.name == val:
+                    return "(" + tree_to_sql(table.value_body, start, symbol_table) + ")"
 
         return val
     else:

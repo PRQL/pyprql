@@ -1,6 +1,8 @@
-    start: (with_def)* (value_defs)* (func_def)* from
+    start: (with_def)* value_defs func_defs from
 
     value_defs: (value_def)*
+    func_defs: (func_def)*
+
     value_def: "value" NAME "=" "(" from ")"
     with_def: "table" NAME "=" "(" from ")"
     from: "from" NAME "|"? (join)? "|"? pipes
@@ -8,7 +10,7 @@
     pipes.2: ((select | derive | filter | sort | take| aggregate) ("|")?)*
     join: ("join"|"left_join")+ name "[" name ("=" name)? "]"
 
-    aggregate: "aggregate" ("by" ":"? "[" group_by"]")? "[" aggregate_body "]"
+    aggregate: "aggregate" ("by" ":"? "[" group_by"]")? "["? aggregate_body "]"?
     group_by: name ("," name)*
     aggregate_body: ( (NAME ":")?  _line)? ( "," ((NAME ":")?  _line))*
 
@@ -34,11 +36,14 @@
     func_call: "count" | NAME value
     piped_call: NAME ("." NAME)* "|" func_call
 
-    eq: gt | gt "=" gt
-    ?gt: sum | sum ">" sum | lt | gte | lte
+    eq: gt | gt "=" gt | neq
+    neq: expression "!=" expression
+
+    gt: sum | sum ">" sum | lt | gte | lte
     ?lt:  sum "<" sum
     ?lte:  sum "<=" sum
     ?gte:  sum ">=" sum
+
     ?sum: product | sum "+" product | diff
     ?diff: sum "-" product
     ?product: atom | product "*" atom | division
