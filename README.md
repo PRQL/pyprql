@@ -4,8 +4,9 @@ Python implementation of [PRQL](https://github.com/max-sixty/prql).
 ```python
 
 import prql
-
 q = """
+```
+```elm
 from employees
 filter country = "USA"                           # Each line transforms the previous result.
 derive [                                         # This adds columns / variables.
@@ -26,7 +27,8 @@ sort sum_gross_cost
 filter count > 200
 take 20
 """
-
+```
+```python
 sql = prql.to_sql(q)
 print(sql)
 ```
