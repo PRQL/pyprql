@@ -34,16 +34,19 @@ print(sql)
 --- 
 
 ```sql
-SELECT SUM(fcs.population)             as country_pop,
-       SUM(cte.population)             as city_pop,
-       cte.name                        as city,
-       fcs.name                        as country,
-       fcs.area                        as country_area,
-       fcs.birth_rate - fcs.death_rate as population_growth
-FROM facts fcs
-         JOIN cities cte ON fcs.id = cte.facts_id
-WHERE 1 = 1
-GROUP BY code LIMIT 6
+SELECT average(salary)              as average_salary,
+       sum(salary)                  as sum_salary,
+       average(gross_salary)        as average_gross_salary,
+       sum(gross_salary)            as sum_gross_salary,
+       average(gross_cost)          as average_gross_cost,
+       sum(gross_cost)              as sum_gross_cost,
+       salary + payroll_tax         as gross_salary,
+       gross_salary + benefits_cost as gross_cost
+FROM employees ele
+WHERE country = USA
+  AND gross_cost > 0
+  AND count > 200
+GROUP BY title, country LIMIT 20
 
 ```
 
