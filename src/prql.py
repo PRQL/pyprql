@@ -359,7 +359,7 @@ class FuncCall(_Statement):
     parm1: Any = None
 
     def __str__(self):
-        return f'{self.name}({str(self.func_args)})'
+        return f'{get_func_str(self.name)}({str(self.func_args)})'
 
 
 @dataclass
@@ -419,7 +419,7 @@ class ToAst(Transformer):
         return s[2:-1]
 
     def ESCAPED_STRING(self, s):
-        return s[1:-1].replace('\\"', '"').replace("\\'", "'")
+        return s.replace('\\"', '"').replace("\\'", "'")
 
     def NEWLINE(self, s):
         return s
@@ -456,6 +456,13 @@ def get_op_str(op: str) -> str:
         return '<='
     else:
         return str(op)
+
+
+@enforce_types
+def get_func_str(func: str) -> str:
+    if func == 'average':
+        return 'avg'
+    return func
 
 
 @enforce_types
@@ -565,7 +572,6 @@ def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
     return msg
 
 
-# E
 @enforce_types
 def ast_to_sql(
         rule: Union[_Ast, lark.lexer.Token],
