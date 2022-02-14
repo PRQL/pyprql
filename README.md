@@ -34,7 +34,16 @@ print(sql)
 --- 
 
 ```sql
-SELECT  SUM(fcs.population) as country_pop,SUM(cte.population) as city_pop ,cte.name  as city ,fcs.name  as country ,fcs.area  as country_area ,fcs.birth_rate - fcs.death_rate  as population_growth  FROM facts fcs JOIN cities cte ON fcs.id = cte.facts_id WHERE 1=1 GROUP BY code  LIMIT 6
+SELECT SUM(fcs.population)             as country_pop,
+       SUM(cte.population)             as city_pop,
+       cte.name                        as city,
+       fcs.name                        as country,
+       fcs.area                        as country_area,
+       fcs.birth_rate - fcs.death_rate as population_growth
+FROM facts fcs
+         JOIN cities cte ON fcs.id = cte.facts_id
+WHERE 1 = 1
+GROUP BY code LIMIT 6
 
 ```
 
