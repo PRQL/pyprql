@@ -486,6 +486,12 @@ def parse(_text: str) -> Start:
 
 
 @enforce_types
+def to_sql(prql: str) -> str:
+    ast = parse(prql)
+    return ast_to_sql(ast._from,ast)
+
+
+@enforce_types
 def pretty_print(start: Start, do_print: bool = True) -> str:
     # rich.print(start)
     ret = ''
@@ -585,7 +591,7 @@ def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
 
 # E
 @enforce_types
-def prql_to_sql(
+def ast_to_sql(
         rule: Union[_Ast, lark.lexer.Token],
         start: Start,
         symbol_table: dict = None,
@@ -694,7 +700,7 @@ def prql_to_sql(
             for filter in filters:
                 if filter:
                     for f in filter.fields:
-                        filter_str += prql_to_sql(f, start, symbol_table) + ' AND '
+                        filter_str += ast_to_sql(f, start, symbol_table) + ' AND '
             filter_str = filter_str.rstrip(' AND ')
 
         if derives:
@@ -731,7 +737,7 @@ def prql_to_sql(
         expr = rule
         msg = ''
         for s in expr.statements:
-            msg += prql_to_sql(s, start, symbol_table)
+            msg += ast_to_sql(s, start, symbol_table)
         return msg
     elif isinstance(rule, Tree):
         print(f'TREE={tree.data}')
@@ -748,22 +754,22 @@ def prql_to_sql(
         msg = ''
         operator = rule.op
         if s.lhs:
-            msg += prql_to_sql(s.lhs, start, symbol_table)
+            msg += ast_to_sql(s.lhs, start, symbol_table)
         if s.rhs:
-            msg += operator + prql_to_sql(s.rhs, start, symbol_table)
+            msg += operator + ast_to_sql(s.rhs, start, symbol_table)
         return msg
     elif isinstance(rule, PipedCall):
         pipe: PipedCall = rule
         msg = ''
         pipe.func_body.parm1 = pipe.parm1
-        msg += prql_to_sql(pipe.func_body, start, symbol_table)
+        msg += ast_to_sql(pipe.func_body, start, symbol_table)
 
         # msg = f'{pipe.func_body}({pipe.parm1})'
         return msg
     elif isinstance(rule, FuncCall):
         f = rule
         if f.parm1:
-            v = ',' + prql_to_sql(f.parm1, start, symbol_table)
+            v = ',' + ast_to_sql(f.parm1, start, symbol_table)
             msg = str(f.name) + f'({v})'
         if f.name in symbol_table:
             msg = execute_function(f, symbol_table)
@@ -775,7 +781,7 @@ def prql_to_sql(
         if start.value_defs:
             for table in start.value_defs.fields:
                 if table.name == val:
-                    return "(" + prql_to_sql(table.value_body, start, symbol_table) + ")"
+                    return "(" + ast_to_sql(table.value_body, start, symbol_table) + ")"
 
         return val
     else:

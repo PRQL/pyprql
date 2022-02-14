@@ -1,10 +1,10 @@
 import sqlite3
 import unittest
 
-from prql import parse, read_file, prql_to_sql
+import prql
 
 
-class TestSQLGenerator(unittest.TestCase):
+class TestSQLGeneratorForFactbook(unittest.TestCase):
 
     def setUp(self) -> None:
         self.base_path = 'factbook_examples'
@@ -13,7 +13,7 @@ class TestSQLGenerator(unittest.TestCase):
         self.cur = self.con.cursor()
 
     def get_query(self, file_name):
-        return read_file('/../tests/' + self.base_path + '/' + file_name)
+        return prql.read_file('/../tests/' + self.base_path + '/' + file_name)
 
     def test_factbook_q1(self):
         text = self.get_query('q1.prql')
@@ -22,8 +22,7 @@ class TestSQLGenerator(unittest.TestCase):
     def run_query(self, text, expected):
         print(text.replace('\n\n', '\n'))
         print('-' * 40)
-        tree = parse(text)
-        sql = prql_to_sql(tree._from, tree, verbose=True)
+        sql = prql.to_sql(text)
         print(sql)
         rows = self.cur.execute(sql)
         columns = [d[0] for d in rows.description]
