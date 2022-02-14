@@ -560,7 +560,6 @@ def build_symbol_table(start: Start) -> Dict[str, _Ast]:
     for n in start.func_defs.fields:
         table[str(n.name)] = n
 
-    ic(table)
     return table
 
 
@@ -579,7 +578,6 @@ def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
             for i in range(0, len(func_def.func_args.fields)):
                 n = str(func_def.func_args.fields[i])
                 args[n] = vals[i]
-            ic(args)
             msg = line.format(**args)
 
     return msg
@@ -639,7 +637,6 @@ def prql_to_sql(
 
         if verbose:
             rich.print(tree)
-            ic(selects, agg, take, filters, derives)
 
         for select in selects:
             select_str += replace_tables(str(select))
