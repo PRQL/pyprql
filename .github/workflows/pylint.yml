@@ -23,4 +23,4 @@ jobs:
         flake8 src
     - name: Run tests
       run: |
-        pytest
+        PYTHONPATH='./src/' pytest
