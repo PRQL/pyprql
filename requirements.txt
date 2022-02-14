@@ -2,4 +2,5 @@ lark
 icecream
 rich
 enforce-typing
-pylint
+flake8
+pytest

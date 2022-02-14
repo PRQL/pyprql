@@ -517,11 +517,11 @@ def get_operation(ops: List[_Statement],
                   class_type: Type[_Statement],
                   last_match: bool = False,
                   return_all: bool = False) -> List[_Statement]:
-    l = ops
+    ops_list = ops
     ret = []
     if last_match:
-        l = list(reversed(ops))
-    for op in l:
+        ops_list = list(reversed(ops))
+    for op in ops_list:
         # print(type(op))
         if isinstance(op, class_type):
             if return_all:
@@ -533,9 +533,9 @@ def get_operation(ops: List[_Statement],
 
 @enforce_types
 def shorten(s: str, n: int = 4):
-    l = len(s)
-    c = ceil(l / n)
-    return s[0:l:c]
+    length = len(s)
+    ceiling = ceil(length / n)
+    return s[0:length:ceiling]
 
 
 def replace_tables_standalone(from_long, from_short, join_long, join_short, s) -> str:
@@ -583,6 +583,7 @@ def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
     return msg
 
 
+# E
 @enforce_types
 def prql_to_sql(
         rule: Union[_Ast, lark.lexer.Token],
