@@ -19,12 +19,6 @@ class _Ast(ast_utils.Ast):
     pass
 
 
-@enforce_types
-def get_leaf(start, name):
-    assert (isinstance(start, Start))
-    start.value_defs
-
-
 class _Statement(_Ast):
 
     @enforce_types
@@ -33,10 +27,6 @@ class _Statement(_Ast):
             if str(v.name) == str(s):
                 if isinstance(v, ValueDef):
                     return str(v.value_body)
-            # print(f'f-->{v}')
-        # print('here')
-
-        # print(f'replacing {type(start)}')
 
     @enforce_types
     def assign_field(self, clazz: Type, values: List[Any]):
@@ -71,7 +61,7 @@ class Expression(_Statement, ast_utils.AsList):
             if isinstance(s, Tree):
                 msg += tree_to_str(s).replace("\n", ",")
             else:
-                msg += f'{s} '  # str(s)
+                msg += f'{s} '
 
         return msg
 
@@ -291,7 +281,7 @@ class Sort(_Statement):
     name: Name
 
     def __str__(self):
-        return f'sort: {str(self.name)}'
+        return f'{str(self.name)}'
 
 
 @dataclass
@@ -488,7 +478,7 @@ def parse(_text: str) -> Start:
 @enforce_types
 def to_sql(prql: str) -> str:
     ast = parse(prql)
-    return ast_to_sql(ast._from, ast)
+    return ast_to_sql(ast._from, ast).replace('   ', ' ').replace('  ', ' ')
 
 
 @enforce_types
@@ -538,7 +528,7 @@ def get_operation(ops: List[_Statement],
 
 
 @enforce_types
-def shorten(s: str, n: int = 4):
+def shorten(s: str, n: int = 5):
     length = len(s)
     ceiling = ceil(length / n)
     return s[0:length:ceiling]
@@ -639,6 +629,8 @@ def ast_to_sql(
         selects = get_operation(ops.operations, Select, return_all=True)
         agg = get_operation(ops.operations, Aggregate)
         take = get_operation(ops.operations, Take)
+        sort = get_operation(ops.operations, Sort)
+
         filters = get_operation(ops.operations, Filter, return_all=True)
         derives = get_operation(ops.operations, Derive, return_all=True)
 
@@ -709,6 +701,9 @@ def ast_to_sql(
                     derives_str += f'{replace_tables(str(line.expression))} as {line.name} ,'
             derives_str = "," + derives_str.rstrip(",")
 
+        if sort:
+            order_by_str = f"ORDER BY {sort}"
+
         if not select_str and not agg_str:
             select_str = '*'
         elif not select_str and agg_str:
@@ -732,6 +727,8 @@ def ast_to_sql(
                limit_str)
         sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by_str} {limit_str}'
         # print(sql)
+        if verbose:
+            print(sql)
         return sql
     elif isinstance(rule, Expression):
         expr = rule
