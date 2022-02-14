@@ -42,11 +42,13 @@ SELECT average(salary)              as average_salary,
        sum(gross_cost)              as sum_gross_cost,
        salary + payroll_tax         as gross_salary,
        gross_salary + benefits_cost as gross_cost
-FROM employees ele
+FROM employees employees_e
 WHERE country = USA
   AND gross_cost > 0
   AND count > 200
-GROUP BY title, country LIMIT 20
+GROUP BY title, country
+ORDER BY sum_gross_cost
+LIMIT 20
 
 ```
 

@@ -1,7 +1,6 @@
 import os
 import sys
 from dataclasses import dataclass
-from math import ceil
 from typing import List, Union, Type, Any, Dict
 
 import lark
@@ -528,10 +527,8 @@ def get_operation(ops: List[_Statement],
 
 
 @enforce_types
-def shorten(s: str, n: int = 5):
-    length = len(s)
-    ceiling = ceil(length / n)
-    return s[0:length:ceiling]
+def alias(s: str, n: int = 1):
+    return s + '_' + s[0:n]
 
 
 def replace_tables_standalone(from_long, from_short, join_long, join_short, s) -> str:
@@ -615,12 +612,12 @@ def ast_to_sql(
         _join = _from.get_join()
 
         from_long = str(_from.name)
-        from_short = shorten(from_long)
+        from_short = alias(from_long)
         join_long = ''
         join_short = ''
         if _join:
             join_long = str(_join.name)
-            join_short = shorten(join_long)
+            join_short = alias(join_long)
         replace_tables = wrap_replace_tables(from_long, from_short, join_long, join_short)
 
         from_str = from_long + ' ' + from_short
