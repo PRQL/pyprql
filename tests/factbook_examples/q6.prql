@@ -19,7 +19,7 @@ derive [
     country_area: "facts.area",
     population_growth: "facts.birth_rate - facts.death_rate",
 ]
-aggregate by:[code] [
+aggregate by:code [
     country_pop: "SUM(facts.population)",
     city_pop: "SUM(cities.population)"
 ]

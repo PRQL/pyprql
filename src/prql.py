@@ -644,10 +644,10 @@ def ast_to_sql(
             join_short = join_short
 
             # left_id = left_id.replace(from_long, '').replace(from_short, '')
-            on_statement = from_short + "." + left_id
+            on_statement = str(from_short + "." + left_id).replace(from_short + "." + from_short + "." ,from_short + "." )
 
             # right_id = right_id.replace(from_long, '').replace(from_short, '')
-            right_side = join_short + "." + right_id
+            right_side = str(join_short + "." + right_id).replace(join_short + "." + join_short + ".",join_short + ".")
 
             join_str = f'JOIN {join.name} {join_short} ON {on_statement} = {right_side}'
 
@@ -710,6 +710,10 @@ def ast_to_sql(
         elif not select_str and derives_str:
             select_str = ''
         select_str = select_str.rstrip(',').lstrip(',')
+
+        if select_str and agg_str :
+            select_str += ','
+
         if not filter_str:
             filter_str = '1=1'
         if verbose:

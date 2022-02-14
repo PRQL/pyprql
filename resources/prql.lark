@@ -10,7 +10,7 @@
     pipes.2: ((select | derive | filter | sort | take| aggregate) ("|")?)*
     join: ("join"|"left_join")+ name "[" name ("=" name)? "]"
 
-    aggregate: "aggregate" ("by" ":"? "[" group_by"]")? "["? aggregate_body "]"?
+    aggregate: "aggregate" ("by" ":" ("[" group_by "]"|group_by) )? "["? aggregate_body "]"?
     group_by: name ("," name)*
     aggregate_body: ( (NAME ":")?  _line)? ( "," ((NAME ":")?  _line))*
 
@@ -18,7 +18,6 @@
     take: "take" INT
 
     filter: "filter" (ESCAPED_STRING|expression)?
-    whole_line: /(.*?)[|\n\r]/
     sort: "sort" (ESCAPED_STRING|name)
 
 
