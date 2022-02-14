@@ -2,3 +2,4 @@ lark
 icecream
 rich
 enforce-typing
+pylint
