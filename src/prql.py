@@ -21,13 +21,6 @@ class _Ast(ast_utils.Ast):
 class _Statement(_Ast):
 
     @enforce_types
-    def replace_variables(self, s, start):
-        for idx, v in enumerate(start.value_defs.fields):
-            if str(v.name) == str(s):
-                if isinstance(v, ValueDef):
-                    return str(v.value_body)
-
-    @enforce_types
     def assign_field(self, clazz: Type, values: List[Any]):
         for v in values:
             if isinstance(v, clazz):
@@ -620,7 +613,7 @@ def ast_to_sql(
             join_short = alias(join_long)
         replace_tables = wrap_replace_tables(from_long, from_short, join_long, join_short)
 
-        from_str = from_long + ' ' + from_short
+        from_str = f'`{from_long}`' + ' ' + from_short
 
         ops = _from.get_pipes()
         selects = get_operation(ops.operations, Select, return_all=True)
