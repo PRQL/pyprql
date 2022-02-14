@@ -488,7 +488,7 @@ def parse(_text: str) -> Start:
 @enforce_types
 def to_sql(prql: str) -> str:
     ast = parse(prql)
-    return ast_to_sql(ast._from,ast)
+    return ast_to_sql(ast._from, ast)
 
 
 @enforce_types
