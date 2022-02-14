@@ -1,4 +1,4 @@
-name: Pylint
+name: Tests
 
 on: [push]
 
@@ -20,7 +20,7 @@ jobs:
         pip install -r requirements.txt
     - name: Analysing the code with flake8
       run: |
-        flake8 src
+        PYTHONPATH='./src/' flake8 src
     - name: Run tests
       run: |
         PYTHONPATH='./src/' pytest
