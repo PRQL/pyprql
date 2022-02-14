@@ -490,12 +490,8 @@ def pretty_print(start: Start, do_print: bool = True) -> str:
 @enforce_types
 def tree_to_str(tree: Union[Tree, Token, _Ast, str]) -> str:
     if isinstance(tree, Tree):
-        # print(f'TREE={tree.data}')
-        if tree.data == 'whole_line':
-            return tree.children[0].replace('\n', '').replace('\r', '').rstrip('|')
-        else:
-            msg = str(f' {get_op_str(tree.data.value)} ').join([tree_to_str(c) for c in tree.children])
-            return f'({msg})'
+        msg = str(f' {get_op_str(tree.data.value)} ').join([tree_to_str(c) for c in tree.children])
+        return f'({msg})'
     else:
         return str(tree)
 
@@ -667,7 +663,6 @@ def ast_to_sql(
                             agg_str += f'{func_call} as {name},'
                         else:
                             raise Exception('Unknown type for aggregate body ')
-                        # print('ASSIGNMENT! : ', first)
                     elif isinstance(first, FuncCall):
                         f = first
                         if f.func_args is not None:
@@ -732,16 +727,11 @@ def ast_to_sql(
             msg += ast_to_sql(s, start, symbol_table)
         return msg
     elif isinstance(rule, Tree):
-        print(f'TREE={tree.data}')
         tree = rule
-        if tree.data == 'whole_line':
-            return tree.children[0].replace('\n', '').replace('\r', '').rstrip('|')
-        else:
-            msg = str(f' {get_op_str(tree.data.value)} ').join([tree_to_str(c) for c in tree.children])
-            return f'({msg})'
+        msg = str(f' {get_op_str(tree.data.value)} ').join([tree_to_str(c) for c in tree.children])
+        return f'({msg})'
     elif isinstance(rule, Eq) or isinstance(rule, Gt) or isinstance(rule, Neq) \
             or isinstance(rule, Lt) or isinstance(rule, Gte) or isinstance(rule, Lte):
-        # s.lhs = self.replace_variables(s.lhs, start)
         s = rule
         msg = ''
         operator = rule.op
@@ -756,7 +746,6 @@ def ast_to_sql(
         pipe.func_body.parm1 = pipe.parm1
         msg += ast_to_sql(pipe.func_body, start, symbol_table)
 
-        # msg = f'{pipe.func_body}({pipe.parm1})'
         return msg
     elif isinstance(rule, FuncCall):
         f = rule
@@ -767,8 +756,7 @@ def ast_to_sql(
             msg = execute_function(f, symbol_table)
         return msg
     elif isinstance(rule, Value):
-        # Here is where we dp variable expansion and function execution .
-        # If its a table or value, we generate the SQL.  If its a function, we execute it
+
         val = str(rule)
         if start.value_defs:
             for table in start.value_defs.fields:
@@ -778,4 +766,3 @@ def ast_to_sql(
         return val
     else:
         raise Exception(f"No sql for {type(rule)}")
-        # return str(rule)
