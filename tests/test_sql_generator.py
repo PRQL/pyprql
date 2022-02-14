@@ -31,8 +31,7 @@ class TestSqlGenerator(unittest.TestCase):
         join table2 [id1=id2]
         '''
         res = prql.to_sql(q)
-        self.assertTrue(res.index('JOIN table2') != -1)
-        self.assertTrue(res.index('ON table.id1 = tbe.id2') != -1)
+        self.assertTrue(res.index('JOIN table2 table2_t ON table_t.id1 = table2_t.id2') != -1)
 
     def test_agg_syntax(self):
         q = '''
