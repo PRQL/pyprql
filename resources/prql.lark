@@ -1,4 +1,4 @@
-    start: (with_def)* value_defs func_defs from
+    root: (with_def)* value_defs func_defs from
 
     value_defs: (value_def)*
     func_defs: (func_def)*
@@ -7,14 +7,14 @@
     with_def: "table" NAME "=" "(" from ")"
     from: "from" NAME "|"? (join)? "|"? pipes
 
-    pipes.2: ((select | derive | filter | sort | take| aggregate) ("|")?)*
-    join: ("join"|"left_join")+ name "[" name ("=" name)? "]"
+    pipes: ((select | derive | filter | sort | take| aggregate) ("|")? )*
+    join: ("join"|"left_join"|"right_join")+ name "[" name ("=" name)? "]"
 
     aggregate: "aggregate" ("by" ":" ("[" group_by "]"|group_by) )? "["? aggregate_body "]"?
     group_by: name ("," name)*
     aggregate_body: ( (NAME ":")?  _line)? ( "," ((NAME ":")?  _line))*
 
-    _line: (STRING|FSTRING|func_call)
+    _line: (STRING|FSTRING|func_call|piped_call)
     take: "take" INT
 
     filter: "filter" (ESCAPED_STRING|expression)?
@@ -27,34 +27,25 @@
     derive: ("derive" ( "[" derive_line+ "]" | derive_line ))+
     derive_line: name ":" expression (",")?
 
-    expression:  eq
+    expression:  atom | atom operator atom
 
     func_def: "func" NAME (func_args)? "=" "("? func_body ")"?
     func_args: ((NAME " ")* NAME)*
     func_body: _line ("," _line)*
     func_call: "count" | NAME | NAME value | NAME value value | NAME value value value
 
-    piped_call: NAME ("." NAME)* "|" func_call
+    piped_call.2: NAME ("." NAME)* "|" func_call
 
-    eq: gt | gt "=" gt | neq
-    neq: expression "!=" expression
-
-    gt: sum | sum ">" sum | lt | gte | lte
-    ?lt:  sum "<" sum
-    ?lte:  sum "<=" sum
-    ?gte:  sum ">=" sum
-
-    ?sum: product | sum "+" product | diff
-    ?diff: sum "-" product
-    ?product: atom | product "*" atom | division
-    ?division: product "/" atom
-    ?atom: "(" expression ")" | value | piped_call
 
     value: NAME | STRING | NUMBER | SIGNED_NUMBER | FLOAT | SIGNED_FLOAT | FSTRING
     name: NAME ( "." NAME)*
 
     FSTRING: "f" STRING
     COMMENT: /#[^\n]*/
+
+    operator: (OP_ADD | OP_SUB | OP_MUL | OP_DIV  | OP_EQ | OP_NE  | OP_LT | OP_GE | OP_LE )
+    ?atom: "(" expression ")" | value | piped_call
+
     OP_ADD: "+"
     OP_SUB: "-"
     OP_MUL: "*"
@@ -63,7 +54,6 @@
     OP_EQ: "="
     OP_NE: "!="
     OP_LT: "<"
-    OP_GT: ">"
     OP_LE: "<="
     OP_GE: ">="
     OP_COLON: ":"

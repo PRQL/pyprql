@@ -131,14 +131,31 @@ class TestSqlGenerator(unittest.TestCase):
         print(res)
 
 
-    # def test_stdlib(self):
-    #     q = '''
-    #     from table
-    #     select [ foo, bar ]
-    #     filter bar = bar | min
-    #
-    #     '''
-    #     res = prql.to_sql(q)
-    #     self.assertTrue(res.index('foo + bar as foo_bar') != -1)
-    #     self.run_query(q, 12)
-    #     print(res)
+    def test_stdlib(self):
+        q = '''
+        from table
+        select [ foo, bar ]
+        aggregate [
+            min_price: price | min     
+        ]
+
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('MIN(price)') != -1)
+        self.run_query(q, 1)
+        print(res)
+
+    def test_stdlib_2(self):
+        q = '''
+        from table
+        select [ foo, bar ]
+        aggregate max_price: price | max     
+        
+
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('MAX(price)') != -1)
+        self.run_query(q, 1)
+        print(res)

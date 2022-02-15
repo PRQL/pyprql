@@ -59,12 +59,6 @@ class Expression(_Statement, ast_utils.AsList):
 
 
 @dataclass
-class PipedCall(_Statement):
-    parm1: Name
-    func_body: Tree
-
-
-@dataclass
 class Join(_Statement):
     name: Name
     left_id: Name
@@ -98,113 +92,10 @@ class DeriveLine(_Statement):
 
 @dataclass
 class Operator(_Statement):
-
-    def get_op(self):
-        return self.op
+    op: Token
 
     def __str__(self):
-        if self.rhs is None:
-            return f"{self.lhs}"
-        else:
-            return f"{self.lhs} {self.op} {self.rhs}"
-
-
-@dataclass
-class Neq(Operator):
-    lhs: Expression
-    rhs: Expression = None
-    op: str = '!='
-
-    def __str__(self):
-        if self.rhs is None:
-            return f"{self.lhs}"
-        else:
-            return f"{self.lhs} != {self.rhs}"
-
-
-@dataclass
-class Eq(Operator):
-    lhs: Expression
-    rhs: Expression = None
-    op: str = '='
-
-    def __str__(self):
-        if self.rhs is None:
-            return f"{self.lhs}"
-        else:
-            return f"{self.lhs} = {self.rhs}"
-
-
-@dataclass
-class Diff(Operator):
-    lhs: Expression
-    rhs: Expression = None
-    op: str = '-'
-
-
-@dataclass
-class Lt(_Statement):
-    lhs: Expression
-    rhs: Expression = None
-    op: str = '<'
-
-    def __str__(self):
-        if self.rhs is None:
-            return f"{self.lhs}"
-        else:
-            return f"{self.lhs} < {self.rhs}"
-
-
-@dataclass
-class Lte(_Statement):
-    lhs: Expression
-    rhs: Expression = None
-    op: str = '<='
-
-    def __str__(self):
-        if self.rhs is None:
-            return f"{self.lhs}"
-        else:
-            return f"{self.lhs} <= {self.rhs}"
-
-
-@dataclass
-class Sum(_Statement):
-    lhs: Expression
-    rhs: Expression = None
-    op: str = '+'
-
-    def __str__(self):
-        if self.rhs is None:
-            return f"{self.lhs}"
-        else:
-            return f"{self.lhs} + {self.rhs}"
-
-
-@dataclass
-class Gt(_Statement):
-    lhs: Expression
-    rhs: Expression = None
-    op: str = '>'
-
-    def __str__(self):
-        if self.rhs is None:
-            return f"{self.lhs}"
-        else:
-            return f"{self.lhs} > {self.rhs}"
-
-
-@dataclass
-class Gte(_Statement):
-    lhs: Expression
-    rhs: Expression = None
-    op: str = '>='
-
-    def __str__(self):
-        if self.rhs is None:
-            return f"{self.lhs}"
-        else:
-            return f"{self.lhs} >= {self.rhs}"
+        return self.op.value
 
 
 @dataclass
@@ -216,17 +107,8 @@ class GroupBy(_Statement, ast_utils.AsList):
 
 
 @dataclass
-class NamePair(_Statement):
-    name1: str = "count"
-    name2: str = "all"
-
-    def __str__(self):
-        return f'{self.name1}({self.name2}) as {self.name1}_{self.name2}'
-
-
-@dataclass
 class AggregateBody(_Statement, ast_utils.AsList):
-    statements: List[NamePair]
+    statements: List[_Statement]
 
     def __str__(self):
         return f'{[str(s) for s in self.statements]}'
@@ -363,6 +245,12 @@ class FuncCall(_Statement):
 
 
 @dataclass
+class PipedCall(_Statement):
+    parm1: Name
+    func_body: FuncCall
+
+
+@dataclass
 class ValueDef(_Statement):
     name: Name
     value_body: From
@@ -387,9 +275,9 @@ class WithDef(_Statement):
         return f'with {self.name} from {self._from.name}:\n\t{self._from}'
 
 
+# The top level definition that holds all other definitions
 @dataclass
-class Start(_Statement):
-    # Corresponds to start in the grammar
+class Root(_Statement):
     with_def: WithDef = None
     _from: From = None
     value_defs: ValueDefs = None
@@ -466,9 +354,9 @@ def get_func_str(func: str) -> str:
 
 
 @enforce_types
-def parse(_text: str) -> Start:
+def parse(_text: str) -> Root:
     text = _text + '\n'
-    parser = Lark(read_file('/../resources/prql.lark'), start="start", parser="lalr", transformer=ToAst())
+    parser = Lark(read_file('/../resources/prql.lark'), start="root", parser="lalr", transformer=ToAst())
     tree = parser.parse(text)
     transformer = ast_utils.create_transformer(this_module, ToAst())
     return transformer.transform(tree)
@@ -482,11 +370,11 @@ def to_sql(prql: str) -> str:
 
 
 @enforce_types
-def pretty_print(start: Start, do_print: bool = True) -> str:
-    # rich.print(start)
+def pretty_print(root: Root, do_print: bool = True) -> str:
+    # rich.print(root)
     ret = ''
-    _from = start.get_from()
-    table = start.get_cte()
+    _from = root.get_from()
+    table = root.get_cte()
     if table:
         ret += str(table) + "\n"
     ret += str(_from)
@@ -508,7 +396,7 @@ def tree_to_str(tree: Union[Tree, Token, _Ast, str]) -> str:
 def get_operation(ops: List[_Statement],
                   class_type: Type[_Statement],
                   last_match: bool = False,
-                  return_all: bool = False) -> List[_Statement]:
+                  return_all: bool = False) -> Union[List, _Statement]:
     ops_list = ops
     ret = []
     if last_match:
@@ -543,52 +431,58 @@ def wrap_replace_tables(from_long, from_short, join_long, join_short):
 
 
 @enforce_types
-def build_symbol_table(starts: List[Start]) -> Dict[str, _Ast]:
+def build_symbol_table(roots: List[Root]) -> Dict[str, _Ast]:
     table = {}
-    for start in starts:
-        for n in start.value_defs.fields:
+    for root in roots:
+        for n in root.value_defs.fields:
             table[str(n.name)] = n
-        for n in start.func_defs.fields:
+        for n in root.func_defs.fields:
             table[str(n.name)] = n
 
     return table
 
 
+class PRQLException(Exception):
+    pass
+
+
 def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
-    print('EXECUTING ' + str(f.name))
-    msg = 'NOT_FINISHED_YET --- '
+    print('EXECUTING function ' + str(f.name) + ' with args ' + str(f.func_args))
+    msg = ''
     name = str(f.name)
     func_def: FuncDef = symbol_table[name]
     # Execute line by line the function
-    for line in func_def.func_body.fields:
-        # First just text replcaement ,
-        if type(line) == str:
-            args = {}
-            vals = [f.parm1, f.func_args]
-            for i in range(0, len(func_def.func_args.fields)):
-                n = str(func_def.func_args.fields[i])
-                args[n] = vals[i]
-            ic(args)
-            msg = line.format(**args)
-
+    try:
+        for line in func_def.func_body.fields:
+            # First just text replcaement ,
+            if type(line) == str:
+                args = {}
+                vals = [f.parm1, f.func_args]
+                for i in range(0, len(func_def.func_args.fields)):
+                    n = str(func_def.func_args.fields[i])
+                    args[n] = vals[i]
+                msg = line.format(**args)
+    except Exception as e:
+        msg = repr(e)
+        if 'KeyError' in msg:
+            msg = f'Function {name} had an error executing , full error: {msg}'
+        raise PRQLException(msg)
     return msg
 
 
 @enforce_types
 def ast_to_sql(
         rule: Union[_Ast, Token],
-        starts: Union[Start, List], # a Start or a list of starts, all share the same symbol table
+        roots: Union[Root, List],  # a Root or a list of roots, all share the same symbol table
         symbol_table: dict = None,
         verbose: bool = True):
-
-    if isinstance(starts, Start):
-        start = starts
+    if isinstance(roots, Root):
+        root = roots
     else:
-        start = starts[0]
-
+        root = roots[0]
 
     if not symbol_table:
-        symbol_table = build_symbol_table([starts] if isinstance(starts, Start) else starts )
+        symbol_table = build_symbol_table([roots] if isinstance(roots, Root) else roots)
         if verbose:
             ic(symbol_table)
 
@@ -636,7 +530,7 @@ def ast_to_sql(
         derives = get_operation(ops.operations, Derive, return_all=True)
 
         if verbose:
-            rich.print(starts)
+            rich.print(roots)
 
         for select in selects:
             select_str += replace_tables(str(select))
@@ -665,6 +559,7 @@ def ast_to_sql(
             i = 0
             while i < upper:
                 first = agg.aggregate_body.statements[i]
+                print(f'here ----> {first}')
                 if first is not None:
                     if isinstance(first, lark.lexer.Token):
                         name = first
@@ -672,17 +567,27 @@ def ast_to_sql(
                         func_call = agg.aggregate_body.statements[i]
 
                         if isinstance(func_call, FuncCall):
-                            if func_call.func_args is not None:
-                                agg_str += f'{func_call} as {name},'
+                            agg_str += f'{func_call} as {name},'
                         elif isinstance(func_call, str):
                             agg_str += f'{func_call} as {name},'
+                        elif isinstance(func_call, PipedCall):
+                            piped = func_call
+                            piped.func_body.parm1 = piped.parm1
+                            agg_str += f'{ast_to_sql(piped.func_body, roots)} as {name},'
+
                         else:
-                            raise Exception('Unknown type for aggregate body ')
+                            raise PRQLException(f'Unknown type for aggregate body {type(first)}, {str(first)}')
                     elif isinstance(first, FuncCall):
                         f = first
                         if f.func_args is not None:
                             agg_str += f'{str(f)} as {f.name}_{f.func_args},'
-                    i += 1
+                    elif isinstance(first, PipedCall):
+                        piped = first
+                        f = piped.func_body.parm1 = piped.parm1
+                        agg_str += ast_to_sql(f, roots)
+                    else:
+                        raise PRQLException(f'Unknown type for aggregate body {type(first)}, {str(first)}')
+                i += 1
 
             agg_str = replace_tables(agg_str)
             agg_str = agg_str.rstrip(',').lstrip(',')
@@ -693,7 +598,7 @@ def ast_to_sql(
             for filter in filters:
                 if filter:
                     for f in filter.fields:
-                        filter_str += ast_to_sql(f, start, symbol_table) + ' AND '
+                        filter_str += ast_to_sql(f, roots, symbol_table) + ' AND '
             filter_str = filter_str.rstrip(' AND ')
 
         if derives:
@@ -731,39 +636,31 @@ def ast_to_sql(
                order_by_str,
                limit_str)
         sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by_str} {limit_str}'
-        # print(sql)
+        if verbose:
+            print('\t' + sql)
         return sql
     elif isinstance(rule, Expression):
         expr = rule
         msg = ''
         for s in expr.statements:
-            msg += ast_to_sql(s, start, symbol_table)
+            msg += ast_to_sql(s, roots, symbol_table)
         return msg
     elif isinstance(rule, Tree):
         tree = rule
         msg = str(f' {get_op_str(tree.data.value)} ').join([tree_to_str(c) for c in tree.children])
         return f'({msg})'
-    elif isinstance(rule, Eq) or isinstance(rule, Gt) or isinstance(rule, Neq) \
-            or isinstance(rule, Lt) or isinstance(rule, Gte) or isinstance(rule, Lte):
-        s = rule
-        msg = ''
-        operator = rule.op
-        if s.lhs:
-            msg += ast_to_sql(s.lhs, start, symbol_table)
-        if s.rhs:
-            msg += operator + ast_to_sql(s.rhs, start, symbol_table)
-        return msg
+
     elif isinstance(rule, PipedCall):
         pipe: PipedCall = rule
         msg = ''
         pipe.func_body.parm1 = pipe.parm1
-        msg += ast_to_sql(pipe.func_body, start, symbol_table)
+        msg += ast_to_sql(pipe.func_body, roots, symbol_table)
 
         return msg
     elif isinstance(rule, FuncCall):
         f = rule
         if f.parm1:
-            v = ',' + ast_to_sql(f.parm1, start, symbol_table)
+            v = ',' + ast_to_sql(f.parm1, roots, symbol_table)
             msg = str(f.name) + f'({v})'
         if f.name in symbol_table:
             msg = execute_function(f, symbol_table)
@@ -771,11 +668,13 @@ def ast_to_sql(
     elif isinstance(rule, Value):
 
         val = str(rule)
-        if start.value_defs:
-            for table in start.value_defs.fields:
+        if root.value_defs:
+            for table in root.value_defs.fields:
                 if table.name == val:
-                    return "(" + ast_to_sql(table.value_body, start, symbol_table) + ")"
+                    return "(" + ast_to_sql(table.value_body, roots, symbol_table) + ")"
 
         return val
+    elif isinstance(rule, Operator):
+        return str(rule)
     else:
         raise Exception(f"No sql for {type(rule)}")
