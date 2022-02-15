@@ -29,7 +29,7 @@
 
     expression:  eq
 
-    func_def: "func" NAME (func_args)? "=" "(" func_body ")"
+    func_def: "func" NAME (func_args)? "=" "("? func_body ")"?
     func_args: ((NAME " ")* NAME)*
     func_body: _line ("," _line)*
     func_call: "count" | NAME | NAME value | NAME value value | NAME value value value
@@ -68,7 +68,7 @@
     OP_GE: ">="
     OP_COLON: ":"
 
-    %import python (NAME, STRING, INTEGER, DEC_NUMBER,HEX_NUMBER,BIN_NUMBER,OCT_NUMBER,FLOAT_NUMBER,IMAG_NUMBER)
+    %import python (NAME, STRING, INTEGER)
     %import common (WS,INT,SIGNED_INT,NUMBER,SIGNED_NUMBER,FLOAT,SIGNED_FLOAT,ESCAPED_STRING)
     %ignore WS
     %ignore COMMENT

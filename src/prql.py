@@ -337,7 +337,7 @@ class FuncArgs(_Statement, ast_utils.AsList):
     fields: List[str] = None
 
     def __str__(self):
-        return ",".join([str(x) for x in {self.fields}])
+        return ",".join([str(x) for x in self.fields])
 
 
 @dataclass
@@ -477,7 +477,8 @@ def parse(_text: str) -> Start:
 @enforce_types
 def to_sql(prql: str) -> str:
     ast = parse(prql)
-    return ast_to_sql(ast._from, ast).replace('   ', ' ').replace('  ', ' ')
+    stdlib = parse(read_file('/../resources/stdlib.prql'))
+    return ast_to_sql(ast._from, [ast, stdlib]).replace('   ', ' ').replace('  ', ' ')
 
 
 @enforce_types
@@ -542,17 +543,17 @@ def wrap_replace_tables(from_long, from_short, join_long, join_short):
 
 
 @enforce_types
-def build_symbol_table(start: Start) -> Dict[str, _Ast]:
+def build_symbol_table(starts: List[Start]) -> Dict[str, _Ast]:
     table = {}
-    for n in start.value_defs.fields:
-        table[str(n.name)] = n
-    for n in start.func_defs.fields:
-        table[str(n.name)] = n
+    for start in starts:
+        for n in start.value_defs.fields:
+            table[str(n.name)] = n
+        for n in start.func_defs.fields:
+            table[str(n.name)] = n
 
     return table
 
 
-@enforce_types
 def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
     print('EXECUTING ' + str(f.name))
     msg = 'NOT_FINISHED_YET --- '
@@ -567,6 +568,7 @@ def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
             for i in range(0, len(func_def.func_args.fields)):
                 n = str(func_def.func_args.fields[i])
                 args[n] = vals[i]
+            ic(args)
             msg = line.format(**args)
 
     return msg
@@ -574,16 +576,23 @@ def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
 
 @enforce_types
 def ast_to_sql(
-        rule: Union[_Ast, lark.lexer.Token],
-        start: Start,
+        rule: Union[_Ast, Token],
+        starts: Union[Start, List], # a Start or a list of starts, all share the same symbol table
         symbol_table: dict = None,
         verbose: bool = True):
-    tree = start
+
+    if isinstance(starts, Start):
+        start = starts
+    else:
+        start = starts[0]
+
 
     if not symbol_table:
-        symbol_table = build_symbol_table(tree)
+        symbol_table = build_symbol_table([starts] if isinstance(starts, Start) else starts )
+        if verbose:
+            ic(symbol_table)
 
-    if isinstance(rule, lark.lexer.Token):
+    if isinstance(rule, Token):
         return str(rule)
 
     if isinstance(rule, From):
@@ -627,7 +636,7 @@ def ast_to_sql(
         derives = get_operation(ops.operations, Derive, return_all=True)
 
         if verbose:
-            rich.print(tree)
+            rich.print(starts)
 
         for select in selects:
             select_str += replace_tables(str(select))
@@ -723,8 +732,6 @@ def ast_to_sql(
                limit_str)
         sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by_str} {limit_str}'
         # print(sql)
-        if verbose:
-            print(sql)
         return sql
     elif isinstance(rule, Expression):
         expr = rule

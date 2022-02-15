@@ -129,3 +129,16 @@ class TestSqlGenerator(unittest.TestCase):
         self.assertTrue(res.index('foo + bar as foo_bar') != -1)
         self.run_query(q, 12)
         print(res)
+
+
+    # def test_stdlib(self):
+    #     q = '''
+    #     from table
+    #     select [ foo, bar ]
+    #     filter bar = bar | min
+    #
+    #     '''
+    #     res = prql.to_sql(q)
+    #     self.assertTrue(res.index('foo + bar as foo_bar') != -1)
+    #     self.run_query(q, 12)
+    #     print(res)

@@ -1,0 +1,12 @@
+
+func min column = f"MIN({column)}"
+func max column = f"MAX({column)}"
+func avg column = f"AVG({column)}"
+func average column = f"AVG({column)}"
+func count column = f"COUNT({column)}"
+func count_distinct column = f"COUNT(DISTINCT `{column}`)"
+
+func count = f"COUNT(*)"
+
+# We just want the functions, but need this to be compliant
+from null

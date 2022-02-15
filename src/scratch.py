@@ -8,7 +8,7 @@ if __name__ == '__main__':
     print(f'Using database: {db_path}')
     con = sqlite3.connect(db_path)
     cur = con.cursor()
-    file_names = [base_path + '/q3.prql', '/../tests/employee_examples/index.prql']
+    file_names = ['/../resources/stdlib.prql']
     for file_name in file_names:
         text = read_file(file_name)
 
@@ -17,7 +17,7 @@ if __name__ == '__main__':
             tree = parse(text)
 
             # try:
-            sql = ast_to_sql(tree._from, tree)
+            sql = ast_to_sql(tree._from, [tree])
             print(f'PRQL->SQL: {sql}\n' + '~' * 80 + '\n')
 
             rows = cur.execute(sql)
