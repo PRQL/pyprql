@@ -233,7 +233,7 @@ class FuncDef(_Statement):
     func_args: FuncArgs
     func_body: FuncBody = None
 
-    def __init__(self, name,func_args=None, func_body=None):
+    def __init__(self, name, func_args=None, func_body=None):
         self.name = name
         values = [func_args, func_body]
         self.func_args = self.assign_field(FuncArgs, values)
