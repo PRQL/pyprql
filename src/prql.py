@@ -1,7 +1,7 @@
 import os
 import sys
 from dataclasses import dataclass
-from typing import List, Union, Type, Any, Dict
+from typing import List, Union, Type, Any, Dict, Optional
 
 import lark
 import rich
@@ -233,6 +233,12 @@ class FuncDef(_Statement):
     func_args: FuncArgs
     func_body: FuncBody = None
 
+    def __init__(self, name,func_args=None, func_body=None):
+        self.name = name
+        values = [func_args, func_body]
+        self.func_args = self.assign_field(FuncArgs, values)
+        self.func_body = self.assign_field(FuncBody, values)
+
 
 @dataclass
 class FuncCall(_Statement):
@@ -241,7 +247,10 @@ class FuncCall(_Statement):
     parm1: Any = None
 
     def __str__(self):
-        return f'{get_func_str(self.name)}({str(self.func_args)})'
+        a = str(self.func_args)
+        if self.func_args is None:
+            a = '*'
+        return f'{get_func_str(self.name)}({a})'
 
 
 @dataclass
@@ -347,7 +356,7 @@ def get_op_str(op: str) -> str:
 
 
 @enforce_types
-def get_func_str(func: str) -> str:
+def get_func_str(func: Optional[str]) -> str:
     if func == 'average':
         return 'avg'
     return func
@@ -458,10 +467,13 @@ def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
             if type(line) == str:
                 args = {}
                 vals = [f.parm1, f.func_args]
-                for i in range(0, len(func_def.func_args.fields)):
-                    n = str(func_def.func_args.fields[i])
-                    args[n] = vals[i]
-                msg = line.format(**args)
+                if func_def.func_args is not None:
+                    for i in range(0, len(func_def.func_args.fields)):
+                        n = str(func_def.func_args.fields[i])
+                        args[n] = vals[i]
+                    msg = line.format(**args)
+                else:
+                    msg = line
     except Exception as e:
         msg = repr(e)
         if 'KeyError' in msg:
@@ -474,7 +486,7 @@ def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
 def ast_to_sql(
         rule: Union[_Ast, Token],
         roots: Union[Root, List],  # a Root or a list of roots, all share the same symbol table
-        symbol_table: dict = None,
+        symbol_table: Dict[str, _Ast] = None,
         verbose: bool = True):
     if isinstance(roots, Root):
         root = roots
@@ -559,7 +571,7 @@ def ast_to_sql(
             i = 0
             while i < upper:
                 first = agg.aggregate_body.statements[i]
-                print(f'here ----> {first}')
+                print(f'here ----> {first},{type(first)}')
                 if first is not None:
                     if isinstance(first, lark.lexer.Token):
                         name = first
@@ -581,10 +593,14 @@ def ast_to_sql(
                         f = first
                         if f.func_args is not None:
                             agg_str += f'{str(f)} as {f.name}_{f.func_args},'
+                        else:
+                            agg_str += f'{str(f)},'
                     elif isinstance(first, PipedCall):
                         piped = first
-                        f = piped.func_body.parm1 = piped.parm1
-                        agg_str += ast_to_sql(f, roots)
+                        piped.func_body.parm1 = piped.parm1
+                        agg_str += f'{ast_to_sql(piped.func_body, roots)} as {piped.parm1}_{piped.func_body.name},'
+                    elif isinstance(first, str):
+                        agg_str += f'{first},'
                     else:
                         raise PRQLException(f'Unknown type for aggregate body {type(first)}, {str(first)}')
                 i += 1
@@ -659,6 +675,7 @@ def ast_to_sql(
         return msg
     elif isinstance(rule, FuncCall):
         f = rule
+
         if f.parm1:
             v = ',' + ast_to_sql(f.parm1, roots, symbol_table)
             msg = str(f.name) + f'({v})'

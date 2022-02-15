@@ -131,7 +131,7 @@ class TestSqlGenerator(unittest.TestCase):
         print(res)
 
 
-    def test_stdlib(self):
+    def test_min(self):
         q = '''
         from table
         select [ foo, bar ]
@@ -146,16 +146,40 @@ class TestSqlGenerator(unittest.TestCase):
         self.run_query(q, 1)
         print(res)
 
-    def test_stdlib_2(self):
+    def test_stdlib_max(self):
         q = '''
         from table
         select [ foo, bar ]
         aggregate max_price: price | max     
-        
-
+    
         '''
         res = prql.to_sql(q)
         print(res)
         self.assertTrue(res.index('MAX(price)') != -1)
+        self.run_query(q, 1)
+        print(res)
+
+    def test_stdlib_count(self):
+        q = '''
+        from table
+        select [ foo, bar ]
+        aggregate foo | count      
+
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('COUNT(foo)') != -1)
+        self.run_query(q, 1)
+        print(res)
+
+    def test_stdlib_count(self):
+        q = '''
+        from table
+        select [ foo, bar ]
+        aggregate count  
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('count(*) FROM `table`') != -1)
         self.run_query(q, 1)
         print(res)
