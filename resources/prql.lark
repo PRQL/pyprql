@@ -43,7 +43,7 @@
     FSTRING: "f" STRING
     COMMENT: /#[^\n]*/
 
-    operator: (OP_ADD | OP_SUB | OP_MUL | OP_DIV  | OP_EQ | OP_NE  | OP_LT | OP_GE | OP_LE )
+    operator: (OP_ADD | OP_SUB | OP_MUL | OP_DIV  | OP_EQ | OP_NE  | OP_LT | OP_GE | OP_LE | OP_GT)
     ?atom: "(" expression ")" | value | piped_call
 
     OP_ADD: "+"
@@ -54,6 +54,8 @@
     OP_EQ: "="
     OP_NE: "!="
     OP_LT: "<"
+    OP_GT: ">"
+
     OP_LE: "<="
     OP_GE: ">="
     OP_COLON: ":"

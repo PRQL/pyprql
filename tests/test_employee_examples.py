@@ -6,12 +6,9 @@ import prql
 
 class TestEmployeeExamples(unittest.TestCase):
     def setUp(self) -> None:
-        self.base_path = 'employee_examples'
-        db_path = f'./{self.base_path}/employee.db'
+        db_path = f'./employee.db'
         self.con = sqlite3.connect(db_path)
         self.cur = self.con.cursor()
-    def get_query(self, file_name):
-        return prql.read_file('/../tests/' + self.base_path + '/' + file_name)
 
     def run_query(self, text, expected=None):
         print(text.replace('\n\n', '\n'))
@@ -26,6 +23,40 @@ class TestEmployeeExamples(unittest.TestCase):
             assert (len(rows) == expected)
 
     def test_index(self):
-        q = self.get_query('index.prql')
+        q =  '''
+        from employees
+        filter country = "USA"                           # Each line transforms the previous result.
+        derive [                                         # This adds columns / variables.
+          gross_salary: salary + payroll_tax,
+          gross_cost:   gross_salary + benefits_cost     # Variables can use other variables.
+        ]
+        filter gross_cost > 0
+        aggregate by:[title, country] [                  # `by` are the columns to group by.
+            average salary,                              # These are aggregation calcs run on each group.
+            sum     salary,
+            average gross_salary,
+            sum     gross_salary,
+            average gross_cost,
+            sum_gross_cost: sum gross_cost,
+            count
+        ]
+        sort sum_gross_cost
+        filter count > 200
+        take 20
+        '''
         # self.run_query(q)
 
+
+    def test_cte1(self):
+        text= '''
+        table newest_employees = (
+            from employees
+            sort tenure
+            take 50
+        )
+        
+        from newest_employees
+        join salary [id]
+        select [name, salary]
+        '''
+        # self.run_query(text)

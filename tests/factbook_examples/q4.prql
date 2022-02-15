@@ -1,2 +1,0 @@
-# SELECT * FROM cities JOIN facts  ON cities.facts_id = facts.id LIMIT 15
-from cities | join facts [facts_id=id] | take 4

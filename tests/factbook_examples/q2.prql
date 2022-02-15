@@ -1,2 +1,0 @@
-# SELECT name, area_land - area_water as just_land FROM facts LIMIT 2
-from facts | select name | derive [ just_land: area_land - area_water ]  | take 2

@@ -1,1 +1,0 @@
-These will generate sql to run against factbook.db, an SQLLite databasee.

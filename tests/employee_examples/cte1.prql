@@ -1,9 +1,0 @@
-table newest_employees = (
-    from employees
-    sort tenure
-    take 50
-)
-
-from newest_employees
-join salary [id]
-select [name, salary]

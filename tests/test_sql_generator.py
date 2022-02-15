@@ -6,8 +6,7 @@ import prql
 
 class TestSqlGenerator(unittest.TestCase):
     def setUp(self) -> None:
-        self.base_path = 'employee_examples'
-        db_path = f'./{self.base_path}/employee.db'
+        db_path = f'./employee.db'
         self.con = sqlite3.connect(db_path)
         self.cur = self.con.cursor()
 
