@@ -1,5 +1,6 @@
 
 func min column = f"MIN({column})"
+func sum column = f"SUM({column})"
 func max column = f"MAX({column})"
 func avg column = f"AVG({column})"
 func stddev column = f"STDDEV({column})"

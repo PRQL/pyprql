@@ -76,6 +76,14 @@ class SelectFields(_Statement, ast_utils.AsList):
         return [str(x) for x in self.fields]
 
 
+@dataclass()
+class PipeBody(_Statement):
+    body: str
+
+    def __str__(self):
+        return str(self.body)
+
+
 @dataclass
 class Select(_Statement):
     fields: SelectFields
@@ -463,15 +471,19 @@ def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
     # Execute line by line the function
     try:
         for line in func_def.func_body.fields:
-            # First just text replcaement ,
+            # First just text replcaement ,1
+            if isinstance(line, PipeBody):
+                line = line.body
             if type(line) == str:
                 args = {}
+                if not f.parm1:
+                    f.parm1 = f.func_args
                 vals = [f.parm1, f.func_args]
                 if func_def.func_args is not None:
                     for i in range(0, len(func_def.func_args.fields)):
                         n = str(func_def.func_args.fields[i])
                         args[n] = vals[i]
-                    msg = line.format(**args)
+                    msg = line.format(**args).replace('None', '*')
                 else:
                     msg = line
     except Exception as e:
@@ -570,11 +582,10 @@ def ast_to_sql(
             upper = len(agg.aggregate_body.statements)
             i = 0
             while i < upper:
-                first = agg.aggregate_body.statements[i]
-                print(f'here ----> {first},{type(first)}')
-                if first is not None:
-                    if isinstance(first, lark.lexer.Token):
-                        name = first
+                line = agg.aggregate_body.statements[i]
+                if line is not None:
+                    if isinstance(line, lark.lexer.Token):
+                        name = line
                         i += 1
                         func_call = agg.aggregate_body.statements[i]
 
@@ -582,27 +593,35 @@ def ast_to_sql(
                             agg_str += f'{func_call} as {name},'
                         elif isinstance(func_call, str):
                             agg_str += f'{func_call} as {name},'
+                        elif isinstance(func_call, PipeBody):
+                            if isinstance(func_call.body, PipedCall):
+                                agg_str += f'{ast_to_sql(func_call.body, roots, symbol_table)} as {name},'
+                            else:
+                                agg_str += f'{func_call} as {name},'
+
                         elif isinstance(func_call, PipedCall):
                             piped = func_call
                             piped.func_body.parm1 = piped.parm1
                             agg_str += f'{ast_to_sql(piped.func_body, roots)} as {name},'
 
                         else:
-                            raise PRQLException(f'Unknown type for aggregate body {type(first)}, {str(first)}')
-                    elif isinstance(first, FuncCall):
-                        f = first
+                            raise PRQLException(f'Unknown type for aggregate body {type(line)}, {str(line)}')
+                    elif isinstance(line, FuncCall):
+                        f = line
                         if f.func_args is not None:
                             agg_str += f'{str(f)} as {f.name}_{f.func_args},'
                         else:
                             agg_str += f'{str(f)},'
-                    elif isinstance(first, PipedCall):
-                        piped = first
+                    elif isinstance(line, PipedCall):
+                        piped = line
                         piped.func_body.parm1 = piped.parm1
                         agg_str += f'{ast_to_sql(piped.func_body, roots)} as {piped.parm1}_{piped.func_body.name},'
-                    elif isinstance(first, str):
-                        agg_str += f'{first},'
+                    elif isinstance(line, str):
+                        agg_str += f'{line},'
+                    elif isinstance(line, PipeBody):
+                        agg_str += ast_to_sql(line.body, roots, symbol_table=symbol_table)
                     else:
-                        raise PRQLException(f'Unknown type for aggregate body {type(first)}, {str(first)}')
+                        raise PRQLException(f'Unknown type for aggregate body {type(line)}, {str(line)}')
                 i += 1
 
             agg_str = replace_tables(agg_str)
@@ -679,7 +698,7 @@ def ast_to_sql(
         if f.parm1:
             v = ',' + ast_to_sql(f.parm1, roots, symbol_table)
             msg = str(f.name) + f'({v})'
-        if f.name in symbol_table:
+        if str(f.name) in symbol_table:
             msg = execute_function(f, symbol_table)
         return msg
     elif isinstance(rule, Value):

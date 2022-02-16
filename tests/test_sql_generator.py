@@ -71,7 +71,7 @@ class TestSqlGenerator(unittest.TestCase):
         '''
         res = prql.to_sql(q)
 
-        self.assertTrue(res.index('sum(price) as sum_price') != -1)
+        self.assertTrue(res.index('SUM(price)') != -1)
         self.assertTrue(res.index('GROUP BY code') != -1)
         self.run_query(q, 3)
 
@@ -85,7 +85,7 @@ class TestSqlGenerator(unittest.TestCase):
         '''
         res = prql.to_sql(q)
 
-        self.assertTrue(res.index('sum(price) as sum_price') != -1)
+        self.assertTrue(res.index('SUM(price)') != -1)
         self.assertTrue(res.index('GROUP BY code,country') != -1)
         self.run_query(q, 5)
 
@@ -99,7 +99,7 @@ class TestSqlGenerator(unittest.TestCase):
         '''
         res = prql.to_sql(q)
 
-        self.assertTrue(res.index('sum(price) as sum_price') != -1)
+        self.assertTrue(res.index('SUM(price)') != -1)
         self.assertTrue(res.index('GROUP BY code') != -1)
         self.run_query(q, 3)
 
@@ -129,56 +129,3 @@ class TestSqlGenerator(unittest.TestCase):
         self.run_query(q, 12)
         print(res)
 
-
-    def test_min(self):
-        q = '''
-        from table
-        select [ foo, bar ]
-        aggregate [
-            min_price: price | min     
-        ]
-
-        '''
-        res = prql.to_sql(q)
-        print(res)
-        self.assertTrue(res.index('MIN(price)') != -1)
-        self.run_query(q, 1)
-        print(res)
-
-    def test_stdlib_max(self):
-        q = '''
-        from table
-        select [ foo, bar ]
-        aggregate max_price: price | max     
-    
-        '''
-        res = prql.to_sql(q)
-        print(res)
-        self.assertTrue(res.index('MAX(price)') != -1)
-        self.run_query(q, 1)
-        print(res)
-
-    def test_stdlib_count(self):
-        q = '''
-        from table
-        select [ foo, bar ]
-        aggregate foo | count      
-
-        '''
-        res = prql.to_sql(q)
-        print(res)
-        self.assertTrue(res.index('COUNT(foo)') != -1)
-        self.run_query(q, 1)
-        print(res)
-
-    def test_stdlib_count(self):
-        q = '''
-        from table
-        select [ foo, bar ]
-        aggregate count  
-        '''
-        res = prql.to_sql(q)
-        print(res)
-        self.assertTrue(res.index('count(*) FROM `table`') != -1)
-        self.run_query(q, 1)
-        print(res)
