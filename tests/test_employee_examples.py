@@ -49,7 +49,7 @@ class TestEmployeeExamples(unittest.TestCase):
 
     def test_cte1(self):
         text= '''
-        table newest_employees = (
+        table newest_employees = ( 
             from employees
             sort tenure
             take 50
