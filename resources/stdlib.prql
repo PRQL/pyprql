@@ -1,7 +1,8 @@
+# Aggregate Functions
 
 func min column = f"MIN({column})"
-func sum column = f"SUM({column})"
 func max column = f"MAX({column})"
+func sum column = f"SUM({column})"
 func avg column = f"AVG({column})"
 func stddev column = f"STDDEV({column})"
 func average column = f"AVG({column})"
@@ -9,5 +10,8 @@ func count = f"COUNT(*)"
 func count column = f"COUNT({column})"
 func count_distinct column = f"COUNT(DISTINCT `{column}`)"
 
-# We just want the functions, but need this to be compliant
+# Casting functions
+
+func as column type = f"CAST({column} AS {type})"
+
 from null

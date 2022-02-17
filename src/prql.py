@@ -499,7 +499,7 @@ def ast_to_sql(
         rule: Union[_Ast, Token],
         roots: Union[Root, List],  # a Root or a list of roots, all share the same symbol table
         symbol_table: Dict[str, _Ast] = None,
-        verbose: bool = True):
+        verbose: bool = False):
     if isinstance(roots, Root):
         root = roots
     else:
@@ -680,11 +680,6 @@ def ast_to_sql(
         for s in expr.statements:
             msg += ast_to_sql(s, roots, symbol_table)
         return msg
-    elif isinstance(rule, Tree):
-        tree = rule
-        msg = str(f' {get_op_str(tree.data.value)} ').join([tree_to_str(c) for c in tree.children])
-        return f'({msg})'
-
     elif isinstance(rule, PipedCall):
         pipe: PipedCall = rule
         msg = ''
