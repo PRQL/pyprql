@@ -68,9 +68,20 @@ class Join(_Statement):
         return f"join: {self.name} on {self.left_id} {' = ' + self.right_id.name if self.right_id else ''}"
 
 
+@dataclass
+class SelectField(_Statement):
+    name: Name
+    cast_type: Optional[Name] = None
+
+    def __str__(self):
+        if self.cast_type is not None:
+            return f"CAST({self.name} as {self.cast_type})"
+        return str(self.name)
+
+
 @dataclass()
 class SelectFields(_Statement, ast_utils.AsList):
-    fields: List[Name]
+    fields: List[SelectField]
 
     def __str__(self):
         return [str(x) for x in self.fields]
@@ -499,7 +510,7 @@ def ast_to_sql(
         rule: Union[_Ast, Token],
         roots: Union[Root, List],  # a Root or a list of roots, all share the same symbol table
         symbol_table: Dict[str, _Ast] = None,
-        verbose: bool = False):
+        verbose: bool = True):
     if isinstance(roots, Root):
         root = roots
     else:

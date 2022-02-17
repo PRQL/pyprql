@@ -25,9 +25,10 @@
 
 
     select: ("select" select_fields)+
-    select_fields: ("[" [(name ",")*] name "]")* \
+    select_fields: ("[" select_field ("," select_field)*  "]")* \
                    (name*)
 
+    select_field: name ( "|" "as" name )?
     derive: ("derive" \
             ( "[" derive_line+ "]" | derive_line ))+
     derive_line: name ":" expression (",")?
@@ -39,7 +40,8 @@
     func_body: pipe_body ("," pipe_body)*
     func_call:  NAME | NAME value | NAME value value | NAME value value value
 
-    piped_call.2: NAME ("." NAME)* "|" func_call
+
+    piped_call: NAME ("." NAME)* "|" func_call
 
 
     value: NAME | STRING | NUMBER | SIGNED_NUMBER | FLOAT | SIGNED_FLOAT | FSTRING

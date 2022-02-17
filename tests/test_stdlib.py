@@ -135,13 +135,73 @@ class TestStdlib(unittest.TestCase):
         self.run_query(q, 1)
         print(res)
 
-    # def test_casts(self):
-    #     q = '''
-    #     from table
-    #     select foo | as float
-    #     '''
-    #     res = prql.to_sql(q)
-    #     print(res)
-    #     self.assertTrue(res.index('COUNT(*)') != -1)
-    #     self.run_query(q, 1)
-    #     print(res)
+    def test_casts(self):
+        q = '''
+        from table
+        select [foo | as float]
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('CAST(foo as float)') != -1)
+        self.run_query(q, 12)
+        print(res)
+
+    def test_casts_float(self):
+        q = '''
+        from table | select [foo | as float, bar] | take 5 
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('CAST(foo as float)') != -1)
+        self.run_query(q, 5)
+        print(res)
+
+    def test_casts_string(self):
+        q = '''
+        from table | select [foo | as string, bar] | take 5 
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('CAST(foo as string)') != -1)
+        self.run_query(q, 5)
+        print(res)
+
+    def test_casts_date(self):
+        q = '''
+        from table | select [foo | as date, bar] | take 5 
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('CAST(foo as date)') != -1)
+        self.run_query(q, 5)
+        print(res)
+
+    def test_casts_datetime(self):
+        q = '''
+        from table | select [foo | as datetime, bar] | take 5 
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('CAST(foo as datetime)') != -1)
+        self.run_query(q, 5)
+        print(res)
+
+    def test_casts_time(self):
+        q = '''
+        from table | select [foo | as time, bar] | take 5 
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('CAST(foo as time)') != -1)
+        self.run_query(q, 5)
+        print(res)
+
+    def test_casts_double(self):
+        q = '''
+        from table | select [foo | as double, bar] | take 5 
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('CAST(foo as double)') != -1)
+        self.run_query(q, 5)
+        print(res)
