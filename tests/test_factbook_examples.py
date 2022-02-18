@@ -12,13 +12,13 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         TestSQLGeneratorForFactbook.cur = TestSQLGeneratorForFactbook.con.cursor()
 
     def run_query(self, text, expected):
-        # print(text.replace('\n\n', '\n'))
-        # print('-' * 40)
+        print(text.replace('\n\n', '\n'))
+        print('-' * 40)
         sql = prql.to_sql(text)
-        # print(sql)
+        print(sql)
         rows = TestSQLGeneratorForFactbook.cur.execute(sql)
         columns = [d[0] for d in rows.description]
-        # print(f'Columns: {columns}')
+        print(f'Columns: {columns}')
         rows = rows.fetchall()
         assert (len(rows) == expected)
 
@@ -67,7 +67,6 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         filter population = min_pop
         '''
 
-
         self.run_query(text, 1)
 
     def test_factbook_q4(self):
@@ -94,11 +93,12 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
             country: "facts.name"
         ]
         aggregate by:[code] [
-            country_pop: "SUM(facts.population)",
-            city_pop: "SUM(cities.population)"
+            country_pop: sum facts.population,
+            city_pop: cities.population | sum
         ]
         sort "city_pop desc"
         take 5        
+        
         '''
         self.run_query(text, 5)
 

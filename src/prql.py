@@ -53,7 +53,7 @@ class Expression(_Statement, ast_utils.AsList):
             if isinstance(s, Tree):
                 msg += tree_to_str(s).replace("\n", ",")
             else:
-                msg += f'{s} '
+                msg += f'{s}'
 
         return msg
 
@@ -510,7 +510,7 @@ def ast_to_sql(
         rule: Union[_Ast, Token],
         roots: Union[Root, List],  # a Root or a list of roots, all share the same symbol table
         symbol_table: Dict[str, _Ast] = None,
-        verbose: bool = False):
+        verbose: bool = True):
     if isinstance(roots, Root):
         root = roots
     else:
@@ -605,7 +605,8 @@ def ast_to_sql(
                         elif isinstance(func_call, str):
                             agg_str += f'{func_call} as {name},'
                         elif isinstance(func_call, PipeBody):
-                            if isinstance(func_call.body, PipedCall):
+                            if isinstance(func_call.body, PipedCall) or \
+                                    isinstance(func_call.body, FuncCall):
                                 agg_str += f'{ast_to_sql(func_call.body, roots, symbol_table)} as {name},'
                             else:
                                 agg_str += f'{func_call} as {name},'
@@ -701,9 +702,9 @@ def ast_to_sql(
     elif isinstance(rule, FuncCall):
         f = rule
 
-        if f.parm1:
-            v = ',' + ast_to_sql(f.parm1, roots, symbol_table)
-            msg = str(f.name) + f'({v})'
+        # if f.parm1:
+        #     v = ',' + ast_to_sql(f.parm1, roots, symbol_table)
+        #     msg = str(f.name) + f'({v})'
         if str(f.name) in symbol_table:
             msg = execute_function(f, symbol_table)
         return msg

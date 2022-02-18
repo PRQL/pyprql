@@ -38,14 +38,18 @@
     func_def: "func" NAME (func_args)? "=" "("? func_body ")"?
     func_args: ((NAME " ")* NAME)*
     func_body: pipe_body ("," pipe_body)*
-    func_call:  NAME | NAME value | NAME value value | NAME value value value
 
+    func_call:  NAME | \
+                NAME name | \
+                NAME name name | \
+                NAME name name name | \
+                NAME name name name name
 
-    piped_call: NAME ("." NAME)* "|" func_call
+    piped_call: name "|" func_call
 
 
     value: NAME | STRING | NUMBER | SIGNED_NUMBER | FLOAT | SIGNED_FLOAT | FSTRING
-    name: NAME ( "." NAME)*
+    name.9: NAME ( "." NAME)*
 
     FSTRING: "f" STRING
     COMMENT: /#[^\n]*/

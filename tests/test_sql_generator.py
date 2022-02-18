@@ -47,6 +47,36 @@ class TestSqlGenerator(unittest.TestCase):
         self.assertTrue(res.startswith('SELECT foo,bar'))
         self.run_query(q)
 
+    def test_select_as(self):
+        q = '''
+        from table | select [ foo | as float ,  bar | as string ]
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.startswith('SELECT CAST(foo as float),CAST(bar as string)'))
+        self.run_query(q)
+
+    def test_select_as_single(self):
+        q = '''
+        from table | select [ foo | as float  ]
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.startswith('SELECT CAST(foo as float)'))
+        self.run_query(q)
+
+    def test_select_as_single_no_brackets_will_fail(self):
+        q = '''
+        from table | select foo | as float
+        '''
+        try:
+            res = prql.to_sql(q)
+            print(res)
+            self.assertTrue(res.startswith('SELECT CAST(foo as float)'))
+            self.run_query(q)
+        except Exception as e:
+            self.assertTrue(True)
+
     def test_limit(self):
         q = 'from table | take 10'
         res = prql.to_sql(q)
@@ -74,7 +104,7 @@ class TestSqlGenerator(unittest.TestCase):
         join table2 [table.id=table2.id]
         '''
         res = prql.to_sql(q)
-        #print(res)
+        # print(res)
         self.assertTrue(res.index('JOIN table2 table2_t ON table_t.id = table2_t.id') != -1)
         self.run_query(q, 6)
 
@@ -130,7 +160,7 @@ class TestSqlGenerator(unittest.TestCase):
         '''
         res = prql.to_sql(q)
 
-        self.assertTrue(res.index('sum(price) as all_costs') != -1)
+        self.assertTrue(res.index('SUM(price) as all_costs') != -1)
         self.assertTrue(res.index('GROUP BY code') != -1)
         self.run_query(q, 3)
 
@@ -142,6 +172,6 @@ class TestSqlGenerator(unittest.TestCase):
         ]
         '''
         res = prql.to_sql(q)
-        self.assertTrue(res.index('foo + bar as foo_bar') != -1)
+        self.assertTrue(res.index('foo+bar as foo_bar') != -1)
         self.run_query(q, 12)
-        #print(res)
+        # print(res)
