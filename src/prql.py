@@ -510,7 +510,7 @@ def ast_to_sql(
         rule: Union[_Ast, Token],
         roots: Union[Root, List],  # a Root or a list of roots, all share the same symbol table
         symbol_table: Dict[str, _Ast] = None,
-        verbose: bool = True):
+        verbose: bool = False):
     if isinstance(roots, Root):
         root = roots
     else:

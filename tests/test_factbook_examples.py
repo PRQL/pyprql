@@ -6,20 +6,19 @@ import prql
 
 class TestSQLGeneratorForFactbook(unittest.TestCase):
 
-    def setUp(self) -> None:
+    def setUpClass() -> None:
         db_path = f'./factbook.db'
-        self.con = sqlite3.connect(db_path)
-        self.cur = self.con.cursor()
-
+        TestSQLGeneratorForFactbook.con = sqlite3.connect(db_path)
+        TestSQLGeneratorForFactbook.cur = TestSQLGeneratorForFactbook.con.cursor()
 
     def run_query(self, text, expected):
-        print(text.replace('\n\n', '\n'))
-        print('-' * 40)
+        # print(text.replace('\n\n', '\n'))
+        # print('-' * 40)
         sql = prql.to_sql(text)
-        print(sql)
-        rows = self.cur.execute(sql)
+        # print(sql)
+        rows = TestSQLGeneratorForFactbook.cur.execute(sql)
         columns = [d[0] for d in rows.description]
-        print(f'Columns: {columns}')
+        # print(f'Columns: {columns}')
         rows = rows.fetchall()
         assert (len(rows) == expected)
 
@@ -63,12 +62,9 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
             aggregate min_population: "MIN(population)"
             take 1
         )
-        
-        
         from facts
         select name
         filter population = min_pop
-        
         '''
 
 

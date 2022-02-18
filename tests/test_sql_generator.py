@@ -5,19 +5,20 @@ import prql
 
 
 class TestSqlGenerator(unittest.TestCase):
-    def setUp(self) -> None:
+
+    def setUpClass() -> None:
         db_path = f'./employee.db'
-        self.con = sqlite3.connect(db_path)
-        self.cur = self.con.cursor()
+        TestSqlGenerator.con = sqlite3.connect(db_path)
+        TestSqlGenerator.cur = TestSqlGenerator.con.cursor()
 
     def run_query(self, text, expected=None):
-        print(text.replace('\n\n', '\n'))
-        print('-' * 40)
+        # print(text.replace('\n\n', '\n'))
+        # print('-' * 40)
         sql = prql.to_sql(text)
-        print(sql)
-        rows = self.cur.execute(sql)
+        # print(sql)
+        rows = TestSqlGenerator.cur.execute(sql)
         columns = [d[0] for d in rows.description]
-        print(f'Columns: {columns}')
+        # print(f'Columns: {columns}')
         rows = rows.fetchall()
         if expected is not None:
             assert (len(rows) == expected)
@@ -28,6 +29,22 @@ class TestSqlGenerator(unittest.TestCase):
         '''
         res = prql.to_sql(q)
         self.assertTrue(res.startswith('SELECT * FROM `table`'))
+        self.run_query(q)
+
+    def test_select_one(self):
+        q = '''
+        from table | select foo
+        '''
+        res = prql.to_sql(q)
+        self.assertTrue(res.startswith('SELECT foo'))
+        self.run_query(q)
+
+    def test_select_two(self):
+        q = '''
+        from table | select [ foo, bar ]
+        '''
+        res = prql.to_sql(q)
+        self.assertTrue(res.startswith('SELECT foo,bar'))
         self.run_query(q)
 
     def test_limit(self):
@@ -57,7 +74,7 @@ class TestSqlGenerator(unittest.TestCase):
         join table2 [table.id=table2.id]
         '''
         res = prql.to_sql(q)
-        print(res)
+        #print(res)
         self.assertTrue(res.index('JOIN table2 table2_t ON table_t.id = table2_t.id') != -1)
         self.run_query(q, 6)
 
@@ -127,5 +144,4 @@ class TestSqlGenerator(unittest.TestCase):
         res = prql.to_sql(q)
         self.assertTrue(res.index('foo + bar as foo_bar') != -1)
         self.run_query(q, 12)
-        print(res)
-
+        #print(res)
