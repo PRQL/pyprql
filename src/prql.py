@@ -8,7 +8,6 @@ import rich
 from enforce_typing import enforce_types
 from icecream import ic
 from lark import Lark, ast_utils, Transformer, Token
-from lark.tree import Tree
 
 this_module = sys.modules[__name__]
 script_path = os.path.dirname(__file__)
