@@ -61,9 +61,6 @@ class Join(_Statement):
     left_id: Name
     right_id: Name = None
 
-    def __str__(self):
-        return f"join: {self.name} on {self.left_id} {' = ' + self.right_id.name if self.right_id else ''}"
-
 
 @dataclass
 class SelectField(_Statement):
