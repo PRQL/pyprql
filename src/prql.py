@@ -173,12 +173,6 @@ class Filter(_Statement, ast_utils.AsList):
     fields: List[str]
     name: str = "filter"
 
-    def __str__(self):
-        msg = 'filter:'
-        for idx, f in enumerate(self.fields):
-            msg += f'\n\t\t{tree_to_str(f)}'
-        return msg
-
 
 @dataclass
 class Pipes(_Statement, ast_utils.AsList):
@@ -203,17 +197,6 @@ class From(_Statement):
 
     def get_join(self):
         return self.join
-
-    def __str__(self):
-
-        ret = ''
-        ret += f'from {self.name}\n'
-        join = self.get_join()
-        if join is not None:
-            ret += f'\t{join}\n'
-        for op in self.get_pipes().operations:
-            ret += f'\t{str(op)}\n'
-        return ret
 
 
 @dataclass
@@ -281,9 +264,6 @@ class FuncDefs(_Statement, ast_utils.AsList):
 class WithDef(_Statement):
     name: Name
     _from: From
-
-    def __str__(self):
-        return f'with {self.name} from {self._from.name}:\n\t{self._from}'
 
 
 # The top level definition that holds all other definitions
@@ -391,26 +371,8 @@ def to_sql(prql: str) -> str:
 
 
 @enforce_types
-def pretty_print(root: Root, do_print: bool = True) -> str:
-    # rich.print(root)
-    ret = ''
-    _from = root.get_from()
-    table = root.get_cte()
-    if table:
-        ret += str(table) + "\n"
-    ret += str(_from)
-    if do_print:
-        print(ret)
-    return ret
-
-
-@enforce_types
-def tree_to_str(tree: Union[Tree, Token, _Ast, str]) -> str:
-    if isinstance(tree, Tree):
-        msg = str(f' {get_op_str(tree.data.value)} ').join([tree_to_str(c) for c in tree.children])
-        return f'({msg})'
-    else:
-        return str(tree)
+def pretty_print(root: Root) -> None:
+    rich.print(root)
 
 
 @enforce_types
@@ -475,7 +437,6 @@ class PRQLException(Exception):
 def replace_variables(param: str, symbol_table: Dict[str, _Ast]) -> str:
     if param in symbol_table:
         if isinstance(symbol_table[param], NameValuePair):
-            print('TEST HERE IF ITS AN EXPRESSION, IF SO , STEP THROUGH EACH STATEMENT AND REPLACE VARIABLES')
             if isinstance(symbol_table[param].value, Expression):
                 msg = ''
                 exp: Expression = symbol_table[param].value
@@ -732,7 +693,6 @@ def ast_to_sql(
     elif isinstance(rule, Value):
 
         val = str(rule)
-        print(f'bippy: {val}')
         if root.value_defs:
             for table in root.value_defs.fields:
                 if table.name == val:
