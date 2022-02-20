@@ -50,10 +50,7 @@ class Expression(_Statement, ast_utils.AsList):
     def __str__(self):
         msg = ''
         for s in self.statements:
-            if isinstance(s, Tree):
-                msg += tree_to_str(s).replace("\n", ",")
-            else:
-                msg += f'{s}'
+            msg += f'{s}'
 
         return msg
 
@@ -139,25 +136,14 @@ class Aggregate(_Statement):
     aggregate_body: AggregateBody = None
 
     def __init__(self, group_by, aggregate_body=None):
-        self.group_by = group_by
-        self.aggregate_body = aggregate_body
-        if self.aggregate_body is None:
-            self.aggregate_body = self.group_by
-            self.group_by = None
-
-    def __str__(self):
-        return f'aggregate: \n\t\taggregates: {self.aggregate_body}\n\t\tgroup_by: {self.group_by}'
+        values = [group_by, aggregate_body]
+        self.aggregate_body = self.assign_field(AggregateBody, values)
+        self.group_by = self.assign_field(GroupBy, values)
 
 
 @dataclass
 class Derive(_Statement, ast_utils.AsList):
     fields: List[DeriveLine]
-
-    def __str__(self):
-        ret = 'derive:'
-        for f in self.fields:
-            ret += '\n\t\t' + str(f)
-        return ret
 
 
 @dataclass
@@ -166,7 +152,7 @@ class DeriveLine(_Statement):
     expression: Expression
 
     def __str__(self):
-        return f'{self.name}={str(self.expression)}'
+        return f'{str(self.expression)}'
 
 
 @dataclass
@@ -325,17 +311,27 @@ class Root(_Statement):
         return self.with_def
 
 
+# This is not an AST but a helper class
+@dataclass
+class NameValuePair(_Ast):
+    name: str
+    value: str
+
+    def __str__(self):
+        return f'({self.value})'
+
+
 class ToAst(Transformer):
 
     def STRING(self, s):
         # Remove quotation marks
-        return s[1:-1]
+        return s  # s[1:-1]
 
     def FSTRING(self, s):
         return s[2:-1]
 
     def ESCAPED_STRING(self, s):
-        return s.replace('\\"', '"').replace("\\'", "'")
+        return s  # s.replace('\\"', '"').replace("\\'", "'")
 
     def NEWLINE(self, s):
         return s
@@ -461,12 +457,17 @@ def wrap_replace_tables(from_long, from_short, join_long, join_short):
 @enforce_types
 def build_symbol_table(roots: List[Root]) -> Dict[str, _Ast]:
     table = {}
-    for root in roots:
+    for _root in roots:
+        root: Root = _root
         for n in root.value_defs.fields:
             table[str(n.name)] = n
         for n in root.func_defs.fields:
             table[str(n.name)] = n
-
+        if root._from.get_pipes():
+            derives = get_operation(root._from.get_pipes().operations, Derive, return_all=True)
+            for d in derives:
+                for line in d.fields:
+                    table[str(line.name)] = NameValuePair(str(line.name), line.expression)
     return table
 
 
@@ -474,8 +475,26 @@ class PRQLException(Exception):
     pass
 
 
+def replace_variables(param: str, symbol_table: Dict[str, _Ast]) -> str:
+    if param in symbol_table:
+        if isinstance(symbol_table[param], NameValuePair):
+            print('TEST HERE IF ITS AN EXPRESSION, IF SO , STEP THROUGH EACH STATEMENT AND REPLACE VARIABLES')
+            if isinstance(symbol_table[param].value, Expression):
+                msg = ''
+                exp: Expression = symbol_table[param].value
+                for s in exp.statements:
+                    msg += str(replace_variables(str(s), symbol_table))
+
+                return msg
+            else:
+                return symbol_table[param].value
+        else:
+            return str(symbol_table[param])
+    else:
+        return param
+
+
 def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
-    print('EXECUTING function ' + str(f.name) + ' with args ' + str(f.func_args))
     msg = ''
     name = str(f.name)
     func_def: FuncDef = symbol_table[name]
@@ -489,7 +508,11 @@ def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
                 args = {}
                 if not f.parm1:
                     f.parm1 = f.func_args
-                vals = [f.parm1, f.func_args]
+                vals = [
+                    replace_variables(str(f.parm1), symbol_table),
+                    replace_variables(str(f.func_args), symbol_table)
+                ]
+
                 if func_def.func_args is not None:
                     for i in range(0, len(func_def.func_args.fields)):
                         n = str(func_def.func_args.fields[i])
@@ -626,12 +649,13 @@ def ast_to_sql(
                             agg_str += f'{str(f)},'
                     elif isinstance(line, PipedCall):
                         piped = line
-                        piped.func_body.parm1 = piped.parm1
+                        # piped.func_body.parm1 = replace_variables(str(piped.parm1), symbol_table)
+                        # piped.func_body.func_args = replace_variables(str(piped.func_args), symbol_table)
                         agg_str += f'{ast_to_sql(piped.func_body, roots)} as {piped.parm1}_{piped.func_body.name},'
                     elif isinstance(line, str):
                         agg_str += f'{line},'
                     elif isinstance(line, PipeBody):
-                        agg_str += ast_to_sql(line.body, roots, symbol_table=symbol_table)
+                        agg_str += ast_to_sql(line.body, roots, symbol_table=symbol_table) + ","
                     else:
                         raise PRQLException(f'Unknown type for aggregate body {type(line)}, {str(line)}')
                 i += 1
@@ -651,7 +675,7 @@ def ast_to_sql(
         if derives:
             for d in derives:
                 for line in d.fields:
-                    derives_str += f'{replace_tables(str(line.expression))} as {line.name} ,'
+                    derives_str += f'{replace_tables(ast_to_sql(line.expression, roots, symbol_table))} as {line.name} ,'
             derives_str = "," + derives_str.rstrip(",")
 
         if sort:
@@ -711,10 +735,15 @@ def ast_to_sql(
     elif isinstance(rule, Value):
 
         val = str(rule)
+        print(f'bippy: {val}')
         if root.value_defs:
             for table in root.value_defs.fields:
                 if table.name == val:
                     return "(" + ast_to_sql(table.value_body, roots, symbol_table) + ")"
+        if val in symbol_table:
+            replacement = symbol_table[val]
+            if not isinstance(replacement, FuncDef):
+                return str(replacement)
 
         return val
     elif isinstance(rule, Operator):

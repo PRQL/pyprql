@@ -23,7 +23,7 @@ class TestEmployeeExamples(unittest.TestCase):
             assert (len(rows) == expected)
 
     def test_index(self):
-        q =  '''
+        text = '''
         from employees
         filter country = "USA"                           # Each line transforms the previous result.
         derive [                                         # This adds columns / variables.
@@ -38,17 +38,17 @@ class TestEmployeeExamples(unittest.TestCase):
             sum     gross_salary,
             average gross_cost,
             sum_gross_cost: sum gross_cost,
-            count
+            row_count: count salary
         ]
         sort sum_gross_cost
-        filter count > 200
+        filter row_count > 200
         take 20
         '''
-        # self.run_query(q)
 
+        # self.run_query(text)
 
     def test_cte1(self):
-        text= '''
+        text = '''
         table newest_employees = ( 
             from employees
             sort tenure

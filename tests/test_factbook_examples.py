@@ -53,13 +53,10 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
 
     def test_factbook_q3b(self):
         text = '''
-        #SELECT name
-        #FROM facts
-        #WHERE population = (SELECT MIN(population) FROM facts);
         
         value min_pop = (
             from facts
-            aggregate min_population: "MIN(population)"
+            aggregate min population
             take 1
         )
         from facts
