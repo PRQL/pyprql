@@ -28,7 +28,7 @@ The parser is only able to parse float casts in select statements insde of `[ ]`
 select foo | as float
 ```
 
-will fail, it must be wrapped in brackets
+will fail, it must be wrapped in brackets as a single item array.
 
 ```sql
 select [ foo | as float ]
