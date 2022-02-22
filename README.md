@@ -2,7 +2,7 @@
 
 Python implementation of [PRQL](https://github.com/max-sixty/prql).
 
-Documentation is at https://github.com/max-sixty/prql
+Documentation of PRQL is at https://github.com/max-sixty/prql
 
 ```elm
 from facts
