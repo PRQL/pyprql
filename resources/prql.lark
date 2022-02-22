@@ -17,10 +17,14 @@
     aggregate_body: ( (NAME ":")?  pipe_body)? \
              ( "," ((NAME ":")?  pipe_body))*
 
+
+
     pipe_body: (STRING|FSTRING|func_call|piped_call)
     take: "take" INT
 
-    filter: "filter" (ESCAPED_STRING|expression)?
+    filter: ("[" filter_line ( "," filter_line)* "]") | \
+            ("filter" filter_line)
+    filter_line: (ESCAPED_STRING|expression)?
     sort: "sort" (ESCAPED_STRING|name)
 
 

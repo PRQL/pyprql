@@ -175,3 +175,33 @@ class TestSqlGenerator(unittest.TestCase):
         self.assertTrue(res.index('foo+bar as foo_bar') != -1)
         self.run_query(q, 12)
         # print(res)
+
+    def test_filter_where_only(self):
+        q = '''
+        from table 
+        filter foo > 10
+        '''
+        res = prql.to_sql(q)
+        assert (res.index('WHERE foo>10') != -1)
+        print(res)
+
+    def test_filter_where_multi(self):
+        q = '''
+        from table 
+        filter [ 
+            foo > 10, 
+            bar < 20
+        ]
+        '''
+        res = prql.to_sql(q)
+        assert (res.index('WHERE foo>10') != -1)
+        print(res)
+
+    def test_filter_fstring(self):
+        q = '''
+        from table 
+        filter f"foo > 10"
+        '''
+        res = prql.to_sql(q)
+        assert (res.index('WHERE foo > 10') != -1)
+        print(res)

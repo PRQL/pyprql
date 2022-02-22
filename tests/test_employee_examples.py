@@ -1,11 +1,11 @@
 import sqlite3
-import unittest
 
 import prql
 
 
-class TestEmployeeExamples(unittest.TestCase):
-    def setUp(self) -> None:
+class TestEmployeeExamples:
+
+    def setup(self) -> None:
         db_path = f'./employee.db'
         self.con = sqlite3.connect(db_path)
         self.cur = self.con.cursor()
@@ -44,7 +44,6 @@ class TestEmployeeExamples(unittest.TestCase):
         filter row_count > 200
         take 20
         '''
-
         # self.run_query(text)
 
     def test_cte1(self):

@@ -174,6 +174,14 @@ class Filter(_Statement, ast_utils.AsList):
 
 
 @dataclass
+class FilterLine(_Statement):
+    val: Any = None
+
+    def __str__(self):
+        return str(self.val)
+
+
+@dataclass
 class Pipes(_Statement, ast_utils.AsList):
     operations: List[_Statement]
 
@@ -378,18 +386,25 @@ def pretty_print(root: Root) -> None:
 def get_operation(ops: List[_Statement],
                   class_type: Type[_Statement],
                   last_match: bool = False,
-                  return_all: bool = False) -> Union[List, _Statement]:
+                  return_all: bool = False,
+                  before: Type = None) -> Union[List, _Statement]:
     ops_list = ops
     ret = []
+    is_before = True
     if last_match:
         ops_list = list(reversed(ops))
     for op in ops_list:
         # print(type(op))
         if isinstance(op, class_type):
             if return_all:
-                ret.append(op)
+                if (before is not None and is_before) or (before is None):
+                    ret.append(op)
+
             else:
                 return op
+        if before is not None:
+            if isinstance(op, before):
+                is_before = False
     return ret
 
 
@@ -433,6 +448,7 @@ class PRQLException(Exception):
     pass
 
 
+@enforce_types
 def replace_variables(param: str, symbol_table: Dict[str, _Ast]) -> str:
     if param in symbol_table:
         if isinstance(symbol_table[param], NameValuePair):
@@ -509,7 +525,6 @@ def ast_to_sql(
         # SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by} {limit_str}'
 
         # We will be creating these strings to form the final SQL,
-        # We will do it in order so that we can reference them
         select_str = ''
         agg_str = ''
         derives_str = ''
@@ -542,7 +557,7 @@ def ast_to_sql(
         sort = get_operation(ops.operations, Sort)
 
         filters = get_operation(ops.operations, Filter, return_all=True)
-        derives = get_operation(ops.operations, Derive, return_all=True)
+        wheres = get_operation(ops.operations, Derive, return_all=True, before=Aggregate)
 
         if verbose:
             rich.print(roots)
@@ -599,11 +614,11 @@ def ast_to_sql(
                         else:
                             raise PRQLException(f'Unknown type for aggregate body {type(line)}, {str(line)}')
                     elif isinstance(line, FuncCall):
-                        f = line
-                        if f.func_args is not None:
-                            agg_str += f'{str(f)} as {f.name}_{f.func_args},'
+                        filter_line = line
+                        if filter_line.func_args is not None:
+                            agg_str += f'{str(filter_line)} as {filter_line.name}_{filter_line.func_args},'
                         else:
-                            agg_str += f'{str(f)},'
+                            agg_str += f'{str(filter_line)},'
                     elif isinstance(line, PipedCall):
                         piped = line
                         # piped.func_body.parm1 = replace_variables(str(piped.parm1), symbol_table)
@@ -625,12 +640,13 @@ def ast_to_sql(
         if filters:
             for filter in filters:
                 if filter:
-                    for f in filter.fields:
-                        filter_str += ast_to_sql(f, roots, symbol_table) + ' AND '
+                    for filter_line in filter.fields:
+                        if filter_line.val is not None:
+                            filter_str += ast_to_sql(filter_line.val, roots, symbol_table) + ' AND '
             filter_str = filter_str.rstrip(' AND ')
 
-        if derives:
-            for d in derives:
+        if wheres:
+            for d in wheres:
                 for line in d.fields:
                     derives_str += f'{replace_tables(ast_to_sql(line.expression, roots, symbol_table))} as {line.name} ,'
             derives_str = "," + derives_str.rstrip(",")
@@ -681,13 +697,13 @@ def ast_to_sql(
 
         return msg
     elif isinstance(rule, FuncCall):
-        f = rule
+        filter_line = rule
 
         # if f.parm1:
         #     v = ',' + ast_to_sql(f.parm1, roots, symbol_table)
         #     msg = str(f.name) + f'({v})'
-        if str(f.name) in symbol_table:
-            msg = execute_function(f, symbol_table)
+        if str(filter_line.name) in symbol_table:
+            msg = execute_function(filter_line, symbol_table)
         return msg
     elif isinstance(rule, Value):
 
@@ -704,5 +720,7 @@ def ast_to_sql(
         return val
     elif isinstance(rule, Operator):
         return str(rule)
+    elif isinstance(rule, FilterLine):
+        return ast_to_sql(rule.val, roots, symbol_table)
     else:
         raise Exception(f"No sql for {type(rule)}")
