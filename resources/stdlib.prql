@@ -14,4 +14,24 @@ func count_distinct column = f"COUNT(DISTINCT `{column}`)"
 
 func as column type = f"CAST({column} AS {type})"
 
+# String functions
+
+func upper column = f"UPPER({column})"
+func lower column = f"LOWER({column})"
+
+func trim column = f"TRIM({column})"
+func trim column val = f"TRIM({column},{val})"
+
+func ltrim column = f"LTRIM({column})"
+func ltrim column val = f"LTRIM({column},{val})"
+
+func rtrim column = f"RTRIM({column})"
+func rtrim column val = f"RTRIM({column},{val})"
+
+func replace target search_str replace_str = f"REPLACE({target},{search_str},{replace_str})"
+
+func substr search_str replace_str = f"SUBSTR({search_str},{replace_str})"
+func substring column = f"SUBSTRING({search_str},{replace_str})"
+
+
 from null

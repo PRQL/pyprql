@@ -205,3 +205,29 @@ class TestSqlGenerator(unittest.TestCase):
         res = prql.to_sql(q)
         assert (res.index('WHERE foo > 10') != -1)
         print(res)
+
+    def test_having(self):
+        q = '''
+                 from employees
+                 filter country = "USA"                           # Each line transforms the previous result.
+                 derive [                                         # This adds columns / variables.
+                   gross_salary: salary + payroll_tax,
+                   gross_cost:   gross_salary + benefits_cost     # Variables can use other variables.
+                 ]
+                 filter gross_cost > 0
+                 aggregate by:[title, country] [                  # `by` are the columns to group by.
+                     average salary,                              # These are aggregation calcs run on each group.
+                     sum     salary,
+                     average gross_salary,
+                     sum     gross_salary,
+                     average gross_cost,
+                     sum_gross_cost: sum gross_cost,
+                     row_count: count salary
+                 ]
+                 sort sum_gross_cost
+                 filter row_count > 200
+                 take 20'''
+        res = prql.to_sql(q)
+        print(res)
+        assert (res.index('HAVING row_count>200') != -1)
+        print(res)

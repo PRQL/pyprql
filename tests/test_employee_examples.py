@@ -44,7 +44,7 @@ class TestEmployeeExamples:
         filter row_count > 200
         take 20
         '''
-        # self.run_query(text)
+        self.run_query(text)
 
     def test_cte1(self):
         text = '''

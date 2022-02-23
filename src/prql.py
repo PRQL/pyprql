@@ -374,7 +374,7 @@ def parse(_text: str) -> Root:
 def to_sql(prql: str) -> str:
     ast = parse(prql)
     stdlib = parse(read_file('/../resources/stdlib.prql'))
-    return ast_to_sql(ast._from, [ast, stdlib]).replace('   ', ' ').replace('  ', ' ')
+    return ast_to_sql(ast._from, [ast, stdlib], verbose=False).replace('   ', ' ').replace('  ', ' ')
 
 
 @enforce_types
@@ -387,24 +387,42 @@ def get_operation(ops: List[_Statement],
                   class_type: Type[_Statement],
                   last_match: bool = False,
                   return_all: bool = False,
-                  before: Type = None) -> Union[List, _Statement]:
+                  before: Type = None,
+                  after: Type = None
+                  ) -> Union[List, _Statement]:
     ops_list = ops
     ret = []
     is_before = True
+    is_after = False
+    if after is not None and before is not None:
+        raise PRQLException('Cannot specify both before and after in get_operation')
+    if before is not None or after is not None:
+        if not return_all:
+            raise PRQLException('Cannot specify before or after without return_all')
     if last_match:
         ops_list = list(reversed(ops))
     for op in ops_list:
         # print(type(op))
         if isinstance(op, class_type):
             if return_all:
-                if (before is not None and is_before) or (before is None):
+
+                if before is not None:
+                    if is_before:
+                        ret.append(op)
+                elif before is None and after is None:
                     ret.append(op)
+                elif after is not None:
+                    if is_after:
+                        ret.append(op)
 
             else:
                 return op
         if before is not None:
             if isinstance(op, before):
                 is_before = False
+        if after is not None:
+            if isinstance(op, after):
+                is_after = True
     return ret
 
 
@@ -532,6 +550,7 @@ def ast_to_sql(
         join_str = ''
         filter_str = ''
         group_by_str = ''
+        havings_str = ''
         order_by_str = ''
         limit_str = ''
         ###
@@ -556,8 +575,9 @@ def ast_to_sql(
         take = get_operation(ops.operations, Take)
         sort = get_operation(ops.operations, Sort)
 
-        filters = get_operation(ops.operations, Filter, return_all=True)
-        wheres = get_operation(ops.operations, Derive, return_all=True, before=Aggregate)
+        filters = get_operation(ops.operations, Filter, return_all=True, before=Aggregate)
+        wheres_from_derives = get_operation(ops.operations, Derive, return_all=True, before=Aggregate)
+        havings = get_operation(ops.operations, Filter, return_all=True, after=Aggregate)
 
         if verbose:
             rich.print(roots)
@@ -572,18 +592,27 @@ def ast_to_sql(
             join_short = join_short
 
             # left_id = left_id.replace(from_long, '').replace(from_short, '')
-            on_statement = str(from_short + "." + left_id).replace(from_short + "." + from_short + ".",
-                                                                   from_short + ".")
+            left_side = str(from_short + "." + left_id).replace(from_short + "." + from_short + ".",
+                                                                from_short + ".")
 
             # right_id = right_id.replace(from_long, '').replace(from_short, '')
             right_side = str(join_short + "." + right_id).replace(join_short + "." + join_short + ".", join_short + ".")
 
-            join_str = f'JOIN {join.name} {join_short} ON {on_statement} = {right_side}'
+            join_str = f'JOIN {join.name} {join_short} ON {left_side} = {right_side}'
 
         if agg:
 
             if agg.group_by is not None:
                 group_by_str = f'GROUP BY {replace_tables(str(agg.group_by))}'
+
+            if havings is not None and len(havings) > 0:
+                havings_str = 'HAVING '
+                for filter in havings:
+                    if filter:
+                        for filter_line in filter.fields:
+                            if filter_line.val is not None:
+                                havings_str += ast_to_sql(filter_line.val, roots, symbol_table, verbose) + ' AND '
+                havings_str = havings_str.rstrip(' AND ')
 
             upper = len(agg.aggregate_body.statements)
             i = 0
@@ -602,14 +631,14 @@ def ast_to_sql(
                         elif isinstance(func_call, PipeBody):
                             if isinstance(func_call.body, PipedCall) or \
                                     isinstance(func_call.body, FuncCall):
-                                agg_str += f'{ast_to_sql(func_call.body, roots, symbol_table)} as {name},'
+                                agg_str += f'{ast_to_sql(func_call.body, roots, symbol_table, verbose)} as {name},'
                             else:
                                 agg_str += f'{func_call} as {name},'
 
                         elif isinstance(func_call, PipedCall):
                             piped = func_call
                             piped.func_body.parm1 = piped.parm1
-                            agg_str += f'{ast_to_sql(piped.func_body, roots)} as {name},'
+                            agg_str += f'{ast_to_sql(piped.func_body, roots, symbol_table, verbose)} as {name},'
 
                         else:
                             raise PRQLException(f'Unknown type for aggregate body {type(line)}, {str(line)}')
@@ -623,11 +652,11 @@ def ast_to_sql(
                         piped = line
                         # piped.func_body.parm1 = replace_variables(str(piped.parm1), symbol_table)
                         # piped.func_body.func_args = replace_variables(str(piped.func_args), symbol_table)
-                        agg_str += f'{ast_to_sql(piped.func_body, roots)} as {piped.parm1}_{piped.func_body.name},'
+                        agg_str += f'{ast_to_sql(piped.func_body, roots, symbol_table, verbose)} as {piped.parm1}_{piped.func_body.name},'
                     elif isinstance(line, str):
                         agg_str += f'{line},'
                     elif isinstance(line, PipeBody):
-                        agg_str += ast_to_sql(line.body, roots, symbol_table=symbol_table) + ","
+                        agg_str += ast_to_sql(line.body, roots, symbol_table=symbol_table, verbose=verbose) + ","
                     else:
                         raise PRQLException(f'Unknown type for aggregate body {type(line)}, {str(line)}')
                 i += 1
@@ -642,13 +671,13 @@ def ast_to_sql(
                 if filter:
                     for filter_line in filter.fields:
                         if filter_line.val is not None:
-                            filter_str += ast_to_sql(filter_line.val, roots, symbol_table) + ' AND '
+                            filter_str += ast_to_sql(filter_line.val, roots, symbol_table, verbose) + ' AND '
             filter_str = filter_str.rstrip(' AND ')
 
-        if wheres:
-            for d in wheres:
+        if wheres_from_derives:
+            for d in wheres_from_derives:
                 for line in d.fields:
-                    derives_str += f'{replace_tables(ast_to_sql(line.expression, roots, symbol_table))} as {line.name} ,'
+                    derives_str += f'{replace_tables(ast_to_sql(line.expression, roots, symbol_table, verbose))} as {line.name} ,'
             derives_str = "," + derives_str.rstrip(",")
 
         if sort:
@@ -677,23 +706,24 @@ def ast_to_sql(
                join_str,
                filter_str,
                group_by_str,
+               havings_str,
                order_by_str,
                limit_str)
-        sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {order_by_str} {limit_str}'
+        sql = f'SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {havings_str} {order_by_str} {limit_str}'
         if verbose:
             print('\t' + sql)
         return sql
     elif isinstance(rule, Expression):
         expr = rule
         msg = ''
-        for s in expr.statements:
-            msg += ast_to_sql(s, roots, symbol_table)
+        for fields in expr.statements:
+            msg += ast_to_sql(fields, roots, symbol_table, verbose)
         return msg
     elif isinstance(rule, PipedCall):
         pipe: PipedCall = rule
         msg = ''
         pipe.func_body.parm1 = pipe.parm1
-        msg += ast_to_sql(pipe.func_body, roots, symbol_table)
+        msg += ast_to_sql(pipe.func_body, roots, symbol_table, verbose)
 
         return msg
     elif isinstance(rule, FuncCall):
@@ -704,6 +734,8 @@ def ast_to_sql(
         #     msg = str(f.name) + f'({v})'
         if str(filter_line.name) in symbol_table:
             msg = execute_function(filter_line, symbol_table)
+        else:
+            raise PRQLException(f'Unknown function {filter_line.name}')
         return msg
     elif isinstance(rule, Value):
 
@@ -711,7 +743,7 @@ def ast_to_sql(
         if root.value_defs:
             for table in root.value_defs.fields:
                 if table.name == val:
-                    return "(" + ast_to_sql(table.value_body, roots, symbol_table) + ")"
+                    return "(" + ast_to_sql(table.value_body, roots, symbol_table, verbose) + ")"
         if val in symbol_table:
             replacement = symbol_table[val]
             if not isinstance(replacement, FuncDef):
@@ -721,6 +753,6 @@ def ast_to_sql(
     elif isinstance(rule, Operator):
         return str(rule)
     elif isinstance(rule, FilterLine):
-        return ast_to_sql(rule.val, roots, symbol_table)
+        return ast_to_sql(rule.val, roots, symbol_table, verbose)
     else:
         raise Exception(f"No sql for {type(rule)}")
