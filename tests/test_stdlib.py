@@ -1,6 +1,8 @@
 import sqlite3
 import unittest
 
+import pytest
+
 import prql
 
 
@@ -210,6 +212,17 @@ class TestStdlib(unittest.TestCase):
         q = '''from table 
             select name
             derive [ trimmed: name | trim "," ]
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('TRIM(name,",") as trimmed') != -1)
+        self.run_query(q, 12)
+
+    @pytest.mark.xfail
+    def test_trim_with_args_alt(self):
+        q = '''from table 
+            select name
+            derive [ trimmed: trim name " ~something_weird~ " ]
         '''
         res = prql.to_sql(q)
         print(res)
