@@ -1,5 +1,6 @@
 import os
 import sys
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import List, Union, Type, Any, Dict, Optional
 
@@ -100,6 +101,14 @@ class Select(_Statement):
 class DeriveLine(_Statement):
     name: str
     expression: Expression
+
+
+@dataclass
+class DeriveBody(_Statement):
+    val: Union[str, Expression]
+
+    def __str__(self):
+        return str(self.val)
 
 
 @dataclass
@@ -238,11 +247,19 @@ class FuncCall(_Statement):
     func_args: FuncArgs = None
     parm1: Any = None
 
-    def __str__(self):
-        a = str(self.func_args)
-        if self.func_args is None:
-            a = '*'
-        return f'{get_func_str(self.name)}({a})'
+    # def __init__(self, name, func_args=None):
+    #     values = [name, func_args]
+    #     self.name = name  # self.assign_field(Name, values)
+    #     self.func_args = self.assign_field(FuncArgs, values)
+    #
+    #     # self.parm1 = self.assign_field(FuncArgs, parm1)
+    #     print('parms have to be manually assigned to the FuncCall')
+
+    # def __str__(self):
+    #     a = str(self.func_args)
+    #     if self.func_args is None:
+    #         a = '*'
+    #     return f'{get_func_str(self.name)}({a})'
 
 
 @dataclass
@@ -295,7 +312,7 @@ class Root(_Statement):
         return self.with_def
 
 
-# This is not an AST but a helper class
+# This is a helper class, its not actually parsed
 @dataclass
 class NameValuePair(_Ast):
     name: str
@@ -329,32 +346,6 @@ def read_file(filename: str, path: str = script_path) -> str:
 
 
 @enforce_types
-def get_op_str(op: str) -> str:
-    if op == 'gt':
-        return '>'
-    elif op == 'lt':
-        return '<'
-    elif op == 'eq':
-        return '='
-    elif op == 'neq':
-        return '!='
-    elif op == 'gte':
-        return '>='
-    elif op == 'sum':
-        return '+'
-    elif op == 'diff':
-        return '-'
-    elif op == 'product':
-        return '*'
-    elif op == 'division':
-        return '/'
-    elif op == 'lte':
-        return '<='
-    else:
-        return str(op)
-
-
-@enforce_types
 def get_func_str(func: Optional[str]) -> str:
     if func == 'average':
         return 'avg'
@@ -371,10 +362,10 @@ def parse(_text: str) -> Root:
 
 
 @enforce_types
-def to_sql(prql: str) -> str:
+def to_sql(prql: str, verbose: bool = False) -> str:
     ast = parse(prql)
     stdlib = parse(read_file('/../resources/stdlib.prql'))
-    return ast_to_sql(ast._from, [ast, stdlib], verbose=False).replace('   ', ' ').replace('  ', ' ')
+    return ast_to_sql(ast._from, [ast, stdlib], verbose=verbose).replace('   ', ' ').replace('  ', ' ')
 
 
 @enforce_types
@@ -446,19 +437,19 @@ def wrap_replace_tables(from_long, from_short, join_long, join_short):
 
 
 @enforce_types
-def build_symbol_table(roots: List[Root]) -> Dict[str, _Ast]:
-    table = {}
+def build_symbol_table(roots: List[Root]) -> Dict[str, List[_Ast]]:
+    table = defaultdict(list)
     for _root in roots:
         root: Root = _root
         for n in root.value_defs.fields:
-            table[str(n.name)] = n
+            table[str(n.name)].append(n)
         for n in root.func_defs.fields:
-            table[str(n.name)] = n
+            table[str(n.name)].append(n)
         if root._from.get_pipes():
             derives = get_operation(root._from.get_pipes().operations, Derive, return_all=True)
             for d in derives:
                 for line in d.fields:
-                    table[str(line.name)] = NameValuePair(str(line.name), line.expression)
+                    table[str(line.name)].append(NameValuePair(str(line.name), line.expression))
     return table
 
 
@@ -467,50 +458,72 @@ class PRQLException(Exception):
 
 
 @enforce_types
-def replace_variables(param: str, symbol_table: Dict[str, _Ast]) -> str:
+def replace_variables(param: str, symbol_table: Dict[str, List[_Ast]]) -> str:
     if param in symbol_table:
-        if isinstance(symbol_table[param], NameValuePair):
-            if isinstance(symbol_table[param].value, Expression):
+        if isinstance(symbol_table[param][0], NameValuePair):
+            if isinstance(symbol_table[param][0].value, Expression):
                 msg = ''
-                exp: Expression = symbol_table[param].value
+                exp: Expression = symbol_table[param][0].value
+                for s in exp.statements:
+                    msg += str(replace_variables(str(s), symbol_table))
+
+                return msg
+            if isinstance(symbol_table[param][0].value, DeriveBody):
+                msg = ''
+                exp: Expression = symbol_table[param][0].value.val
                 for s in exp.statements:
                     msg += str(replace_variables(str(s), symbol_table))
 
                 return msg
             else:
-                return symbol_table[param].value
+                return symbol_table[param][0].value
         else:
-            return str(symbol_table[param])
+            return str(symbol_table[param][0])
     else:
         return param
 
 
-def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
+def execute_function(f: FuncCall, symbol_table: Dict[str, List[_Ast]]) -> str:
     msg = ''
     name = str(f.name)
-    func_def: FuncDef = symbol_table[name]
+    func_defs: List[FuncDef] = symbol_table[name]
+    func_def: FuncDef = None
     # Execute line by line the function
-    try:
-        for line in func_def.func_body.fields:
-            # First just text replcaement ,1
-            if isinstance(line, PipeBody):
-                line = line.body
-            if type(line) == str:
-                args = {}
-                if not f.parm1:
-                    f.parm1 = f.func_args
-                vals = [
-                    replace_variables(str(f.parm1), symbol_table),
-                    replace_variables(str(f.func_args), symbol_table)
-                ]
+    if len(func_defs) == 1:
+        func_def = func_defs[0]
+    else:
+        # Now we match the parameter count against a list of functions and take the first one
+        func_call_parm_count = get_function_parm_count(f)
 
-                if func_def.func_args is not None:
-                    for i in range(0, len(func_def.func_args.fields)):
-                        n = str(func_def.func_args.fields[i])
-                        args[n] = vals[i]
-                    msg = line.format(**args).replace('None', '*')
-                else:
-                    msg = line
+        for defintion in func_defs:
+            if get_function_parm_count(defintion) == func_call_parm_count:
+                func_def = defintion
+                break
+
+        # raise PRQLException(
+        #     f'Function {name} is not unique, found {len(func_defs)}')
+    try:
+        if func_def:
+            for line in func_def.func_body.fields:
+                # First just text replcaement ,1
+                if isinstance(line, PipeBody):
+                    line = line.body
+                if type(line) == str:
+                    args = {}
+                    if not f.parm1:
+                        f.parm1 = f.func_args
+                    vals = [
+                        replace_variables(str(f.parm1), symbol_table),
+                        replace_variables(str(f.func_args), symbol_table)
+                    ]
+
+                    if func_def.func_args is not None:
+                        for i in range(0, len(func_def.func_args.fields)):
+                            n = str(func_def.func_args.fields[i])
+                            args[n] = vals[i]
+                        msg = line.format(**args)
+                    else:
+                        msg = line
     except Exception as e:
         msg = repr(e)
         if 'KeyError' in msg:
@@ -520,10 +533,28 @@ def execute_function(f: FuncCall, symbol_table: Dict[str, _Ast]) -> str:
 
 
 @enforce_types
+def get_function_parm_count(f: Union[FuncCall, FuncDef]) -> int:
+    func_call_parm_count = 0
+    if isinstance(f, FuncCall):
+        if f.func_args is None and f.parm1 is None:
+            func_call_parm_count = 0
+        elif (f.func_args is not None and f.parm1 is None) or \
+                (f.parm1 is not None and f.func_args is None):
+            func_call_parm_count = 1
+        elif f.func_args is not None and f.parm1 is not None:
+            func_call_parm_count = 2
+    elif isinstance(f, FuncDef):
+        if f.func_args is not None:
+            func_call_parm_count = len(f.func_args.fields)
+
+    return func_call_parm_count
+
+
+@enforce_types
 def ast_to_sql(
         rule: Union[_Ast, Token],
         roots: Union[Root, List],  # a Root or a list of roots, all share the same symbol table
-        symbol_table: Dict[str, _Ast] = None,
+        symbol_table: Dict[str, List[_Ast]] = None,
         verbose: bool = True):
     if isinstance(roots, Root):
         root = roots
@@ -609,9 +640,9 @@ def ast_to_sql(
                 havings_str = 'HAVING '
                 for filter in havings:
                     if filter:
-                        for filter_line in filter.fields:
-                            if filter_line.val is not None:
-                                havings_str += ast_to_sql(filter_line.val, roots, symbol_table, verbose) + ' AND '
+                        for func_call in filter.fields:
+                            if func_call.val is not None:
+                                havings_str += ast_to_sql(func_call.val, roots, symbol_table, verbose) + ' AND '
                 havings_str = havings_str.rstrip(' AND ')
 
             upper = len(agg.aggregate_body.statements)
@@ -625,7 +656,7 @@ def ast_to_sql(
                         func_call = agg.aggregate_body.statements[i]
 
                         if isinstance(func_call, FuncCall):
-                            agg_str += f'{func_call} as {name},'
+                            agg_str += f'{ast_to_sql(func_call, roots, symbol_table, verbose)} as {name},'
                         elif isinstance(func_call, str):
                             agg_str += f'{func_call} as {name},'
                         elif isinstance(func_call, PipeBody):
@@ -643,11 +674,11 @@ def ast_to_sql(
                         else:
                             raise PRQLException(f'Unknown type for aggregate body {type(line)}, {str(line)}')
                     elif isinstance(line, FuncCall):
-                        filter_line = line
-                        if filter_line.func_args is not None:
-                            agg_str += f'{str(filter_line)} as {filter_line.name}_{filter_line.func_args},'
+                        func_call = line
+                        if func_call.func_args is not None:
+                            agg_str += f'{str(func_call)} as {func_call.name}_{func_call.func_args},'
                         else:
-                            agg_str += f'{str(filter_line)},'
+                            agg_str += f'{str(func_call)},'
                     elif isinstance(line, PipedCall):
                         piped = line
                         # piped.func_body.parm1 = replace_variables(str(piped.parm1), symbol_table)
@@ -669,9 +700,9 @@ def ast_to_sql(
         if filters:
             for filter in filters:
                 if filter:
-                    for filter_line in filter.fields:
-                        if filter_line.val is not None:
-                            filter_str += ast_to_sql(filter_line.val, roots, symbol_table, verbose) + ' AND '
+                    for func_call in filter.fields:
+                        if func_call.val is not None:
+                            filter_str += ast_to_sql(func_call.val, roots, symbol_table, verbose) + ' AND '
             filter_str = filter_str.rstrip(' AND ')
 
         if wheres_from_derives:
@@ -716,26 +747,38 @@ def ast_to_sql(
     elif isinstance(rule, Expression):
         expr = rule
         msg = ''
-        for fields in expr.statements:
-            msg += ast_to_sql(fields, roots, symbol_table, verbose)
+        upper = len(expr.statements)
+        i = 0
+        while i < upper:
+            fields = expr.statements[i]
+            if isinstance(fields, PipedCall):
+                if i + 1 < upper and isinstance(expr.statements[i + 1], Token):
+                    fields.func_args = expr.statements[i + 1]
+                    i += 1
+                    msg += ast_to_sql(fields, roots, symbol_table, verbose)
+                else:
+                    msg += ast_to_sql(fields, roots, symbol_table, verbose)
+            else:
+                msg += ast_to_sql(fields, roots, symbol_table, verbose)
+            # else:
+            #     raise PRQLException(f'Unknown type for expression {type(fields)}, {str(fields)}')
+            i += 1
         return msg
     elif isinstance(rule, PipedCall):
         pipe: PipedCall = rule
         msg = ''
         pipe.func_body.parm1 = pipe.parm1
+        if hasattr(pipe, 'func_args') and pipe.func_args is not None:
+            pipe.func_body.func_args = pipe.func_args
         msg += ast_to_sql(pipe.func_body, roots, symbol_table, verbose)
 
         return msg
     elif isinstance(rule, FuncCall):
-        filter_line = rule
-
-        # if f.parm1:
-        #     v = ',' + ast_to_sql(f.parm1, roots, symbol_table)
-        #     msg = str(f.name) + f'({v})'
-        if str(filter_line.name) in symbol_table:
-            msg = execute_function(filter_line, symbol_table)
+        func_call: FuncCall = rule
+        if str(func_call.name) in symbol_table:
+            msg = execute_function(func_call, symbol_table)
         else:
-            raise PRQLException(f'Unknown function {filter_line.name}')
+            raise PRQLException(f'Unknown function {func_call.name}')
         return msg
     elif isinstance(rule, Value):
 
@@ -745,7 +788,7 @@ def ast_to_sql(
                 if table.name == val:
                     return "(" + ast_to_sql(table.value_body, roots, symbol_table, verbose) + ")"
         if val in symbol_table:
-            replacement = symbol_table[val]
+            replacement = symbol_table[val][0]
             if not isinstance(replacement, FuncDef):
                 return str(replacement)
 
@@ -753,6 +796,8 @@ def ast_to_sql(
     elif isinstance(rule, Operator):
         return str(rule)
     elif isinstance(rule, FilterLine):
+        return ast_to_sql(rule.val, roots, symbol_table, verbose)
+    elif isinstance(rule, DeriveBody):
         return ast_to_sql(rule.val, roots, symbol_table, verbose)
     else:
         raise Exception(f"No sql for {type(rule)}")

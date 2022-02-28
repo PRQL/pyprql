@@ -203,6 +203,7 @@ class TestSqlGenerator(unittest.TestCase):
         filter f"foo > 10"
         '''
         res = prql.to_sql(q)
+        print(res)
         assert (res.index('WHERE foo > 10') != -1)
         print(res)
 

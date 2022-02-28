@@ -13,7 +13,7 @@ class TestEmployeeExamples:
     def run_query(self, text, expected=None):
         print(text.replace('\n\n', '\n'))
         print('-' * 40)
-        sql = prql.to_sql(text)
+        sql = prql.to_sql(text, True)
         print(sql)
         rows = self.cur.execute(sql)
         columns = [d[0] for d in rows.description]

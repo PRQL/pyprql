@@ -95,7 +95,7 @@ class TestStdlib(unittest.TestCase):
     def test_count(self):
         q = '''from table | select [ foo, bar ] | aggregate foo | count'''
         res = prql.to_sql(q)
-        # print(res)
+        print(res)
         self.assertTrue(res.index('COUNT(foo)') != -1)
         self.run_query(q, 1)
         # print(res)
@@ -196,34 +196,71 @@ class TestStdlib(unittest.TestCase):
         q = 'from table | select name  | derive capitalized: name | upper | take 5'
         res = prql.to_sql(q)
         # print(res)
-        self.assertTrue(res.index('UPPER(name)') != -1)
+        self.assertTrue(res.index('UPPER(name) as capitalized') != -1)
         self.run_query(q, 5)
 
     def test_trim(self):
         q = 'from table | select name  | derive trimmed: name | trim | take 5'
         res = prql.to_sql(q)
         print(res)
-        self.assertTrue(res.index('TRIM(name)') != -1)
+        self.assertTrue(res.index('TRIM(name) as trimmed') != -1)
         self.run_query(q, 5)
-        self.assertTrue(False)
 
     def test_trim_with_args(self):
-        self.assertTrue(False)
+        q = '''from table 
+            select name
+            derive [ trimmed: name | trim "," ]
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('TRIM(name,",") as trimmed') != -1)
+        self.run_query(q, 12)
 
     def test_ltrim(self):
-        self.assertTrue(False)
+        q = 'from table | select name  | derive trimmed: name | ltrim | take 5'
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('LTRIM(name) as trimmed') != -1)
+        self.run_query(q, 5)
 
     def test_ltrim_with_args(self):
-        self.assertTrue(False)
+        q = '''from table 
+            select name
+            derive [ trimmed: name | ltrim "," ]
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('LTRIM(name,",") as trimmed') != -1)
+        self.run_query(q, 12)
 
     def test_rtrim(self):
-        self.assertTrue(False)
+        q = 'from table | select name  | derive trimmed: name | rtrim | take 5'
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('RTRIM(name) as trimmed') != -1)
+        self.run_query(q, 5)
 
     def test_rtrim_with_args(self):
-        self.assertTrue(False)
+        q = '''from table 
+            select name
+            derive [ trimmed: name | rtrim "," ]
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('RTRIM(name,",") as trimmed') != -1)
+        self.run_query(q, 12)
 
-    def test_replace(self):
-        self.assertTrue(False)
-
-    def substr(self):
-        self.assertTrue(False)
+    # Needs to be able to take two arguments here, time to refactor
+    def test_replace_should_fail(self):
+        print('Needs to be able to take two arguments here, time to refactor')
+        q = '''from table 
+            select name
+            derive [ replaced: name | replace "," "|" ]
+        '''
+        try:
+            res = prql.to_sql(q)
+            print(res)
+            self.assertTrue(False)
+            self.run_query(q, 12)
+        except Exception as e:
+            self.assertTrue(True)

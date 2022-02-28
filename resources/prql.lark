@@ -35,9 +35,10 @@
     select_field: name ( "|" "as" name )?
     derive: ("derive" \
             ( "[" derive_line+ "]" | derive_line ))+
-    derive_line: name ":" expression (",")?
+    derive_line: name ":" derive_body (",")?
 
-    expression:  atom | atom operator atom
+    derive_body: (ESCAPED_STRING|expression)
+    expression:  atom | atom operator atom | atom ESCAPED_STRING
 
     func_def: "func" NAME (func_args)? "=" "("? func_body ")"?
     func_args: ((NAME " ")* NAME)*
