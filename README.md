@@ -5,25 +5,25 @@ Python implementation of [PRQL](https://github.com/max-sixty/prql).
 Documentation of PRQL is at https://github.com/max-sixty/prql
 
 ```elm
-        from employees
-        filter country = "USA"                           # Each line transforms the previous result.
-        derive [                                         # This adds columns / variables.
-          gross_salary: salary + payroll_tax,
-          gross_cost:   gross_salary + benefits_cost     # Variables can use other variables.
-        ]
-        filter gross_cost > 0
-        aggregate by:[title, country] [                  # `by` are the columns to group by.
-            average salary,                              # These are aggregation calcs run on each group.
-            sum     salary,
-            average gross_salary,
-            sum     gross_salary,
-            average gross_cost,
-            sum_gross_cost: sum gross_cost,
-            row_count: count salary
-        ]
-        sort sum_gross_cost
-        filter row_count > 200
-        take 20
+from employees
+filter country = "USA"                           
+derive [                                        
+  gross_salary: salary + payroll_tax,
+  gross_cost:   gross_salary + benefits_cost     
+]
+filter gross_cost > 0
+aggregate by:[title, country] [                  
+    average salary,                             
+    sum     salary,
+    average gross_salary,
+    sum     gross_salary,
+    average gross_cost,
+    sum_gross_cost: sum gross_cost,
+    row_count: count salary
+]
+sort sum_gross_cost
+filter row_count > 200
+take 20
 ```
 ---
 
