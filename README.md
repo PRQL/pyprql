@@ -5,18 +5,25 @@ Python implementation of [PRQL](https://github.com/max-sixty/prql).
 Documentation of PRQL is at https://github.com/max-sixty/prql
 
 ```elm
-from facts
-join cities [id=facts_id]
-derive [
-   city: "cities.name",
-   country: "facts.name"
+from employees
+filter country = "USA"                           
+derive [                                        
+  gross_salary: salary + payroll_tax,
+  gross_cost:   gross_salary + benefits_cost     
 ]
-aggregate by:code [
-   country_pop: sum facts.population,
-   city_pop: cities.population | sum
+filter gross_cost > 0
+aggregate by:[title, country] [                  
+    average salary,                             
+    sum     salary,
+    average gross_salary,
+    sum     gross_salary,
+    average gross_cost,
+    sum_gross_cost: sum gross_cost,
+    row_count: count salary
 ]
-sort "city_pop desc"
-take 5   
+sort sum_gross_cost
+filter row_count > 200
+take 20
 ```
 ---
 
@@ -30,16 +37,21 @@ print(sql)
 ---
 
 ```sql
-SELECT SUM(facts_f.population)  as country_pop,
-       SUM(cities_c.population) as city_pop,
-       "cities_c.name"          as city,
-       "facts_f.name"           as country
-FROM ` facts ` facts_f JOIN cities cities_c
-ON facts_f.id = cities_c.facts_id
-WHERE 1=1
-GROUP BY code
-ORDER BY "city_pop desc"
-LIMIT 5
+SELECT AVG(salary),
+       SUM(salary),
+       AVG(salary + payroll_tax),
+       SUM(salary + payroll_tax),
+       AVG(salary + payroll_tax + benefits_cost),
+       SUM(salary + payroll_tax + benefits_cost) as sum_gross_cost,
+       COUNT(salary)                             as row_count,
+       salary + payroll_tax                      as gross_salary,
+       (salary + payroll_tax) + benefits_cost    as gross_cost
+FROM ` employees ` employees_e
+WHERE country="USA" AND (gross_salary+benefits_cost)>0
+GROUP BY title, country
+HAVING row_count >200
+ORDER BY sum_gross_cost
+LIMIT 20
 
 ```
 
