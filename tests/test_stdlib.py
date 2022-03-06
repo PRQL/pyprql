@@ -218,6 +218,16 @@ class TestStdlib(unittest.TestCase):
         self.assertTrue(res.index('TRIM(name,",") as trimmed') != -1)
         self.run_query(q, 12)
 
+    def test_trim_with_args_weird(self):
+        q = '''from table 
+            select name
+            derive [ trimmed: name | trim " ~something_weird~ " ]
+        '''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('TRIM(name," ~something_weird~ ") as trimmed') != -1)
+        self.run_query(q, 12)
+
     @pytest.mark.xfail
     def test_trim_with_args_alt(self):
         q = '''from table 
@@ -264,16 +274,15 @@ class TestStdlib(unittest.TestCase):
         self.run_query(q, 12)
 
     # Needs to be able to take two arguments here, time to refactor
-    def test_replace_should_fail(self):
-        print('Needs to be able to take two arguments here, time to refactor')
-        q = '''from table 
-            select name
-            derive [ replaced: name | replace "," "|" ]
-        '''
-        try:
-            res = prql.to_sql(q)
-            print(res)
-            self.assertTrue(False)
-            self.run_query(q, 12)
-        except Exception as e:
-            self.assertTrue(True)
+    # @pytest.mark.xfail
+    # def test_replace_should_fail(self):
+    #     print('Needs to be able to take two arguments here, time to refactor')
+    #     q = '''from table
+    #         select name
+    #         derive [ replaced: name | replace "," "|" ]
+    #     '''
+    #
+    #     res = prql.to_sql(q, True)
+    #     print(res)
+    #     self.assertTrue(False)
+    #     self.run_query(q, 12)

@@ -160,12 +160,41 @@ class DeriveLine(_Statement):
         return f'{str(self.expression)}'
 
 
+class _Direction(_Statement):
+    pass
+
+
+@dataclass
+class Direction(_Statement):
+    direction: Optional[_Direction] = None
+
+    def __str__(self):
+        return str(self.direction)
+
+
+@dataclass
+class Ascending(_Direction):
+    direction = 'ASC'
+
+    def __str__(self):
+        return self.direction
+
+
+@dataclass
+class Descending(_Direction):
+    direction = 'DESC'
+
+    def __str__(self):
+        return self.direction
+
+
 @dataclass
 class Sort(_Statement):
     name: Name
+    direction: Optional[Direction] = None
 
     def __str__(self):
-        return f'{str(self.name)}'
+        return f'{str(self.name)} {self.direction if self.direction is not None else ""}'
 
 
 @dataclass
@@ -246,7 +275,7 @@ class FuncCall(_Statement):
     name: Name = None
     func_args: FuncArgs = None
     parm1: Any = None
-
+    parm2: Any = None
     # def __init__(self, name, func_args=None):
     #     values = [name, func_args]
     #     self.name = name  # self.assign_field(Name, values)
@@ -328,7 +357,7 @@ class ToAst(Transformer):
         # Remove quotation marks
         return s  # s[1:-1]
 
-    def FSTRING(self, s):
+    def SSTRING(self, s):
         return s[2:-1]
 
     def ESCAPED_STRING(self, s):
@@ -430,10 +459,10 @@ def replace_tables_standalone(from_long, from_short, join_long, join_short, s) -
 
 
 def wrap_replace_tables(from_long, from_short, join_long, join_short):
-    def a(x):
+    def inner(x):
         return replace_tables_standalone(from_long, from_short, join_long, join_short, x)
 
-    return a
+    return inner
 
 
 @enforce_types
@@ -483,6 +512,7 @@ def replace_variables(param: str, symbol_table: Dict[str, List[_Ast]]) -> str:
         return param
 
 
+@enforce_types
 def execute_function(f: FuncCall, symbol_table: Dict[str, List[_Ast]]) -> str:
     msg = ''
     name = str(f.name)
@@ -498,14 +528,10 @@ def execute_function(f: FuncCall, symbol_table: Dict[str, List[_Ast]]) -> str:
         for defintion in func_defs:
             if get_function_parm_count(defintion) == func_call_parm_count:
                 func_def = defintion
-                break
 
-        # raise PRQLException(
-        #     f'Function {name} is not unique, found {len(func_defs)}')
     try:
         if func_def:
             for line in func_def.func_body.fields:
-                # First just text replcaement ,1
                 if isinstance(line, PipeBody):
                     line = line.body
                 if type(line) == str:
@@ -752,9 +778,14 @@ def ast_to_sql(
         while i < upper:
             fields = expr.statements[i]
             if isinstance(fields, PipedCall):
+                print('PUT A BREAK POINT HERE, need to correctly pass in all arguments')
                 if i + 1 < upper and isinstance(expr.statements[i + 1], Token):
                     fields.func_args = expr.statements[i + 1]
                     i += 1
+                    # msg += ast_to_sql(fields, roots, symbol_table, verbose)
+                    if i + 1 < upper and isinstance(expr.statements[i + 1], Token):
+                        fields.parm2 = expr.statements[i + 1]
+                        i += 1
                     msg += ast_to_sql(fields, roots, symbol_table, verbose)
                 else:
                     msg += ast_to_sql(fields, roots, symbol_table, verbose)
@@ -767,7 +798,10 @@ def ast_to_sql(
     elif isinstance(rule, PipedCall):
         pipe: PipedCall = rule
         msg = ''
-        pipe.func_body.parm1 = pipe.parm1
+        if pipe.func_body.parm1 is None:
+            pipe.func_body.parm1 = pipe.parm1
+        else:
+            pipe.func_body.parm2 = pipe.parm1
         if hasattr(pipe, 'func_args') and pipe.func_args is not None:
             pipe.func_body.func_args = pipe.func_args
         msg += ast_to_sql(pipe.func_body, roots, symbol_table, verbose)

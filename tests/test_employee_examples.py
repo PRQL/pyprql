@@ -1,21 +1,21 @@
 import sqlite3
+import unittest
 
 import prql
 
 
-class TestEmployeeExamples:
-
-    def setup(self) -> None:
+class TestEmployeeExamples(unittest.TestCase):
+    def setUpClass() -> None:
         db_path = f'./employee.db'
-        self.con = sqlite3.connect(db_path)
-        self.cur = self.con.cursor()
+        TestEmployeeExamples.con = sqlite3.connect(db_path)
+        TestEmployeeExamples.cur = TestEmployeeExamples.con.cursor()
 
     def run_query(self, text, expected=None):
         print(text.replace('\n\n', '\n'))
         print('-' * 40)
         sql = prql.to_sql(text, True)
         print(sql)
-        rows = self.cur.execute(sql)
+        rows = TestEmployeeExamples.cur.execute(sql)
         columns = [d[0] for d in rows.description]
         print(f'Columns: {columns}')
         rows = rows.fetchall()
@@ -44,6 +44,33 @@ class TestEmployeeExamples:
         filter row_count > 200
         take 20
         '''
+
+        agg_funcs = [
+            'AVG(salary)',
+            'SUM(salary)',
+            'AVG(salary+payroll_tax)',
+            'SUM(salary+payroll_tax)',
+            'AVG(salary+payroll_tax+benefits_cost)',
+            'SUM(salary+payroll_tax+benefits_cost) as sum_gross_cost',
+            'COUNT(salary) as row_count']
+
+        filter_str = 'country="USA"'
+        filter_str_2 = '(gross_salary+benefits_cost)>0'
+        group_by_str = 'GROUP BY title,country'
+        havings_str = 'HAVING row_count>200'
+        order_by_str = 'ORDER BY sum_gross_cost '
+        limit_str = 'LIMIT 20'
+
+        sql = prql.to_sql(text, True)
+        [self.assertTrue(sql.index(f) > 0) for f in agg_funcs]
+        self.assertTrue(sql.index(filter_str) > 0)
+        self.assertTrue(sql.index(filter_str_2) > 0)
+        self.assertTrue(sql.index(group_by_str) > 0)
+        self.assertTrue(sql.index(havings_str) > 0)
+        self.assertTrue(sql.index(order_by_str) > 0)
+        self.assertTrue(sql.index(limit_str) > 0)
+
+        print(sql)
         self.run_query(text)
 
     def test_cte1(self):
@@ -58,4 +85,6 @@ class TestEmployeeExamples:
         join salary [id]
         select [name, salary]
         '''
+        sql = prql.to_sql(text, True)
+        print(sql)
         # self.run_query(text)

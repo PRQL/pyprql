@@ -41,7 +41,7 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         #WHERE population = (SELECT MIN(population) FROM facts);
         
         func  min_value column table = (
-            f"(SELECT MIN({column}) FROM {table})"
+            s"(SELECT MIN({column}) FROM {table})"
         )
         
         from facts

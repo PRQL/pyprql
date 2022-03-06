@@ -89,6 +89,29 @@ class TestSqlGenerator(unittest.TestCase):
         self.assertTrue(res.index('ORDER BY country') != -1)
         self.run_query(q, 7)
 
+    def test_order_by_asc(self):
+        q = 'from table | sort country order:asc | take 10'
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('ORDER BY country ASC') != -1)
+        self.run_query(q, 10)
+
+    def test_order_by_desc(self):
+        q = 'from table | sort country order:desc | take 11'
+        res = prql.to_sql(q)
+        self.assertTrue(res.index('ORDER BY country DESC') != -1)
+        self.run_query(q, 11)
+
+    def test_order_by_invalid_throws_exception(self):
+        q = 'from table | sort country order:invalid | take 7'
+        try:
+            res = prql.to_sql(q)
+
+            self.assertTrue(res.index('ORDER BY country INVALID') == -1)
+            self.run_query(q, 7)
+        except Exception as e:
+            self.assertTrue(True)
+
     def test_join_syntax(self):
         q = '''
         from table
@@ -200,7 +223,7 @@ class TestSqlGenerator(unittest.TestCase):
     def test_filter_fstring(self):
         q = '''
         from table 
-        filter f"foo > 10"
+        filter s"foo > 10"
         '''
         res = prql.to_sql(q)
         print(res)

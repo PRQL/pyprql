@@ -25,7 +25,7 @@ class TestSqlGenerator(unittest.TestCase):
 
     def test_select_all(self):
         q = '''
-        func no_params = f"COUNT(*)"
+        func no_params = s"COUNT(*)"
         from table
         select foo
         aggregate [
