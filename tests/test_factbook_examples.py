@@ -86,14 +86,14 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         from facts
         join cities [id=facts_id]
         derive [
-            city: "cities.name",
-            country: "facts.name"
+            city: s"cities.name",
+            country: s"facts.name"
         ]
         aggregate by:[code] [
             country_pop: sum facts.population,
             city_pop: cities.population | sum
         ]
-        sort "city_pop desc"
+        sort city_pop order:desc
         take 5        
         
         '''
@@ -126,7 +126,7 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
             country_pop: "SUM(facts.population)",
             city_pop: "SUM(cities.population)"
         ]
-        sort "city_pop desc"
+        sort city_pop order:desc
         take 6
         '''
         self.run_query(text, 6)

@@ -1,6 +1,8 @@
 import sqlite3
 import unittest
 
+import pytest
+
 import prql
 
 
@@ -36,3 +38,14 @@ class TestSqlGenerator(unittest.TestCase):
         print(res)
         # self.assertTrue(res.startswith('SELECT * FROM `table`'))
         self.run_query(q)
+
+    @pytest.mark.skip(reason="In progress")
+    def test_replace_function(self):
+        q = '''
+        from table 
+        select name 
+        derive cleaned: name | replace "foo" "bar"
+        
+        '''
+        res = prql.to_sql(q)
+        print(res)
