@@ -595,7 +595,7 @@ def safe_to_sql(
         return rule
     elif isinstance(rule, Token) or isinstance(rule, Name):
         return str(rule)
-    elif isinstance(rule, _Ast or isinstance(rule, Token)):
+    elif isinstance(rule, _Ast):
         return ast_to_sql(rule, roots, symbol_table, verbose)
 
 
