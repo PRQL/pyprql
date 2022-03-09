@@ -1,7 +1,11 @@
-lark
-icecream
-rich
+lark~=1.0.0
+icecream~=2.1.1
+rich~=11.1.0
 enforce-typing
 flake8
-pytest
+pytest~=6.2.5
 pytest-xdist
+click~=8.0.4
+prompt_toolkit~=3.0.20
+pygments~=2.11.2
+fuzzyfinder~=2.1.0
