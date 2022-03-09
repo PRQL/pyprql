@@ -39,7 +39,6 @@ class TestSqlGenerator(unittest.TestCase):
         # self.assertTrue(res.startswith('SELECT * FROM `table`'))
         self.run_query(q)
 
-    @pytest.mark.skip(reason="In progress")
     def test_replace_function(self):
         q = '''
         from table 
@@ -49,3 +48,21 @@ class TestSqlGenerator(unittest.TestCase):
         '''
         res = prql.to_sql(q)
         print(res)
+
+    def test_nested_functions(self):
+        q = '''from table
+        select name
+        derive [ 
+            trimmed: name | rtrim ,
+            cleaned: name | replace "dirty" "clean",
+            nested: (name | rtrim ",") | ltrim,
+            triplenested: ((name | replace "dirty" "clean") | replace "," " ") | trim " "
+        ]'''
+        res = prql.to_sql(q)
+        simple = 'REPLACE(name,"dirty","clean") as cleaned'
+        nest1 = 'LTRIM(RTRIM(name,",")) as nested'
+        triple = 'TRIM(REPLACE(REPLACE(name,"dirty","clean"),","," ")," ") as triplenested'
+        self.assertTrue(res.index(simple) != -1)
+        self.assertTrue(res.index(nest1) != -1)
+        self.assertTrue(res.index(triple) != -1)
+        self.run_query(q, 12)

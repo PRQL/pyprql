@@ -30,7 +30,7 @@ func rtrim column val = s"RTRIM({column},{val})"
 
 func replace target search_str replace_str = s"REPLACE({target},{search_str},{replace_str})"
 
-func substr search_str replace_str = s"SUBSTR({search_str},{replace_str})"
+func substr column search_str replace_str = s"SUBSTR({column},{search_str},{replace_str})"
 func substring column = s"SUBSTRING({search_str},{replace_str})"
 
 

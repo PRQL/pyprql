@@ -211,10 +211,7 @@ class TestSqlGenerator(unittest.TestCase):
     def test_filter_where_multi(self):
         q = '''
         from table 
-        filter [ 
-            foo > 10, 
-            bar < 20
-        ]
+        filter [ foo > 10, bar < 20 ]
         '''
         res = prql.to_sql(q)
         assert (res.index('WHERE foo>10') != -1)

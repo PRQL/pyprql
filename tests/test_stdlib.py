@@ -263,6 +263,18 @@ class TestStdlib(unittest.TestCase):
         self.assertTrue(res.index('RTRIM(name) as trimmed') != -1)
         self.run_query(q, 5)
 
+    def test_nested_trims(self):
+        q = '''from table
+        select name
+        derive [ 
+            trimmed: name | rtrim ,
+            trimmed2: (name | rtrim ",") | ltrim 
+        ]'''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('RTRIM(name) as trimmed') != -1)
+        self.run_query(q, 12)
+
     def test_rtrim_with_args(self):
         q = '''from table 
             select name
@@ -273,16 +285,22 @@ class TestStdlib(unittest.TestCase):
         self.assertTrue(res.index('RTRIM(name,",") as trimmed') != -1)
         self.run_query(q, 12)
 
-    # Needs to be able to take two arguments here, time to refactor
-    # @pytest.mark.xfail
-    # def test_replace_should_fail(self):
-    #     print('Needs to be able to take two arguments here, time to refactor')
-    #     q = '''from table
-    #         select name
-    #         derive [ replaced: name | replace "," "|" ]
-    #     '''
-    #
-    #     res = prql.to_sql(q, True)
-    #     print(res)
-    #     self.assertTrue(False)
-    #     self.run_query(q, 12)
+    def test_replace_function(self):
+        q = '''
+        from table 
+        select name 
+        derive cleaned: name | replace "foo" "bar"
+
+        '''
+        res = prql.to_sql(q, verbose=True)
+        self.assertTrue(res.index('REPLACE(name,"foo","bar") as cleaned') > 0)
+        print(res)
+        self.run_query(q, 12)
+
+    def test_substr(self):
+        q = '''
+        from table | select name | derive [ short: name | substr 0 3 ]'''
+        res = prql.to_sql(q, verbose=True)
+        print(res)
+        self.assertTrue(res.index('SUBSTR(name,0,3) as short') > 0)
+        self.run_query(q, 12)
