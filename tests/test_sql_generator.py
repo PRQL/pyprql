@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from pyprql import prql
+import pytest
 
 
 class TestSqlGenerator(unittest.TestCase):
@@ -204,6 +205,29 @@ class TestSqlGenerator(unittest.TestCase):
         self.assertTrue(res.index("foo+bar as foo_bar") != -1)
         self.run_query(q, 12)
         # print(res)
+
+    def test_derive_single_column(self):
+        q = '''
+        from table
+        derive [
+         foo_only: foo
+        ]'''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('foo as foo_only') != -1)
+        self.run_query(q, 12)
+
+    @pytest.mark.skip(reason="In Progress")
+    def test_derive_single_column_nested(self):
+        q = '''
+        from table
+        derive [
+         foo_only: table.foo
+        ]'''
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('foo as foo_only') != -1)
+        self.run_query(q, 12)
 
     def test_filter_where_only(self):
         q = """

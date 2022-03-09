@@ -39,8 +39,8 @@
             ( "[" derive_line+ "]" | derive_line ))+
     derive_line: name ":" derive_body (",")?
 
-    derive_body: expression
-    expression:  atom | atom operator atom | atom ESCAPED_STRING
+    derive_body: (ESCAPED_STRING|expression)
+    expression:  atom | atom operator atom
 
     func_def: "func" NAME (func_args)? "=" "("? func_body ")"?
     func_args: ((NAME " ")* NAME)*
