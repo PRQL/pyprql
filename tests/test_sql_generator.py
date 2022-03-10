@@ -81,6 +81,26 @@ class TestSqlGenerator(unittest.TestCase):
         except Exception as e:
             self.assertTrue(True)
 
+    def test_take(self):
+        q = 'from table | take 10'
+        res = prql.to_sql(q)
+        self.assertTrue(res.index('LIMIT 10') != -1)
+        self.run_query(q, 10)
+
+    def test_take_with_offset(self):
+        q = 'from table | take 10 offset:10 '
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('LIMIT 10 OFFSET 10') != -1)
+        self.run_query(q, 2)
+
+    def test_take_with_offset_2(self):
+        q = 'from table | take 2 offset:10 '
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index('LIMIT 2 OFFSET 10') != -1)
+        self.run_query(q, 2)
+
     def test_limit(self):
         q = "from table | take 10"
         res = prql.to_sql(q)

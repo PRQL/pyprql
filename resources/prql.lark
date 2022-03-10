@@ -20,7 +20,7 @@
 
 
     pipe_body: (STRING|SSTRING|func_call|piped_call)
-    take: "take" INT
+    take: "take" INT ("offset" ":" INT)?
 
     filter: ("filter" "[" filter_line ( "," filter_line)* "]") | \
             ("filter" filter_line)
