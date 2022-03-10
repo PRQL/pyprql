@@ -686,8 +686,6 @@ def ast_to_sql(
                 join_long = str(join.name)
                 join_short = alias(join_long)
 
-                replace_tables = wrap_replace_tables(from_long, from_short, join_long, join_short)
-
                 left_id = replace_all_tables(str(join.left_id))
                 right_id = replace_all_tables(str(join.right_id))
                 if right_id is None or right_id == 'None':
@@ -706,11 +704,11 @@ def ast_to_sql(
 
                 # right_id = right_id.replace(from_long, '').replace(from_short, '')
                 if right_id.find('.') == -1:
-                    right_side = replace_all_tables(str(join_long + "." + right_id). \
+                    right_side = replace_all_tables(str(join_long + "." + right_id).
                                                     replace(join_short + "." + join_short + ".",
                                                             join_short + "."))
                 else:
-                    right_side = replace_all_tables(str(right_id). \
+                    right_side = replace_all_tables(str(right_id).
                                                     replace(join_short + "." + join_short + ".",
                                                             join_short + "."))
 
