@@ -74,7 +74,7 @@ class TestStdlib(unittest.TestCase):
         # print(res)
 
     def test_avg(self):
-        q = """from table | select foo | aggregate foo | avg"""
+        q = '''from table | select foo | aggregate [average_foo: foo | avg]'''
         res = prql.to_sql(q)
         # print(res)
         self.assertTrue(res.index("AVG(foo)") != -1)

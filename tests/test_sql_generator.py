@@ -19,6 +19,7 @@ class TestSqlGenerator(unittest.TestCase):
         # print('-' * 40)
         sql = prql.to_sql(text)
         # print(sql)
+
         rows = TestSqlGenerator.cur.execute(sql)
         columns = [d[0] for d in rows.description]
         # print(f'Columns: {columns}')
@@ -54,7 +55,7 @@ class TestSqlGenerator(unittest.TestCase):
         q = """
         from table | select [ foo | as float ,  bar | as string ]
         """
-        res = prql.to_sql(q)
+        res = prql.to_sql(q, True)
         print(res)
         self.assertTrue(res.startswith("SELECT CAST(foo as float),CAST(bar as string)"))
         self.run_query(q)
@@ -120,10 +121,8 @@ class TestSqlGenerator(unittest.TestCase):
         from table
         join table2 [id=id]
         """
-        res = prql.to_sql(q)
-        self.assertTrue(
-            res.index("JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
-        )
+        res = prql.to_sql(q, True)
+        self.assertTrue(res.index('JOIN table2 table2_t ON table_t.id = table2_t.id') != -1)
         self.run_query(q, 6)
 
     def test_join_syntax_2(self):
@@ -136,6 +135,16 @@ class TestSqlGenerator(unittest.TestCase):
         self.assertTrue(
             res.index("JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
         )
+        self.run_query(q, 6)
+
+    def test_double_join_syntax_2(self):
+        q = '''
+        from table
+        join table2 [table.id=table2.id]
+        '''
+        res = prql.to_sql(q)
+        # print(res)
+        self.assertTrue(res.index('JOIN table2 table2_t ON table_t.id = table2_t.id') != -1)
         self.run_query(q, 6)
 
     def test_group_by_single_item_array(self):
@@ -217,7 +226,7 @@ class TestSqlGenerator(unittest.TestCase):
         self.assertTrue(res.index('foo as foo_only') != -1)
         self.run_query(q, 12)
 
-    @pytest.mark.skip(reason="In Progress")
+    # @pytest.mark.skip(reason="In Progress")
     def test_derive_single_column_nested(self):
         q = '''
         from table
@@ -281,4 +290,22 @@ class TestSqlGenerator(unittest.TestCase):
         res = prql.to_sql(q)
         print(res)
         assert res.index("HAVING row_count>200") != -1
+        print(res)
+
+    def test_like(self):
+        q = '''
+        from table 
+        filter foo | like "bar"'''
+        res = prql.to_sql(q)
+        print(res)
+        assert (res.index('WHERE foo LIKE "bar"') != -1)
+        print(res)
+
+    def test_like(self):
+        q = '''
+        from table 
+        filter foo | like "%"'''
+        res = prql.to_sql(q)
+        print(res)
+        assert (res.index('WHERE foo LIKE "%"') != -1)
         print(res)
