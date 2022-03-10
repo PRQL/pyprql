@@ -200,9 +200,13 @@ class Sort(_Statement):
 @dataclass
 class Take(_Statement):
     qty: str
+    offset: str = Optional[str]
 
     def __str__(self):
-        return f'take: {self.qty}'
+        sql = f'LIMIT {self.qty}'
+        if self.offset is not None and self.offset and isinstance(self.offset, lark.lexer.Token):
+            sql += f' OFFSET {self.offset} '
+        return sql
 
 
 @dataclass
@@ -651,8 +655,8 @@ def ast_to_sql(
         ops = _from.get_pipes()
         joins = get_operation(ops.operations, Join, return_all=True)
         agg = get_operation(ops.operations, Aggregate)
-        take = get_operation(ops.operations, Take)
-        sort = get_operation(ops.operations, Sort)
+        take = get_operation(ops.operations, Take, last_match=True)
+        sort = get_operation(ops.operations, Sort, last_match=True)
 
         filters = get_operation(ops.operations, Filter, return_all=True, before=Aggregate)
         wheres_from_derives = get_operation(ops.operations, Derive, return_all=True, before=Aggregate)
@@ -663,9 +667,6 @@ def ast_to_sql(
         from_short = alias(from_long)
 
         from_str = f'`{from_long}`' + ' ' + from_short
-
-        if verbose:
-            rich.print(roots)
         all_join_longs = []
         all_join_shorts = []
         for join in joins:
@@ -675,11 +676,20 @@ def ast_to_sql(
 
                 all_join_shorts.append(join_short)
                 all_join_longs.append(join_long)
+        replace_all_tables = wrap_replace_all_tables(from_long, from_short, all_join_longs, all_join_shorts)
+
+        if verbose:
+            rich.print(roots)
+
+        for join in joins:
+            if join:
+                join_long = str(join.name)
+                join_short = alias(join_long)
 
                 replace_tables = wrap_replace_tables(from_long, from_short, join_long, join_short)
 
-                left_id = replace_tables(str(join.left_id))
-                right_id = replace_tables(str(join.right_id))
+                left_id = replace_all_tables(str(join.left_id))
+                right_id = replace_all_tables(str(join.right_id))
                 if right_id is None or right_id == 'None':
                     right_id = left_id
 
@@ -696,17 +706,15 @@ def ast_to_sql(
 
                 # right_id = right_id.replace(from_long, '').replace(from_short, '')
                 if right_id.find('.') == -1:
-                    right_side = str(join_short + "." + right_id). \
-                        replace(join_short + "." + join_short + ".",
-                                join_short + ".")
+                    right_side = replace_all_tables(str(join_long + "." + right_id). \
+                                                    replace(join_short + "." + join_short + ".",
+                                                            join_short + "."))
                 else:
-                    right_side = str(right_id). \
-                        replace(join_short + "." + join_short + ".",
-                                join_short + ".")
+                    right_side = replace_all_tables(str(right_id). \
+                                                    replace(join_short + "." + join_short + ".",
+                                                            join_short + "."))
 
-                join_str += f'JOIN {join.name} {join_short} ON {left_side} = {right_side} '
-
-        replace_all_tables = wrap_replace_all_tables(from_long, from_short, all_join_longs, all_join_shorts)
+                join_str += replace_all_tables(f'JOIN {join.name} {join_short} ON {left_side} = {right_side} ')
 
         if selects:
             for select in selects:
@@ -773,7 +781,7 @@ def ast_to_sql(
             agg_str = replace_all_tables(agg_str)
             agg_str = agg_str.rstrip(',').lstrip(',')
         if take:
-            limit_str = f'LIMIT {take.qty}'
+            limit_str = str(take)
 
         if filters:
             for filter in filters:

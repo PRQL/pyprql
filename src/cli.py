@@ -137,6 +137,7 @@ class CLI:
             rich.print(table)
 
     def highlight_prql(self, text):
+
         highlighted = pygments.highlight(text, PRQLLexer(), Formatter())
         return highlighted
 
@@ -211,8 +212,8 @@ class CLI:
                 # if self.has_one_blank:
                 self.has_one_blank = False
                 if self.command and self.command.strip().rstrip('') != '':
-                    rich.print('[pale_green3 bold]PRQL:[/pale_green3 bold]')
-                    print('\t' + self.highlight_prql(self.command).strip())
+                    # rich.print('[pale_green3 bold]PRQL:[/pale_green3 bold]')
+                    # print('\t' + self.highlight_prql(self.command).strip())
                     sql = prql.to_sql(self.command)
                     if 'LIMIT' not in sql:
                         sql += ' LIMIT 5'
