@@ -85,7 +85,7 @@ def stringify(row):
 
 class CLI:
 
-    def __init__(self, connect_str: str = 'sqlite:///../resources/chinook.db'):
+    def __init__(self, connect_str: str = 'chinook'):
         self.has_one_blank = False
         self.prompt_text = 'PRQL> '
         self.command = ''
@@ -105,22 +105,14 @@ class CLI:
             columns[table] = self.inspector.get_columns(table)
             columns[table] = [x['name'] for x in columns[table]]
             columns[table].sort()
-        # print('HERE!!')
-        # print(columns)
+
         column_names = []
         for col in columns.keys():
-            # print(col)
             for column in columns[col]:
                 column_names.append(column)
         column_names = list(set(column_names))
         column_names.sort()
         return column_names, columns
-
-    # def get_completer(self):
-    #     table_names = set(self.inspector.get_table_names())
-    #
-    #     completer = NestedCompleter.from_nested_dict()
-    #     return completer
 
     def execute_sql(self, sql):
         with self.engine.connect() as con:
@@ -193,18 +185,16 @@ class CLI:
         self.command += user_input + ' '
         if self.sql_mode:
             if not user_input:
-                if self.has_one_blank:
-                    self.has_one_blank = False
-                    sql = self.command
-                    if 'LIMIT' not in sql:
-                        sql += ' LIMIT 5'
 
-                    print('\t' + self.highlight_sql(sql))
-                    self.prompt_text = 'SQL> '
-                    self.execute_sql(sql)
-                else:
-                    self.prompt_text = '<enter to execute>'
-                    self.has_one_blank = True
+                self.has_one_blank = False
+                sql = self.command
+                if 'LIMIT' not in sql:
+                    sql += ' LIMIT 5'
+
+                print('\t' + self.highlight_sql(sql))
+                self.prompt_text = 'SQL> '
+                self.execute_sql(sql)
+
             else:
                 self.prompt_text = '....>'
         else:
