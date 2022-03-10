@@ -1,0 +1,66 @@
+[tool.poetry]
+name = "pyprql"
+version = "0.0.0"
+description = "Python Implementation of Pipelined Relational Query Language (PRQL)"
+authors = ["qorrect <charlie.fats@gmail.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/qorrect/PyPrql"
+homepage = ""
+classifiers = [
+        "Development Status :: 3 - Alpha",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Typing :: Typed",
+]
+
+[tool.poetry.dependencies]
+python = "^3.6.2"
+lark = "^1.1.2"
+icecream = "^2.1.2"
+rich = "^12.0.0"
+enforce-typing = "^1.0.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0.1"
+nox = "^2022.1.7"
+pre-commit = "^2.17.0"
+commitizen = "^2.21.2"
+flake8 = "^4.0.1"
+mypy = "^0.931"
+isort = "^5.10.1"
+black = "^22.1.0"
+safety = "^1.10.3"
+pytest-xdist = "^2.5.0"
+pytest-clarity = "^1.0.1"
+pytest-sugar = "^0.9.4"
+
+[tool.semantic_release]
+branch = "main"
+version_toml = [
+        "pyproject.toml:tool.poetry.version"
+]
+changelog_file = "CHANGELOG.md"
+upload_to_pypi = false
+upload_to_release = false
+build_command = "poetry build"
+
+[tool.pytest.ini_options]
+addopts = """
+-vv
+-n auto
+"""
+
+[tool.isort]
+profile = "black"
+skip_gitignore = true
+float_to_top = false
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

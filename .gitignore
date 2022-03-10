@@ -4,3 +4,4 @@ __pycache__/
 *$py.class
 .idea/
 scratch.py
+.python-version
