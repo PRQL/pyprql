@@ -16,6 +16,8 @@ func as column type = s"CAST({column} AS {type})"
 
 # String functions
 
+func like column str = s"{column} LIKE {str}"
+
 func upper column = s"UPPER({column})"
 func lower column = s"LOWER({column})"
 

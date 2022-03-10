@@ -5,9 +5,9 @@
 
     value_def: "value" NAME "=" "(" from ")"
     with_def: "table" NAME "=" "(" from ")"
-    from: "from" NAME "|"? (join)? "|"? pipes
+    from: "from" NAME "|"?  pipes
 
-    pipes: ((select | derive | filter | sort | take| aggregate) ("|")? )*
+    pipes: ((join | select | derive | filter | sort | take| aggregate) ("|")? )*
     join: ("join"|"left_join"|"right_join")+ name "[" name ("=" name)? "]"
 
     aggregate: "aggregate"  \
@@ -27,8 +27,8 @@
     filter_line: (ESCAPED_STRING|expression)
     sort: "sort" (ESCAPED_STRING|name) ( "order" ":" direction)?
     direction: (ascending|descending)
-    ascending: "asc"
-    descending: "desc"
+    ascending: ("asc"|"ascending")
+    descending: ("desc"|"descending")
 
     select: ("select" select_fields)+
     select_fields: ("[" select_field ("," select_field)*  "]")* \
@@ -46,16 +46,16 @@
     func_args: ((NAME " ")* NAME)*
     func_body: pipe_body ("," pipe_body)*
 
-    func_call:  NAME | \
-                NAME (name|ESCAPED_STRING|NUMBER) | \
-                NAME (name|ESCAPED_STRING|NUMBER) (name|ESCAPED_STRING|NUMBER) | \
-                NAME (name|ESCAPED_STRING|NUMBER) (name|ESCAPED_STRING|NUMBER) (name|ESCAPED_STRING|NUMBER) | \
-                NAME (name|ESCAPED_STRING|NUMBER) (name|ESCAPED_STRING|NUMBER) (name|ESCAPED_STRING|NUMBER) (name|ESCAPED_STRING|NUMBER)
+    func_call: NAME | \
+                NAME value | \
+                NAME value value | \
+                NAME value value value | \
+                NAME value value value value
 
     piped_call: (name | "(" piped_call ")" ) "|" func_call
 
 
-    value: NAME | STRING | NUMBER | SIGNED_NUMBER | FLOAT | SIGNED_FLOAT | SSTRING
+    value: name | STRING | NUMBER | SIGNED_NUMBER | FLOAT | SIGNED_FLOAT | SSTRING
     name.1: NAME ( "." NAME)*
 
     SSTRING: "s" ESCAPED_STRING

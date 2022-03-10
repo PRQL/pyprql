@@ -228,7 +228,6 @@ class Pipes(_Statement, ast_utils.AsList):
 class From(_Statement):
     name: str
     pipes: Pipes = None
-    join: Join = None
 
     def __init__(self, name, pipes=None, join=None):
         self.name = name
@@ -239,9 +238,6 @@ class From(_Statement):
 
     def get_pipes(self):
         return self.pipes
-
-    def get_join(self):
-        return self.join
 
 
 @dataclass
@@ -451,6 +447,22 @@ def alias(s: str, n: int = 1):
     return s + '_' + s[0:n]
 
 
+def replace_all_tables_standalone(from_long: str, from_short: str, join_long: List, join_short: List, s: str):
+    s = s.replace(f'{from_long}.', f'{from_short}.')
+    if join_long and len(join_long) > 0:
+        for i in range(len(join_long)):
+            s = s.replace(f'{join_long[i]}.', f'{join_short[i]}.')
+        # s = s.replace(f'{join_long}.', f'{join_short}.')
+    return s
+
+
+def wrap_replace_all_tables(from_long, from_short, join_long, join_short):
+    def inner(x):
+        return replace_all_tables_standalone(from_long, from_short, join_long, join_short, x)
+
+    return inner
+
+
 def replace_tables_standalone(from_long, from_short, join_long, join_short, s) -> str:
     s = s.replace(f'{from_long}.', f'{from_short}.')
     if join_long:
@@ -636,21 +648,8 @@ def ast_to_sql(
         ###
 
         _from = rule
-        _join = _from.get_join()
-
-        from_long = str(_from.name)
-        from_short = alias(from_long)
-        join_long = ''
-        join_short = ''
-        if _join:
-            join_long = str(_join.name)
-            join_short = alias(join_long)
-        replace_tables = wrap_replace_tables(from_long, from_short, join_long, join_short)
-
-        from_str = f'`{from_long}`' + ' ' + from_short
-
         ops = _from.get_pipes()
-        selects = get_operation(ops.operations, Select, return_all=True)
+        joins = get_operation(ops.operations, Join, return_all=True)
         agg = get_operation(ops.operations, Aggregate)
         take = get_operation(ops.operations, Take)
         sort = get_operation(ops.operations, Sort)
@@ -658,32 +657,65 @@ def ast_to_sql(
         filters = get_operation(ops.operations, Filter, return_all=True, before=Aggregate)
         wheres_from_derives = get_operation(ops.operations, Derive, return_all=True, before=Aggregate)
         havings = get_operation(ops.operations, Filter, return_all=True, after=Aggregate)
+        selects = get_operation(ops.operations, Select, return_all=True)
+
+        from_long = str(_from.name)
+        from_short = alias(from_long)
+
+        from_str = f'`{from_long}`' + ' ' + from_short
 
         if verbose:
             rich.print(roots)
+        all_join_longs = []
+        all_join_shorts = []
+        for join in joins:
+            if join:
+                join_long = str(join.name)
+                join_short = alias(join_long)
 
-        for select in selects:
-            select_str += replace_tables(str(select))
+                all_join_shorts.append(join_short)
+                all_join_longs.append(join_long)
 
-        join = _join
-        if join:
-            left_id = replace_tables(str(join.left_id))
-            right_id = replace_tables(str(join.right_id))
-            join_short = join_short
+                replace_tables = wrap_replace_tables(from_long, from_short, join_long, join_short)
 
-            # left_id = left_id.replace(from_long, '').replace(from_short, '')
-            left_side = str(from_short + "." + left_id).replace(from_short + "." + from_short + ".",
-                                                                from_short + ".")
+                left_id = replace_tables(str(join.left_id))
+                right_id = replace_tables(str(join.right_id))
+                if right_id is None or right_id == 'None':
+                    right_id = left_id
 
-            # right_id = right_id.replace(from_long, '').replace(from_short, '')
-            right_side = str(join_short + "." + right_id).replace(join_short + "." + join_short + ".", join_short + ".")
+                # left_id = left_id.replace(from_long, '').replace(from_short, '')
 
-            join_str = f'JOIN {join.name} {join_short} ON {left_side} = {right_side}'
+                if left_id.find('.') == -1:
+                    left_side = str(from_short + "." + left_id). \
+                        replace(from_short + "." + from_short + ".",
+                                from_short + ".")
+                else:
+                    left_side = str(left_id). \
+                        replace(from_short + "." + from_short + ".",
+                                from_short + ".")
+
+                # right_id = right_id.replace(from_long, '').replace(from_short, '')
+                if right_id.find('.') == -1:
+                    right_side = str(join_short + "." + right_id). \
+                        replace(join_short + "." + join_short + ".",
+                                join_short + ".")
+                else:
+                    right_side = str(right_id). \
+                        replace(join_short + "." + join_short + ".",
+                                join_short + ".")
+
+                join_str += f'JOIN {join.name} {join_short} ON {left_side} = {right_side} '
+
+        replace_all_tables = wrap_replace_all_tables(from_long, from_short, all_join_longs, all_join_shorts)
+
+        if selects:
+            for select in selects:
+                select_str += replace_all_tables(str(select))
 
         if agg:
 
             if agg.group_by is not None:
-                group_by_str = f'GROUP BY {replace_tables(str(agg.group_by))}'
+                group_by_str = f'GROUP BY {replace_all_tables(str(agg.group_by))}'
 
             if havings is not None and len(havings) > 0:
                 havings_str = 'HAVING '
@@ -738,7 +770,7 @@ def ast_to_sql(
                         raise PRQLException(f'Unknown type for aggregate body {type(line)}, {str(line)}')
                 i += 1
 
-            agg_str = replace_tables(agg_str)
+            agg_str = replace_all_tables(agg_str)
             agg_str = agg_str.rstrip(',').lstrip(',')
         if take:
             limit_str = f'LIMIT {take.qty}'
@@ -748,13 +780,14 @@ def ast_to_sql(
                 if filter:
                     for func_call in filter.fields:
                         if func_call.val is not None:
-                            filter_str += ast_to_sql(func_call.val, roots, symbol_table, verbose) + ' AND '
+                            filter_str += replace_all_tables(
+                                ast_to_sql(func_call.val, roots, symbol_table, verbose)) + ' AND '
             filter_str = filter_str.rstrip(' AND ')
 
         if wheres_from_derives:
             for d in wheres_from_derives:
                 for line in d.fields:
-                    derives_str += f'{replace_tables(ast_to_sql(line.expression, roots, symbol_table, verbose))} as {line.name} ,'
+                    derives_str += f'{replace_all_tables(ast_to_sql(line.expression, roots, symbol_table, verbose))} as {line.name} ,'
             derives_str = "," + derives_str.rstrip(",")
 
         if sort:
