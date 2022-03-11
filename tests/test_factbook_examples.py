@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 import sqlite3
 import unittest
+from pathlib import Path
 
-import prql
+from pyprql import prql
 
 
 class TestSQLGeneratorForFactbook(unittest.TestCase):
     def setUpClass() -> None:
-        db_path = f"./factbook.db"
+        # Use Path for robust construction, but sqlite3 py3.6 requires str
+        db_path = str(Path("tests", "factbook.db"))
         TestSQLGeneratorForFactbook.con = sqlite3.connect(db_path)
         TestSQLGeneratorForFactbook.cur = TestSQLGeneratorForFactbook.con.cursor()
 

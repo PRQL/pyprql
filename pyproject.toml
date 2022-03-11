@@ -42,6 +42,9 @@ pytest-sugar = "^0.9.4"
 
 [tool.semantic_release]
 branch = "main"
+version_variable = [
+        "prql/__init__.py:__version__"
+]
 version_toml = [
         "pyproject.toml:tool.poetry.version"
 ]

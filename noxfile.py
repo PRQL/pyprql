@@ -6,7 +6,7 @@ from typing import Any, List
 import nox
 from nox.sessions import Session
 
-PACKAGE: str = "src"
+PACKAGE: str = "pyprql"
 LOCATIONS: List[str] = [
     PACKAGE,
     "noxfile.py",

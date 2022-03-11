@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 import sqlite3
 import unittest
+from pathlib import Path
 
 import pytest
 
-import prql
+from pyprql import prql
 
 
 class TestStdlib(unittest.TestCase):
     def setUpClass() -> None:
-        db_path = f"./employee.db"
+        # Use Path for robust construction, but sqlite3 py3.6 requires str
+        db_path = str(Path("tests", "employee.db"))
         TestStdlib.con = sqlite3.connect(db_path)
         TestStdlib.cur = TestStdlib.con.cursor()
 
