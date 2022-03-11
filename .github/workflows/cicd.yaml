@@ -35,7 +35,7 @@ jobs:
         with:
           version: ${{ env.POETRY_VERSION }}
       - name: Format and Lint
-        run: nox -s form lint type
+        run: nox -s form lint
 
   security:
     runs-on: ubuntu-latest

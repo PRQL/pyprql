@@ -59,7 +59,7 @@ class Expression(_Statement, ast_utils.AsList):
 class Join(_Statement):
     name: Name
     left_id: Name
-    right_id: Name = None
+    right_id: Optional[Name] = None
 
 
 @dataclass
@@ -98,12 +98,6 @@ class Select(_Statement):
 
 
 @dataclass
-class DeriveLine(_Statement):
-    name: str
-    expression: Expression
-
-
-@dataclass
 class DeriveBody(_Statement):
     val: Union[str, Expression]
 
@@ -138,17 +132,12 @@ class AggregateBody(_Statement, ast_utils.AsList):
 @dataclass
 class Aggregate(_Statement):
     group_by: GroupBy
-    aggregate_body: AggregateBody = None
+    aggregate_body: Optional[AggregateBody] = None
 
     def __init__(self, group_by, aggregate_body=None):
         values = [group_by, aggregate_body]
         self.aggregate_body = self.assign_field(AggregateBody, values)
         self.group_by = self.assign_field(GroupBy, values)
-
-
-@dataclass
-class Derive(_Statement, ast_utils.AsList):
-    fields: List[DeriveLine]
 
 
 @dataclass
@@ -158,6 +147,11 @@ class DeriveLine(_Statement):
 
     def __str__(self):
         return f"{str(self.expression)}"
+
+
+@dataclass
+class Derive(_Statement, ast_utils.AsList):
+    fields: List[DeriveLine]
 
 
 class _Direction(_Statement):
