@@ -1,7 +1,0 @@
-lark
-icecream
-rich
-enforce-typing
-flake8
-pytest
-pytest-xdist
