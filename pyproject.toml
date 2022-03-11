@@ -8,14 +8,14 @@ readme = "README.md"
 repository = "https://github.com/qorrect/PyPrql"
 homepage = ""
 classifiers = [
-        "Development Status :: 3 - Alpha",
-        "License :: OSI Approved :: Apache Software License",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Typing :: Typed",
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Typing :: Typed",
 ]
 
 [tool.poetry.dependencies]
@@ -50,10 +50,10 @@ prql = "pyprql.cli:main"
 [tool.semantic_release]
 branch = "main"
 version_variable = [
-        "prql/__init__.py:__version__"
+    "pyprql/__init__.py:__version__"
 ]
 version_toml = [
-        "pyproject.toml:tool.poetry.version"
+    "pyproject.toml:tool.poetry.version"
 ]
 changelog_file = "CHANGELOG.md"
 upload_to_pypi = false
