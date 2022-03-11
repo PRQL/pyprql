@@ -3,8 +3,9 @@ import sqlite3
 import unittest
 from pathlib import Path
 
-from pyprql import prql
 import pytest
+
+from pyprql import prql
 
 
 class TestSqlGenerator(unittest.TestCase):
@@ -82,23 +83,23 @@ class TestSqlGenerator(unittest.TestCase):
             self.assertTrue(True)
 
     def test_take(self):
-        q = 'from table | take 10'
+        q = "from table | take 10"
         res = prql.to_sql(q)
-        self.assertTrue(res.index('LIMIT 10') != -1)
+        self.assertTrue(res.index("LIMIT 10") != -1)
         self.run_query(q, 10)
 
     def test_take_with_offset(self):
-        q = 'from table | take 10 offset:10 '
+        q = "from table | take 10 offset:10 "
         res = prql.to_sql(q)
         print(res)
-        self.assertTrue(res.index('LIMIT 10 OFFSET 10') != -1)
+        self.assertTrue(res.index("LIMIT 10 OFFSET 10") != -1)
         self.run_query(q, 2)
 
     def test_take_with_offset_2(self):
-        q = 'from table | take 2 offset:10 '
+        q = "from table | take 2 offset:10 "
         res = prql.to_sql(q)
         print(res)
-        self.assertTrue(res.index('LIMIT 2 OFFSET 10') != -1)
+        self.assertTrue(res.index("LIMIT 2 OFFSET 10") != -1)
         self.run_query(q, 2)
 
     def test_limit(self):
@@ -142,7 +143,9 @@ class TestSqlGenerator(unittest.TestCase):
         join table2 [id=id]
         """
         res = prql.to_sql(q, True)
-        self.assertTrue(res.index('JOIN table2 table2_t ON table_t.id = table2_t.id') != -1)
+        self.assertTrue(
+            res.index("JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
+        )
         self.run_query(q, 6)
 
     def test_join_syntax_2(self):
@@ -158,13 +161,15 @@ class TestSqlGenerator(unittest.TestCase):
         self.run_query(q, 6)
 
     def test_double_join_syntax_2(self):
-        q = '''
+        q = """
         from table
         join table2 [table.id=table2.id]
-        '''
+        """
         res = prql.to_sql(q)
         # print(res)
-        self.assertTrue(res.index('JOIN table2 table2_t ON table_t.id = table2_t.id') != -1)
+        self.assertTrue(
+            res.index("JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
+        )
         self.run_query(q, 6)
 
     def test_group_by_single_item_array(self):
@@ -236,26 +241,26 @@ class TestSqlGenerator(unittest.TestCase):
         # print(res)
 
     def test_derive_single_column(self):
-        q = '''
+        q = """
         from table
         derive [
          foo_only: foo
-        ]'''
+        ]"""
         res = prql.to_sql(q)
         print(res)
-        self.assertTrue(res.index('foo as foo_only') != -1)
+        self.assertTrue(res.index("foo as foo_only") != -1)
         self.run_query(q, 12)
 
     # @pytest.mark.skip(reason="In Progress")
     def test_derive_single_column_nested(self):
-        q = '''
+        q = """
         from table
         derive [
          foo_only: table.foo
-        ]'''
+        ]"""
         res = prql.to_sql(q)
         print(res)
-        self.assertTrue(res.index('foo as foo_only') != -1)
+        self.assertTrue(res.index("foo as foo_only") != -1)
         self.run_query(q, 12)
 
     def test_filter_where_only(self):
@@ -314,18 +319,18 @@ class TestSqlGenerator(unittest.TestCase):
 
     def test_like(self):
         q = '''
-        from table 
+        from table
         filter foo | like "bar"'''
         res = prql.to_sql(q)
         print(res)
-        assert (res.index('WHERE foo LIKE "bar"') != -1)
+        assert res.index('WHERE foo LIKE "bar"') != -1
         print(res)
 
     def test_like(self):
         q = '''
-        from table 
+        from table
         filter foo | like "%"'''
         res = prql.to_sql(q)
         print(res)
-        assert (res.index('WHERE foo LIKE "%"') != -1)
+        assert res.index('WHERE foo LIKE "%"') != -1
         print(res)
