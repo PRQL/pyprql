@@ -6,14 +6,14 @@ Documentation of PRQL is at https://github.com/max-sixty/prql
 
 ```elm
 from employees
-filter country = "USA"                           
-derive [                                        
+filter country = "USA"
+derive [
   gross_salary: salary + payroll_tax,
-  gross_cost:   gross_salary + benefits_cost     
+  gross_cost:   gross_salary + benefits_cost
 ]
 filter gross_cost > 0
-aggregate by:[title, country] [                  
-    average salary,                             
+aggregate by:[title, country] [
+    average salary,
     sum     salary,
     average gross_salary,
     sum     gross_salary,
@@ -29,7 +29,8 @@ take 20
 
 ```python
 
-import prql
+from pyprql import prql
+
 sql = prql.to_sql(q)
 print(sql)
 ```
@@ -68,4 +69,3 @@ will fail, it must be wrapped in brackets as a single item list.
 ```sql
 select [ foo | as float ]
 ```
-

@@ -4,3 +4,5 @@ __pycache__/
 *$py.class
 .idea/
 scratch.py
+.python-version
+.prql-history.txt

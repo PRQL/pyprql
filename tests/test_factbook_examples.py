@@ -1,59 +1,61 @@
+# -*- coding: utf-8 -*-
 import sqlite3
 import unittest
+from pathlib import Path
 
-import prql
+from pyprql import prql
 
 
 class TestSQLGeneratorForFactbook(unittest.TestCase):
-
     def setUpClass() -> None:
-        db_path = f'./factbook.db'
+        # Use Path for robust construction, but sqlite3 py3.6 requires str
+        db_path = str(Path("tests", "factbook.db"))
         TestSQLGeneratorForFactbook.con = sqlite3.connect(db_path)
         TestSQLGeneratorForFactbook.cur = TestSQLGeneratorForFactbook.con.cursor()
 
     def run_query(self, text, expected):
-        print(text.replace('\n\n', '\n'))
-        print('-' * 40)
+        print(text.replace("\n\n", "\n"))
+        print("-" * 40)
         sql = prql.to_sql(text)
         print(sql)
         rows = TestSQLGeneratorForFactbook.cur.execute(sql)
         columns = [d[0] for d in rows.description]
-        print(f'Columns: {columns}')
+        print(f"Columns: {columns}")
         rows = rows.fetchall()
-        assert (len(rows) == expected)
+        assert len(rows) == expected
 
     def test_factbook_q1(self):
         # SELECT * FROM facts LIMIT 1;
-        text = 'from facts | take 1'
+        text = "from facts | take 1"
         self.run_query(text, 1)
 
     def test_factbook_q2(self):
-        text = '''
+        text = """
         # SELECT name, area_land - area_water as just_land FROM facts LIMIT 2
         from facts | select name | derive [ just_land: area_land - area_water ]  | take 2
-        '''
+        """
         self.run_query(text, 2)
 
     def test_factbook_q3(self):
-        text = '''
+        text = """
         #SELECT name
         #FROM facts
         #WHERE population = (SELECT MIN(population) FROM facts);
-        
+
         func  min_value column table = (
             s"(SELECT MIN({column}) FROM {table})"
         )
-        
+
         from facts
         select name
         filter population = population | min_value facts
         take 3
-        '''
+        """
         self.run_query(text, 1)
 
     def test_factbook_q3b(self):
-        text = '''
-        
+        text = """
+
         value min_pop = (
             from facts
             aggregate min population
@@ -62,17 +64,17 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         from facts
         select name
         filter population = min_pop
-        '''
+        """
 
         self.run_query(text, 1)
 
     def test_factbook_q4(self):
         # # SELECT * FROM cities JOIN facts  ON cities.facts_id = facts.id LIMIT 15
-        text = 'from cities | join facts [facts_id=id] | take 4'
+        text = "from cities | join facts [facts_id=id] | take 4"
         self.run_query(text, 4)
 
     def test_factbook_q5(self):
-        text = '''
+        text = """
         #SELECT cities.name            as city,
         #       facts.name             as country,
         #       SUM(facts.population)  as country_pop,
@@ -82,7 +84,7 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         #GROUP BY code
         #ORDER BY city_pop DESC
         #LIMIT 15
-        
+
         from facts
         join cities [id=facts_id]
         derive [
@@ -94,13 +96,13 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
             city_pop: cities.population | sum
         ]
         sort city_pop order:desc
-        take 5        
-        
-        '''
+        take 5
+
+        """
         self.run_query(text, 5)
 
     def test_factbook_q6(self):
-        text = '''
+        text = """
         #SELECT cities.name            as city,
         #       facts.name             as country,
         #       facts.area             as country_area,
@@ -112,8 +114,8 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         #GROUP BY code
         #ORDER BY city_pop DESC
         #LIMIT 15
-        
-        
+
+
         from facts
         join cities [id=facts_id]
         derive [
@@ -128,9 +130,9 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         ]
         sort city_pop order:desc
         take 6
-        '''
+        """
         self.run_query(text, 6)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

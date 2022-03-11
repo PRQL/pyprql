@@ -1,13 +1,15 @@
+# -*- coding: utf-8 -*-
 import sqlite3
 import unittest
+from pathlib import Path
 
-import prql
+from pyprql import prql
 
 
 class TestSqlGenerator(unittest.TestCase):
-
     def setUpClass() -> None:
-        db_path = f'./employee.db'
+        # Use Path for robust construction, but sqlite3 py3.6 requires str
+        db_path = str(Path("tests", "employee.db"))
         TestSqlGenerator.con = sqlite3.connect(db_path)
         TestSqlGenerator.cur = TestSqlGenerator.con.cursor()
 
@@ -21,49 +23,51 @@ class TestSqlGenerator(unittest.TestCase):
         # print(f'Columns: {columns}')
         rows = rows.fetchall()
         if expected is not None:
-            assert (len(rows) == expected)
+            assert len(rows) == expected
 
     def test_select_all(self):
-        q = '''
+        q = """
         func no_params = s"COUNT(*)"
         from table
         select foo
         aggregate [
             cnt: no_params
         ]
-        '''
+        """
         res = prql.to_sql(q)
         print(res)
-        self.assertTrue(res.index('COUNT(*) as cnt') > 0)
+        self.assertTrue(res.index("COUNT(*) as cnt") > 0)
         self.run_query(q)
 
     def test_replace_function(self):
-        q = '''
-        from table 
-        select name 
+        q = """
+        from table
+        select name
         derive cleaned: name | replace "foo" "bar"
-        
-        '''
+
+        """
         res = prql.to_sql(q)
         self.assertTrue(res.index('REPLACE(name,"foo","bar") as cleaned') > 0)
         print(res)
         self.run_query(q, 12)
 
     def test_nested_functions(self):
-        q = '''from table
+        q = """from table
         select name
-        derive [ 
+        derive [
             trimmed: name | rtrim ,
             cleaned: name | replace "dirty" "clean",
             nested: (name | rtrim ",") | ltrim,
             triple_nested: ((name | replace "dirty" "clean") | replace "," " ") | trim " "
-        ]'''
+        ]"""
         res = prql.to_sql(q)
         print(res)
-        trimmed = 'RTRIM(name) as trimmed'
+        trimmed = "RTRIM(name) as trimmed"
         simple = 'REPLACE(name,"dirty","clean") as cleaned'
         nest1 = 'LTRIM(RTRIM(name,",")) as nested'
-        triple = 'TRIM(REPLACE(REPLACE(name,"dirty","clean"),","," ")," ") as triple_nested'
+        triple = (
+            'TRIM(REPLACE(REPLACE(name,"dirty","clean"),","," ")," ") as triple_nested'
+        )
         self.assertTrue(res.index(trimmed) != -1)
         self.assertTrue(res.index(simple) != -1)
         self.assertTrue(res.index(nest1) != -1)

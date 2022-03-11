@@ -1,0 +1,110 @@
+name: CI/CD
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+env:
+  POETRY_VERSION: 1.1.13
+  PSR_VERSION: 7.26.0
+
+# We cache the lint and security job, as there is no poetry install
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Nox
+        uses: excitedleigh/setup-nox@v2.0.0
+      - name: Cache Nox
+        uses: actions/cache@v2
+        env:
+          CACHE_NUMBER: 1
+        with:
+          path: .nox
+          key:
+            nox-${{ env.CACHE_NUMBER }}-${{ hashFiles('noxfile.py') }}-${{ hashFiles('poetry.lock') }}
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.3.1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+      - name: Format and Lint
+        run: nox -s form lint type
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Nox
+        uses: excitedleigh/setup-nox@v2.0.0
+      - name: Cache Nox
+        uses: actions/cache@v2
+        env:
+          CACHE_NUMBER: 2
+        with:
+          path: .nox
+          key:
+            nox-${{ env.CACHE_NUMBER }}-${{ hashFiles('noxfile.py') }}-${{ hashFiles('poetry.lock') }}
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.3.1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+      - name: Check for Dependency Vulnerabilities
+        run: nox -s security
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Nox
+        uses: excitedleigh/setup-nox@v2.0.0
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.3.0
+        with:
+          version: ${{ env.POETRY_VERSION }}
+      - name: Test Code and Docs
+        run: nox -s tests
+
+  release:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs: [ lint, test, security ]
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPOSITORY_USERNAME: __token__
+      REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Pyton
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Cache Pip
+        uses: actions/cache@v2
+        env:
+          CACHE_NUMBER: 0
+        with:
+          path: ~/.pip
+          key:
+            pip-${{ env.CACHE_NUMBER }}-PT${{ env.POETRY_VERSION }}-PRS${{ env.PSR_VERSION }}
+      - name: Get Dependencies
+        run: |
+          pip install poetry==$POETRY_VERSION python-semantic-release==$PSR_VERSION
+      - name: Configure git
+        run: |
+          git config --global user.name 'qorrect'
+          git config --global user.email 'qorrect@users.noreply.github.com'
+      - name: Python Semantic Release
+        run: |
+          semantic-release -v DEBUG publish

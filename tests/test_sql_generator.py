@@ -1,15 +1,17 @@
+# -*- coding: utf-8 -*-
 import sqlite3
 import unittest
+from pathlib import Path
 
 import pytest
 
-import prql
+from pyprql import prql
 
 
 class TestSqlGenerator(unittest.TestCase):
-
     def setUpClass() -> None:
-        db_path = f'./employee.db'
+        # Use Path for robust construction, but sqlite3 py3.6 requires str
+        db_path = str(Path("tests", "employee.db"))
         TestSqlGenerator.con = sqlite3.connect(db_path)
         TestSqlGenerator.cur = TestSqlGenerator.con.cursor()
 
@@ -24,268 +26,273 @@ class TestSqlGenerator(unittest.TestCase):
         # print(f'Columns: {columns}')
         rows = rows.fetchall()
         if expected is not None:
-            assert (len(rows) == expected)
+            assert len(rows) == expected
 
     def test_select_all(self):
-        q = '''
+        q = """
         from table
-        '''
+        """
         res = prql.to_sql(q)
-        self.assertTrue(res.startswith('SELECT * FROM `table`'))
+        self.assertTrue(res.startswith("SELECT * FROM `table`"))
         self.run_query(q)
 
     def test_select_one(self):
-        q = '''
+        q = """
         from table | select foo
-        '''
+        """
         res = prql.to_sql(q)
-        self.assertTrue(res.startswith('SELECT foo'))
+        self.assertTrue(res.startswith("SELECT foo"))
         self.run_query(q)
 
     def test_select_two(self):
-        q = '''
+        q = """
         from table | select [ foo, bar ]
-        '''
+        """
         res = prql.to_sql(q)
-        self.assertTrue(res.startswith('SELECT foo,bar'))
+        self.assertTrue(res.startswith("SELECT foo,bar"))
         self.run_query(q)
 
     def test_select_as(self):
-        q = '''
+        q = """
         from table | select [ foo | as float ,  bar | as string ]
-        '''
+        """
         res = prql.to_sql(q, True)
         print(res)
-        self.assertTrue(res.startswith('SELECT CAST(foo as float),CAST(bar as string)'))
+        self.assertTrue(res.startswith("SELECT CAST(foo as float),CAST(bar as string)"))
         self.run_query(q)
 
     def test_select_as_single(self):
-        q = '''
+        q = """
         from table | select [ foo | as float  ]
-        '''
+        """
         res = prql.to_sql(q)
         print(res)
-        self.assertTrue(res.startswith('SELECT CAST(foo as float)'))
+        self.assertTrue(res.startswith("SELECT CAST(foo as float)"))
         self.run_query(q)
 
     def test_select_as_single_no_brackets_will_fail(self):
-        q = '''
+        q = """
         from table | select foo | as float
-        '''
+        """
         try:
             res = prql.to_sql(q)
             print(res)
-            self.assertTrue(res.startswith('SELECT CAST(foo as float)'))
+            self.assertTrue(res.startswith("SELECT CAST(foo as float)"))
             self.run_query(q)
         except Exception as e:
             self.assertTrue(True)
 
     def test_take(self):
-        q = 'from table | take 10'
+        q = "from table | take 10"
         res = prql.to_sql(q)
-        self.assertTrue(res.index('LIMIT 10') != -1)
+        self.assertTrue(res.index("LIMIT 10") != -1)
         self.run_query(q, 10)
 
     def test_take_with_offset(self):
-        q = 'from table | take 10 offset:10 '
+        q = "from table | take 10 offset:10 "
         res = prql.to_sql(q)
         print(res)
-        self.assertTrue(res.index('LIMIT 10 OFFSET 10') != -1)
+        self.assertTrue(res.index("LIMIT 10 OFFSET 10") != -1)
         self.run_query(q, 2)
 
     def test_take_with_offset_2(self):
-        q = 'from table | take 2 offset:10 '
+        q = "from table | take 2 offset:10 "
         res = prql.to_sql(q)
         print(res)
-        self.assertTrue(res.index('LIMIT 2 OFFSET 10') != -1)
+        self.assertTrue(res.index("LIMIT 2 OFFSET 10") != -1)
         self.run_query(q, 2)
 
     def test_limit(self):
-        q = 'from table | take 10'
+        q = "from table | take 10"
         res = prql.to_sql(q)
-        self.assertTrue(res.index('LIMIT 10') != -1)
+        self.assertTrue(res.index("LIMIT 10") != -1)
         self.run_query(q, 10)
 
     def test_order_by(self):
-        q = 'from table | sort country | take 7'
+        q = "from table | sort country | take 7"
         res = prql.to_sql(q)
-        self.assertTrue(res.index('ORDER BY country') != -1)
+        self.assertTrue(res.index("ORDER BY country") != -1)
         self.run_query(q, 7)
 
     def test_order_by_asc(self):
-        q = 'from table | sort country order:asc | take 10'
+        q = "from table | sort country order:asc | take 10"
         res = prql.to_sql(q)
         print(res)
-        self.assertTrue(res.index('ORDER BY country ASC') != -1)
+        self.assertTrue(res.index("ORDER BY country ASC") != -1)
         self.run_query(q, 10)
 
     def test_order_by_desc(self):
-        q = 'from table | sort country order:desc | take 11'
+        q = "from table | sort country order:desc | take 11"
         res = prql.to_sql(q)
-        self.assertTrue(res.index('ORDER BY country DESC') != -1)
+        self.assertTrue(res.index("ORDER BY country DESC") != -1)
         self.run_query(q, 11)
 
     def test_order_by_invalid_throws_exception(self):
-        q = 'from table | sort country order:invalid | take 7'
+        q = "from table | sort country order:invalid | take 7"
         try:
             res = prql.to_sql(q)
 
-            self.assertTrue(res.index('ORDER BY country INVALID') == -1)
+            self.assertTrue(res.index("ORDER BY country INVALID") == -1)
             self.run_query(q, 7)
         except Exception as e:
             self.assertTrue(True)
 
     def test_join_syntax(self):
-        q = '''
+        q = """
         from table
         join table2 [id=id]
-        '''
+        """
         res = prql.to_sql(q, True)
-        print(res)
-        self.assertTrue(res.index('JOIN table2 table2_t ON table_t.id = table2_t.id') != -1)
+        self.assertTrue(
+            res.index("JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
+        )
         self.run_query(q, 6)
 
     def test_join_syntax_2(self):
-        q = '''
+        q = """
         from table
         join table2 [table.id=table2.id]
-        '''
+        """
         res = prql.to_sql(q)
         # print(res)
-        self.assertTrue(res.index('JOIN table2 table2_t ON table_t.id = table2_t.id') != -1)
+        self.assertTrue(
+            res.index("JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
+        )
         self.run_query(q, 6)
 
     def test_double_join_syntax_2(self):
-        q = '''
+        q = """
         from table
         join table2 [table.id=table2.id]
-        '''
+        """
         res = prql.to_sql(q)
         # print(res)
-        self.assertTrue(res.index('JOIN table2 table2_t ON table_t.id = table2_t.id') != -1)
+        self.assertTrue(
+            res.index("JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
+        )
         self.run_query(q, 6)
 
     def test_group_by_single_item_array(self):
-        q = '''
+        q = """
         from table
         select [ foo, bar ]
         aggregate by:[code] [
-            sum price 
-        ] 
-        '''
+            sum price
+        ]
+        """
         res = prql.to_sql(q)
 
-        self.assertTrue(res.index('SUM(price)') != -1)
-        self.assertTrue(res.index('GROUP BY code') != -1)
+        self.assertTrue(res.index("SUM(price)") != -1)
+        self.assertTrue(res.index("GROUP BY code") != -1)
         self.run_query(q, 3)
 
     def test_group_by_double_item_array(self):
-        q = '''
+        q = """
         from table
         select [ foo, bar ]
         aggregate by:[code,country] [
-            sum price 
-        ] 
-        '''
+            sum price
+        ]
+        """
         res = prql.to_sql(q)
 
-        self.assertTrue(res.index('SUM(price)') != -1)
-        self.assertTrue(res.index('GROUP BY code,country') != -1)
+        self.assertTrue(res.index("SUM(price)") != -1)
+        self.assertTrue(res.index("GROUP BY code,country") != -1)
         self.run_query(q, 5)
 
     def test_groupby_single_argument(self):
-        q = '''
+        q = """
         from table
         select [ foo, bar ]
         aggregate by:code [
-            sum price 
-        ] 
-        '''
+            sum price
+        ]
+        """
         res = prql.to_sql(q)
 
-        self.assertTrue(res.index('SUM(price)') != -1)
-        self.assertTrue(res.index('GROUP BY code') != -1)
+        self.assertTrue(res.index("SUM(price)") != -1)
+        self.assertTrue(res.index("GROUP BY code") != -1)
         self.run_query(q, 3)
 
     def test_named_aggs(self):
-        q = '''
+        q = """
         from table
         select [ foo, bar ]
         aggregate by:code [
-            all_costs: sum price 
-        ] 
-        '''
+            all_costs: sum price
+        ]
+        """
         res = prql.to_sql(q)
 
-        self.assertTrue(res.index('SUM(price) as all_costs') != -1)
-        self.assertTrue(res.index('GROUP BY code') != -1)
+        self.assertTrue(res.index("SUM(price) as all_costs") != -1)
+        self.assertTrue(res.index("GROUP BY code") != -1)
         self.run_query(q, 3)
 
     def test_derive_syntax(self):
-        q = '''
+        q = """
         from table
         derive [
          foo_bar: foo + bar
         ]
-        '''
+        """
         res = prql.to_sql(q)
-        self.assertTrue(res.index('foo+bar as foo_bar') != -1)
+        self.assertTrue(res.index("foo+bar as foo_bar") != -1)
         self.run_query(q, 12)
         # print(res)
 
     def test_derive_single_column(self):
-        q = '''
+        q = """
         from table
         derive [
          foo_only: foo
-        ]'''
+        ]"""
         res = prql.to_sql(q)
         print(res)
-        self.assertTrue(res.index('foo as foo_only') != -1)
+        self.assertTrue(res.index("foo as foo_only") != -1)
         self.run_query(q, 12)
 
     # @pytest.mark.skip(reason="In Progress")
     def test_derive_single_column_nested(self):
-        q = '''
+        q = """
         from table
         derive [
          foo_only: table.foo
-        ]'''
+        ]"""
         res = prql.to_sql(q)
         print(res)
-        self.assertTrue(res.index('foo as foo_only') != -1)
+        self.assertTrue(res.index("foo as foo_only") != -1)
         self.run_query(q, 12)
 
     def test_filter_where_only(self):
-        q = '''
-        from table 
+        q = """
+        from table
         filter foo > 10
-        '''
+        """
         res = prql.to_sql(q)
-        assert (res.index('WHERE foo>10') != -1)
+        assert res.index("WHERE foo>10") != -1
         print(res)
 
     def test_filter_where_multi(self):
-        q = '''
-        from table 
+        q = """
+        from table
         filter [ foo > 10, bar < 20 ]
-        '''
+        """
         res = prql.to_sql(q)
-        assert (res.index('WHERE foo>10') != -1)
+        assert res.index("WHERE foo>10") != -1
         print(res)
 
     def test_filter_fstring(self):
-        q = '''
-        from table 
+        q = """
+        from table
         filter s"foo > 10"
-        '''
+        """
         res = prql.to_sql(q)
         print(res)
-        assert (res.index('WHERE foo > 10') != -1)
+        assert res.index("WHERE foo > 10") != -1
         print(res)
 
     def test_having(self):
-        q = '''
+        q = """
                  from employees
                  filter country = "USA"                           # Each line transforms the previous result.
                  derive [                                         # This adds columns / variables.
@@ -304,26 +311,26 @@ class TestSqlGenerator(unittest.TestCase):
                  ]
                  sort sum_gross_cost
                  filter row_count > 200
-                 take 20'''
+                 take 20"""
         res = prql.to_sql(q)
         print(res)
-        assert (res.index('HAVING row_count>200') != -1)
+        assert res.index("HAVING row_count>200") != -1
         print(res)
 
     def test_like(self):
         q = '''
-        from table 
+        from table
         filter foo | like "bar"'''
         res = prql.to_sql(q)
         print(res)
-        assert (res.index('WHERE foo LIKE "bar"') != -1)
+        assert res.index('WHERE foo LIKE "bar"') != -1
         print(res)
 
     def test_like(self):
         q = '''
-        from table 
+        from table
         filter foo | like "%"'''
         res = prql.to_sql(q)
         print(res)
-        assert (res.index('WHERE foo LIKE "%"') != -1)
+        assert res.index('WHERE foo LIKE "%"') != -1
         print(res)

@@ -1,12 +1,12 @@
+# -*- coding: utf-8 -*-
 import unittest
 
-import prql
+from pyprql import prql
 
 
 class TestSQLGeneratorForFactbook(unittest.TestCase):
-
     def test_get_operations(self):
-        text = '''
+        text = """
                 from employees
                 filter country = "USA"                           # Each line transforms the previous result.
                 derive [                                         # This adds columns / variables.
@@ -25,20 +25,30 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
                 ]
                 sort sum_gross_cost
                 filter row_count > 200
-                take 20'''
+                take 20"""
 
         ast = prql.parse(text)
 
         # First get all derives
-        all_filters = prql.get_operation(ast.get_from().get_pipes().operations, prql.Filter, return_all=True)
+        all_filters = prql.get_operation(
+            ast.get_from().get_pipes().operations, prql.Filter, return_all=True
+        )
         self.assertTrue(len(all_filters) == 3)
 
-        wheres = prql.get_operation(ast.get_from().get_pipes().operations, prql.Filter, return_all=True,
-                                    before=prql.Aggregate)
+        wheres = prql.get_operation(
+            ast.get_from().get_pipes().operations,
+            prql.Filter,
+            return_all=True,
+            before=prql.Aggregate,
+        )
 
         self.assertTrue(len(wheres) == 2)
 
-        havings = prql.get_operation(ast.get_from().get_pipes().operations, prql.Filter, return_all=True,
-                                     after=prql.Aggregate)
+        havings = prql.get_operation(
+            ast.get_from().get_pipes().operations,
+            prql.Filter,
+            return_all=True,
+            after=prql.Aggregate,
+        )
 
         self.assertTrue(len(havings) == 1)
