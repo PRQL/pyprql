@@ -17,7 +17,7 @@ from sqlalchemy import create_engine, inspect
 import prql
 from PRQLLexer import PRQLLexer
 
-script_path = os.path.abspath(os.path.dirname(__file__))
+this_files_path = os.path.abspath(os.path.dirname(__file__))
 
 
 class PRQLCompleter(Completer):
@@ -33,37 +33,40 @@ class PRQLCompleter(Completer):
     def get_completions(self, document, complete_event):
         word_before_cursor = document.get_word_before_cursor(WORD=True)
         selection = []
-
+        completion_operators = ['[', '+', ',']
         possible_matches = {
             'from': self.table_names,
             'join': self.table_names,
             'columns': self.table_names,
-            '[': self.column_names,
-            '+': self.column_names,
+            'select': self.column_names,
             ' ': self.column_names,
 
             'sort': self.column_names,
             'show': ['tables', 'columns', 'connection'],
             'exit': None
         }
-        # print(word_before_cursor)
+        for op in completion_operators:
+            possible_matches[op] = self.column_names
+
+        # This delays the completions until they hit space, or an completion operator
         if word_before_cursor in possible_matches:
             selection = possible_matches[word_before_cursor]
             selection = [f'{x}' for x in selection]
             self.previous_selection = selection
-            if word_before_cursor == 'from' or word_before_cursor == 'join' or word_before_cursor == 'sort' or \
-                    word_before_cursor == 'columns' or word_before_cursor == 'show':
+            if word_before_cursor == 'from' or word_before_cursor == 'join' or \
+                    word_before_cursor == 'sort' or word_before_cursor == 'select' or \
+                    word_before_cursor == 'columns' or word_before_cursor == 'show' or \
+                    word_before_cursor == ',' or word_before_cursor == '[':
                 pass
             else:
                 for m in selection:
                     yield Completion(m, start_position=-len(word_before_cursor))
 
-        elif len(word_before_cursor) >= 1 and word_before_cursor[-1] in ['[', '+']:
+        # If its an operator
+        elif len(word_before_cursor) >= 1 and word_before_cursor[-1] in completion_operators:
             selection = possible_matches[word_before_cursor[-1]]
-            # selection = [f'{word_before_cursor} {x}' for x in selection]
             self.previous_selection = selection
-            # for m in selection:
-            #     yield Completion(m, start_position=-len(word_before_cursor))
+        # If its a period, then we assume the first word was a table
         elif len(word_before_cursor) >= 1 and word_before_cursor[-1] == '.':
             table = word_before_cursor[:-1]
             if table in self.column_map:
@@ -71,16 +74,13 @@ class PRQLCompleter(Completer):
                 self.previous_selection = selection
                 for m in selection:
                     yield Completion(m, start_position=0)
+        # This goes to the first if, this is the delayed completion finally completing
         elif self.previous_selection:
             selection = [x for x in self.previous_selection if x.find(word_before_cursor) != -1]
             self.previous_selection = selection
 
             for m in selection:
                 yield Completion(m, start_position=-len(word_before_cursor))
-
-
-def stringify(row):
-    return [str(x) for x in row]
 
 
 class CLI:
@@ -92,9 +92,11 @@ class CLI:
         self.sql_mode = False
         self.connect_str = connect_str
         if connect_str == 'chinook':
-            print(script_path)
-            connect_str = f'sqlite:///{script_path}/../resources/chinook.db'
-        print('Connecting to {}'.format(connect_str))
+            connect_str = f'sqlite:///{this_files_path}/../resources/chinook.db'
+        elif connect_str == 'factbook':
+            connect_str = f'sqlite:///{this_files_path}/../resources/factbook.db'
+
+        rich.print('Connecting to [pale_turquoise1]{}[/pale_turquoise1]'.format(connect_str))
         self.engine = create_engine(connect_str)
         self.inspector = inspect(self.engine)
 
@@ -124,7 +126,7 @@ class CLI:
 
             for _row in rs:
                 row = list(_row)
-                table.add_row(*stringify(row))
+                table.add_row(*[str(x) for x in row])
 
             rich.print(table)
 
@@ -145,7 +147,18 @@ class CLI:
             self.sql_mode = False
             self.prompt_text = 'PRQL> '
             return
+        elif user_input == 'examples':
+            rich.print('''
+            [pale_turquoise1]SQL  : SELECT * from employees[/pale_turquoise1]
+            [sandy_brown]PRQL : from employees[/sandy_brown]
+            
+            [pale_turquoise1]SQL  : SELECT name, salary from employees WHERE salary > 100000[/pale_turquoise1]
+            [sandy_brown]PRQL : from employees | select \[name,salary] | filter salary > 100000[/sandy_brown]
+                          
+            ''')
+            return
         elif user_input == '?' or user_input == 'help':
+
             if self.sql_mode:
                 rich.print(
                     '\tCommand [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n' +
@@ -160,7 +173,13 @@ class CLI:
                 rich.print('\tCommand [cornflower_blue bold]prql[/cornflower_blue bold]: Switch to PRQL mode')
                 rich.print(
                     '\tCommand [cornflower_blue bold]<enter>[/cornflower_blue bold]: Hit enter twice to execute your query')
+                rich.print(
+                    '\n\tCommand [cornflower_blue bold]examples[/cornflower_blue bold]: Displays sql-to-prql examples for reference')
+
                 self.prompt_text = 'PRQL> '
+
+            rich.print("\nPRQL Syntax documentation is here https://github.com/max-sixty/prql\n")
+
             return
         elif user_input == 'sql':
             self.sql_mode = True
@@ -199,11 +218,8 @@ class CLI:
                 self.prompt_text = '....>'
         else:
             if not user_input:
-                # if self.has_one_blank:
                 self.has_one_blank = False
                 if self.command and self.command.strip().rstrip('') != '':
-                    # rich.print('[pale_green3 bold]PRQL:[/pale_green3 bold]')
-                    # print('\t' + self.highlight_prql(self.command).strip())
                     sql = prql.to_sql(self.command)
                     if 'LIMIT' not in sql:
                         sql += ' LIMIT 5'
@@ -214,12 +230,9 @@ class CLI:
                     self.execute_sql(sql)
                     self.command = ''
                 self.prompt_text = 'PRQL> '
-                # else:
-                #     self.prompt_text = '<enter to execute>'
-                #     self.has_one_blank = True
+
             else:
                 self.prompt_text = '....>'
-        # rich.print(user_input)
 
     def run(self):
         # PRQLKeywords = ['select', 'from', 'filter', 'derive', 'aggregate', 'sort', 'take', 'order']
@@ -241,23 +254,27 @@ class CLI:
 
 
 def print_usage():
-    rich.print('''
-    [bold sandy_brown]Usage[/bold sandy_brown]:
+    print('''
+    Usage:
         python cli.py connection_string''')
 
-    rich.print('''
-    [bold green]Examples[/bold green]:
+    print('''
+    Examples:
         python cli.py 'sqlite:///file.db'
         python cli.py 'postgresql://user:password@localhost:5432/database'
         python cli.py 'postgresql+psycopg2://user:password@localhost:5432/database'
-        python cli.py 'mysql://scott:tiger@localhost/foo''')
+        python cli.py 'mysql://scott:tiger@localhost/foo'
+        ''')
 
-    rich.print('''
-    [bold cornflower_blue]Try It[/bold cornflower_blue ]
-        python cli.py 'chinook'
+    print('''
+    Test Database:
+        python cli.py chinook
+        python cli.py factbook
+        
     ''')
 
-    print('''Notes:
+    print('''
+    Notes:
         The connection string syntax is detailed here https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
     ''')
 

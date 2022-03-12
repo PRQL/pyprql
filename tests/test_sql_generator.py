@@ -3,15 +3,13 @@ import sqlite3
 import unittest
 from pathlib import Path
 
-import pytest
-
 from pyprql import prql
 
 
 class TestSqlGenerator(unittest.TestCase):
     def setUpClass() -> None:
         # Use Path for robust construction, but sqlite3 py3.6 requires str
-        db_path = str(Path("tests", "employee.db"))
+        db_path = str(Path("tests", "../resources/employee.db"))
         TestSqlGenerator.con = sqlite3.connect(db_path)
         TestSqlGenerator.cur = TestSqlGenerator.con.cursor()
 
@@ -154,7 +152,7 @@ class TestSqlGenerator(unittest.TestCase):
         join table2 [table.id=table2.id]
         """
         res = prql.to_sql(q)
-        # print(res)
+        print(res)
         self.assertTrue(
             res.index("JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
         )
@@ -163,14 +161,53 @@ class TestSqlGenerator(unittest.TestCase):
     def test_double_join_syntax_2(self):
         q = """
         from table
-        join table2 [table.id=table2.id]
+        join side:inner table2 [table.id=table2.id]
         """
-        res = prql.to_sql(q)
-        # print(res)
+        res = prql.to_sql(q,True)
+        print(res)
         self.assertTrue(
             res.index("JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
         )
         self.run_query(q, 6)
+
+    def test_inner_join_syntax_1(self):
+        q = """
+        from table
+        join side:inner table2 [table.id=table2.id]
+        """
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(
+            res.index("INNER JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
+        )
+        self.run_query(q, 6)
+
+    def test_left_join_syntax_1(self):
+        q = """
+        from table
+        join side:left table2 [table.id=table2.id]
+        """
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(
+            res.index("LEFT JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
+        )
+        self.run_query(q, 12)
+
+    def test_right_join_syntax_1(self):
+        q = """
+        from table
+        join side:right table2 [table.id=table2.id]
+        """
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(
+            res.index("RIGHT JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
+        )
+
+        # This fails beacuse SQLITE doesnt support RIGHT and FULL OUTTER
+        # self.run_query(q, 6)
+
 
     def test_group_by_single_item_array(self):
         q = """

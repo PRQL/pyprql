@@ -8,7 +8,12 @@
     from: "from" NAME "|"?  pipes
 
     pipes: ((join | select | derive | filter | sort | take| aggregate) ("|")? )*
-    join: ("join"|"left_join"|"right_join")+ name "[" name ("=" name)? "]"
+    join: "join"  ( "side" ":" join_type)? name "[" name ("=" name)? "]"
+    join_type: inner_join | left_join | right_join | outer_join
+    inner_join: "inner"
+    left_join: "left"
+    right_join: "right"
+    outer_join: "outer"
 
     aggregate: "aggregate"  \
             ("by" ":" ("[" group_by "]"| group_by) )? \

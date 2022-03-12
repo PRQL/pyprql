@@ -9,7 +9,7 @@ import lark
 import rich
 from enforce_typing import enforce_types
 from icecream import ic
-from lark import Lark, Token, Transformer, ast_utils
+from lark import Lark, Token, Transformer, ast_utils, Tree
 
 this_module = sys.modules[__name__]
 script_path = os.path.dirname(__file__)
@@ -55,11 +55,78 @@ class Expression(_Statement, ast_utils.AsList):
         return msg
 
 
+class _JoinType(_Ast):
+
+    def __str__(self):
+        return "JOIN"
+
+@dataclass
+class InnerJoin(_JoinType):
+
+    def __str__(self):
+        return "INNER JOIN"
+
+@dataclass
+class LeftJoin(_JoinType):
+
+    def __str__(self):
+        return "LEFT JOIN"
+
+@dataclass
+class RightJoin(_JoinType):
+
+    def __str__(self):
+        return "RIGHT JOIN"
+
+@dataclass
+class OuterJoin(_JoinType):
+
+    def __str__(self):
+        return "OUTER JOIN"
+
+@dataclass
+class JoinType(_JoinType):
+    join_type: _JoinType
+
+    def __str__(self):
+        if self.join_type is None:
+            return "JOIN"
+        else:
+            return str(self.join_type)
+
+
+
 @dataclass
 class Join(_Statement):
     name: Name
-    left_id: Name
+    join_type: Optional[_JoinType] = None
+    left_id: Optional[Name] = None # Has to have a default argument now
     right_id: Optional[Name] = None
+
+
+    def __init__(self, name: Name, join_type: Optional[_JoinType] = None , left_id: Name = None , right_id: Optional[Name] = None ):
+        self.name = name
+        self.join_type = join_type
+
+        if isinstance(self.name,JoinType):
+            temp = self.join_type
+            self.join_type = self.name
+            self.name = temp
+
+        if isinstance(self.join_type,Name):
+            # Now we need to shift everything , since join_type is now our left_id
+
+            temp = left_id
+            self.left_id = self.join_type
+            self.right_id = temp
+            self.join_type = None
+        else:
+            self.left_id = left_id
+            self.right_id = right_id
+
+        # self.left_id = left_id
+        # self.right_id = right_id
+
 
 
 @dataclass
@@ -276,19 +343,6 @@ class FuncCall(_Statement):
     parm1: Any = None
     parm2: Any = None
     parm3: Any = None
-    # def __init__(self, name, func_args=None):
-    #     values = [name, func_args]
-    #     self.name = name  # self.assign_field(Name, values)
-    #     self.func_args = self.assign_field(FuncArgs, values)
-    #
-    #     # self.parm1 = self.assign_field(FuncArgs, parm1)
-    #     print('parms have to be manually assigned to the FuncCall')
-
-    # def __str__(self):
-    #     a = str(self.func_args)
-    #     if self.func_args is None:
-    #         a = '*'
-    #     return f'{get_func_str(self.name)}({a})'
 
 
 @dataclass
@@ -364,6 +418,7 @@ class ToAst(Transformer):
 
     def NEWLINE(self, s):
         return s
+
 
 
 @enforce_types
@@ -721,6 +776,8 @@ def ast_to_sql(
 
                 all_join_shorts.append(join_short)
                 all_join_longs.append(join_long)
+
+
         replace_all_tables = wrap_replace_all_tables(
             from_long, from_short, all_join_longs, all_join_shorts
         )
@@ -763,8 +820,11 @@ def ast_to_sql(
                         )
                     )
 
+                join_type = "JOIN"
+                if join.join_type is not None:
+                    join_type = str(join.join_type)
                 join_str += replace_all_tables(
-                    f"JOIN {join.name} {join_short} ON {left_side} = {right_side} "
+                    f"{join_type} {join.name} {join_short} ON {left_side} = {right_side} "
                 )
 
         if selects:

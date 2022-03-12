@@ -9,14 +9,14 @@ from pyprql import prql
 class TestSQLGeneratorForFactbook(unittest.TestCase):
     def setUpClass() -> None:
         # Use Path for robust construction, but sqlite3 py3.6 requires str
-        db_path = str(Path("tests", "factbook.db"))
+        db_path = str(Path("resources", "factbook.db"))
         TestSQLGeneratorForFactbook.con = sqlite3.connect(db_path)
         TestSQLGeneratorForFactbook.cur = TestSQLGeneratorForFactbook.con.cursor()
 
     def run_query(self, text, expected):
         print(text.replace("\n\n", "\n"))
         print("-" * 40)
-        sql = prql.to_sql(text)
+        sql = prql.to_sql(text,True)
         print(sql)
         rows = TestSQLGeneratorForFactbook.cur.execute(sql)
         columns = [d[0] for d in rows.description]
@@ -131,6 +131,8 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         sort city_pop order:desc
         take 6
         """
+        sql = prql.to_sql(text,True)
+        print(sql)
         self.run_query(text, 6)
 
 
