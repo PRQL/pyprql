@@ -9,7 +9,7 @@ import lark
 import rich
 from enforce_typing import enforce_types
 from icecream import ic
-from lark import Lark, Token, Transformer, ast_utils, Tree
+from lark import Lark, Token, Transformer, ast_utils
 
 this_module = sys.modules[__name__]
 script_path = os.path.dirname(__file__)
@@ -60,11 +60,13 @@ class _JoinType(_Ast):
     def __str__(self):
         return "JOIN"
 
+
 @dataclass
 class InnerJoin(_JoinType):
 
     def __str__(self):
         return "INNER JOIN"
+
 
 @dataclass
 class LeftJoin(_JoinType):
@@ -72,17 +74,20 @@ class LeftJoin(_JoinType):
     def __str__(self):
         return "LEFT JOIN"
 
+
 @dataclass
 class RightJoin(_JoinType):
 
     def __str__(self):
         return "RIGHT JOIN"
 
+
 @dataclass
 class OuterJoin(_JoinType):
 
     def __str__(self):
         return "OUTER JOIN"
+
 
 @dataclass
 class JoinType(_JoinType):
@@ -95,25 +100,24 @@ class JoinType(_JoinType):
             return str(self.join_type)
 
 
-
 @dataclass
 class Join(_Statement):
     name: Name
     join_type: Optional[_JoinType] = None
-    left_id: Optional[Name] = None # Has to have a default argument now
+    left_id: Optional[Name] = None  # Has to have a default argument now
     right_id: Optional[Name] = None
 
-
-    def __init__(self, name: Name, join_type: Optional[_JoinType] = None , left_id: Name = None , right_id: Optional[Name] = None ):
+    def __init__(self, name: Name, join_type: Optional[_JoinType] = None, left_id: Name = None,
+                 right_id: Optional[Name] = None):
         self.name = name
         self.join_type = join_type
 
-        if isinstance(self.name,JoinType):
+        if isinstance(self.name, JoinType):
             temp = self.join_type
             self.join_type = self.name
             self.name = temp
 
-        if isinstance(self.join_type,Name):
+        if isinstance(self.join_type, Name):
             # Now we need to shift everything , since join_type is now our left_id
 
             temp = left_id
@@ -126,7 +130,6 @@ class Join(_Statement):
 
         # self.left_id = left_id
         # self.right_id = right_id
-
 
 
 @dataclass
@@ -256,7 +259,7 @@ class Sort(_Statement):
 
     def __str__(self):
         return (
-            f'{str(self.name)} {self.direction if self.direction is not None else ""}'
+                f'{str(self.name)} {self.direction if self.direction is not None else ""}'
         )
 
 
@@ -420,7 +423,6 @@ class ToAst(Transformer):
         return s
 
 
-
 @enforce_types
 def read_file(filename: str, path: str = script_path) -> str:
     with open(path + filename, "r") as f:
@@ -439,10 +441,10 @@ def get_func_str(func: Optional[str]) -> str:
 def parse(_text: str) -> Root:
     text = _text + "\n"
     parser = Lark(
-        read_file("/../resources/prql.lark"),
-        start="root",
-        parser="lalr",
-        transformer=ToAst(),
+            read_file("/../resources/prql.lark"),
+            start="root",
+            parser="lalr",
+            transformer=ToAst(),
     )
     tree = parser.parse(text)
     transformer = ast_utils.create_transformer(this_module, ToAst())
@@ -454,9 +456,7 @@ def to_sql(prql: str, verbose: bool = False) -> str:
     ast = parse(prql)
     stdlib = parse(read_file("/../resources/stdlib.prql"))
     return (
-        ast_to_sql(ast._from, [ast, stdlib], verbose=verbose)
-            .replace("   ", " ")
-            .replace("  ", " ")
+            ast_to_sql(ast._from, [ast, stdlib], verbose=verbose).replace("   ", " ").replace("  ", " ")
     )
 
 
@@ -529,7 +529,7 @@ def replace_all_tables_standalone(
 def wrap_replace_all_tables(from_long, from_short, join_long, join_short):
     def inner(x):
         return replace_all_tables_standalone(
-            from_long, from_short, join_long, join_short, x
+                from_long, from_short, join_long, join_short, x
         )
 
     return inner
@@ -545,7 +545,7 @@ def replace_tables_standalone(from_long, from_short, join_long, join_short, s) -
 def wrap_replace_tables(from_long, from_short, join_long, join_short):
     def inner(x):
         return replace_tables_standalone(
-            from_long, from_short, join_long, join_short, x
+                from_long, from_short, join_long, join_short, x
         )
 
     return inner
@@ -562,12 +562,12 @@ def build_symbol_table(roots: List[Root]) -> Dict[str, List[_Ast]]:
             table[str(n.name)].append(n)
         if root._from.get_pipes():
             derives = get_operation(
-                root._from.get_pipes().operations, Derive, return_all=True
+                    root._from.get_pipes().operations, Derive, return_all=True
             )
             for d in derives:
                 for line in d.fields:
                     table[str(line.name)].append(
-                        NameValuePair(str(line.name), line.expression)
+                            NameValuePair(str(line.name), line.expression)
                     )
     return table
 
@@ -634,21 +634,21 @@ def execute_function(
                     args = {}
 
                     vals = [
-                        safe_to_sql(
-                            replace_variables(f.parm1, symbol_table),
-                            roots,
-                            symbol_table,
-                        ),
-                        safe_to_sql(
-                            replace_variables(f.parm2, symbol_table),
-                            roots,
-                            symbol_table,
-                        ),
-                        safe_to_sql(
-                            replace_variables(f.parm3, symbol_table),
-                            roots,
-                            symbol_table,
-                        ),
+                            safe_to_sql(
+                                    replace_variables(f.parm1, symbol_table),
+                                    roots,
+                                    symbol_table,
+                            ),
+                            safe_to_sql(
+                                    replace_variables(f.parm2, symbol_table),
+                                    roots,
+                                    symbol_table,
+                            ),
+                            safe_to_sql(
+                                    replace_variables(f.parm3, symbol_table),
+                                    roots,
+                                    symbol_table,
+                            ),
                     ]
 
                     if func_def.func_args is not None:
@@ -753,13 +753,13 @@ def ast_to_sql(
         sort = get_operation(ops.operations, Sort, last_match=True)
 
         filters = get_operation(
-            ops.operations, Filter, return_all=True, before=Aggregate
+                ops.operations, Filter, return_all=True, before=Aggregate
         )
         wheres_from_derives = get_operation(
-            ops.operations, Derive, return_all=True, before=Aggregate
+                ops.operations, Derive, return_all=True, before=Aggregate
         )
         havings = get_operation(
-            ops.operations, Filter, return_all=True, after=Aggregate
+                ops.operations, Filter, return_all=True, after=Aggregate
         )
         selects = get_operation(ops.operations, Select, return_all=True)
 
@@ -777,9 +777,8 @@ def ast_to_sql(
                 all_join_shorts.append(join_short)
                 all_join_longs.append(join_long)
 
-
         replace_all_tables = wrap_replace_all_tables(
-            from_long, from_short, all_join_longs, all_join_shorts
+                from_long, from_short, all_join_longs, all_join_shorts
         )
 
         if verbose:
@@ -799,32 +798,32 @@ def ast_to_sql(
 
                 if left_id.find(".") == -1:
                     left_side = str(from_short + "." + left_id).replace(
-                        from_short + "." + from_short + ".", from_short + "."
+                            from_short + "." + from_short + ".", from_short + "."
                     )
                 else:
                     left_side = str(left_id).replace(
-                        from_short + "." + from_short + ".", from_short + "."
+                            from_short + "." + from_short + ".", from_short + "."
                     )
 
                 # right_id = right_id.replace(from_long, '').replace(from_short, '')
                 if right_id.find(".") == -1:
                     right_side = replace_all_tables(
-                        str(join_long + "." + right_id).replace(
-                            join_short + "." + join_short + ".", join_short + "."
-                        )
+                            str(join_long + "." + right_id).replace(
+                                    join_short + "." + join_short + ".", join_short + "."
+                            )
                     )
                 else:
                     right_side = replace_all_tables(
-                        str(right_id).replace(
-                            join_short + "." + join_short + ".", join_short + "."
-                        )
+                            str(right_id).replace(
+                                    join_short + "." + join_short + ".", join_short + "."
+                            )
                     )
 
                 join_type = "JOIN"
                 if join.join_type is not None:
                     join_type = str(join.join_type)
                 join_str += replace_all_tables(
-                    f"{join_type} {join.name} {join_short} ON {left_side} = {right_side} "
+                        f"{join_type} {join.name} {join_short} ON {left_side} = {right_side} "
                 )
 
         if selects:
@@ -844,7 +843,7 @@ def ast_to_sql(
                             if func_call.val is not None:
                                 havings_str += (
                                         ast_to_sql(
-                                            func_call.val, roots, symbol_table, verbose
+                                                func_call.val, roots, symbol_table, verbose
                                         )
                                         + " AND "
                                 )
@@ -876,7 +875,7 @@ def ast_to_sql(
                             agg_str += f"{ast_to_sql(func_call, roots, symbol_table, verbose)} as {name},"
                         else:
                             raise PRQLException(
-                                f"Unknown type for aggregate body {type(line)}, {str(line)}"
+                                    f"Unknown type for aggregate body {type(line)}, {str(line)}"
                             )
                     elif isinstance(line, FuncCall):
                         func_call = line
@@ -894,16 +893,16 @@ def ast_to_sql(
                     elif isinstance(line, PipeBody):
                         agg_str += (
                                 ast_to_sql(
-                                    line.body,
-                                    roots,
-                                    symbol_table=symbol_table,
-                                    verbose=verbose,
+                                        line.body,
+                                        roots,
+                                        symbol_table=symbol_table,
+                                        verbose=verbose,
                                 )
                                 + ","
                         )
                     else:
                         raise PRQLException(
-                            f"Unknown type for aggregate body {type(line)}, {str(line)}"
+                                f"Unknown type for aggregate body {type(line)}, {str(line)}"
                         )
                 i += 1
 
@@ -919,9 +918,9 @@ def ast_to_sql(
                         if func_call.val is not None:
                             filter_str += (
                                     replace_all_tables(
-                                        ast_to_sql(
-                                            func_call.val, roots, symbol_table, verbose
-                                        )
+                                            ast_to_sql(
+                                                    func_call.val, roots, symbol_table, verbose
+                                            )
                                     )
                                     + " AND "
                             )
@@ -953,16 +952,16 @@ def ast_to_sql(
             filter_str = "1=1"
         if verbose:
             ic(
-                select_str,
-                agg_str,
-                derives_str,
-                from_str,
-                join_str,
-                filter_str,
-                group_by_str,
-                havings_str,
-                order_by_str,
-                limit_str,
+                    select_str,
+                    agg_str,
+                    derives_str,
+                    from_str,
+                    join_str,
+                    filter_str,
+                    group_by_str,
+                    havings_str,
+                    order_by_str,
+                    limit_str,
             )
         sql = f"SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {havings_str} {order_by_str} {limit_str}"
         if verbose:
