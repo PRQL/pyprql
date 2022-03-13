@@ -88,7 +88,7 @@ class PRQLStyle(Style):
     }
 
 
-PRQLStyle = style_from_pygments_dict(PRQLStyle.styles)
+
 
 
 class PRQLCompleter(Completer):
@@ -328,7 +328,7 @@ class CLI:
                                 completer=PRQLCompleter(self.inspector.get_table_names(), all_columns, columns_map,
                                                         prql_keywords),
                                 lexer=PygmentsLexer(PRQLLexer),
-                                style=PRQLStyle
+                                style=style_from_pygments_dict(PRQLStyle.styles)
                                 )
             try:
                 self.handle_input(user_input)
