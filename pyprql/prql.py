@@ -676,7 +676,7 @@ def execute_function(
 
                     if func_def.func_args is not None:
                         for i in range(0, len(func_def.func_args.fields)):  # type: ignore[arg-type]
-                            n = str(func_def.func_args.fields[i]) # type: ignore[index]
+                            n = str(func_def.func_args.fields[i])  # type: ignore[index]
                             args[n] = vals[i]
                         msg = line.format(**args)
                     else:
@@ -708,7 +708,7 @@ def get_function_parm_count(f: Union[FuncCall, FuncDef]) -> int:
             parm_count += 1
     elif isinstance(f, FuncDef):
         if f.func_args is not None:
-            parm_count = len(f.func_args.fields) # type: ignore[arg-type]
+            parm_count = len(f.func_args.fields)  # type: ignore[arg-type]
     return parm_count
 
 
@@ -716,7 +716,7 @@ def get_function_parm_count(f: Union[FuncCall, FuncDef]) -> int:
 def safe_to_sql(
         rule: Any,
         roots: Union[Root, List],
-        symbol_table: Optional[Dict] = None, # Dict[str, List[_Ast]]
+        symbol_table: Optional[Dict] = None,  # Dict[str, List[_Ast]]
         verbose: bool = False,
 ):
     if isinstance(rule, str):
@@ -731,7 +731,7 @@ def safe_to_sql(
 def ast_to_sql(
         rule: Union[_Ast, Token],
         roots: Union[Root, List],
-        symbol_table: Optional[Dict] = None, #  Optional[Dict[str, List[_Ast]]]
+        symbol_table: Optional[Dict] = None,  # Optional[Dict[str, List[_Ast]]]
         verbose: bool = True):
     if isinstance(roots, Root):
         root = roots
@@ -1017,7 +1017,7 @@ def ast_to_sql(
 
         return msg
     elif isinstance(rule, FuncCall):
-        function_call: FuncCall = rule # type: ignore [no-redef]
+        function_call: FuncCall = rule  # type: ignore [no-redef]
         if str(function_call.name) in symbol_table:
             msg = execute_function(function_call, roots, symbol_table)
         else:
@@ -1035,7 +1035,7 @@ def ast_to_sql(
                             + ")"
                     )
         if val in symbol_table:
-            replacement = symbol_table[val][0] # type: ignore [index]
+            replacement = symbol_table[val][0]  # type: ignore [index]
             if not isinstance(replacement, FuncDef):
                 return str(replacement)
 
