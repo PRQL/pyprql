@@ -42,6 +42,50 @@ class TestSqlGenerator(unittest.TestCase):
         self.assertTrue(res.startswith("SELECT foo"))
         self.run_query(q)
 
+    def test_select_sort(self):
+        q = """
+        from table | select foo | sort foo 
+        """
+        res = prql.to_sql(q)
+        self.assertTrue(res.startswith("SELECT foo"))
+        self.run_query(q)
+
+    def test_select_sort_and_order(self):
+        q = """
+        from table | select foo | sort foo order:desc 
+        """
+        res = prql.to_sql(q,True)
+        print(res)
+        self.assertTrue(res.index("ORDER BY foo DESC ") != -1)
+        self.run_query(q)
+
+    def test_select_sort_and_order_2(self):
+        q = """
+        from table | select foo | sort bar order:asc 
+        """
+        res = prql.to_sql(q)
+        print(res)
+        self.assertTrue(res.index("ORDER BY bar ASC ") != -1)
+        self.run_query(q)
+
+    def test_select_sort_on_many(self):
+        q = """
+        from table | select foo | sort [ foo, bar ] 
+        """
+        res = prql.to_sql(q,True)
+        print(res)
+        self.assertTrue(res.index("ORDER BY foo,bar ") != -1)
+        self.run_query(q)
+
+    def test_select_sort_on_many_with_direction(self):
+        q = """
+        from table | select foo | sort [ foo, bar ] order:desc 
+        """
+        res = prql.to_sql(q,True)
+        print(res)
+        self.assertTrue(res.index("ORDER BY foo,bar DESC") != -1)
+        self.run_query(q)
+
     def test_select_two(self):
         q = """
         from table | select [ foo, bar ]

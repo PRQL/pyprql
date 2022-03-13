@@ -30,13 +30,16 @@
     filter: ("filter" "[" filter_line ( "," filter_line)* "]") | \
             ("filter" filter_line)
     filter_line: (ESCAPED_STRING|expression)
-    sort: "sort" (ESCAPED_STRING|name) ( "order" ":" direction)?
+    sort: "sort" sort_fields ( "order" ":" direction)?
+    sort_fields: ("[" name ("," name)* "]" )* \
+                 (ESCAPED_STRING|name*)
+
     direction: (ascending|descending)
     ascending: ("asc"|"ascending")
     descending: ("desc"|"descending")
 
     select: ("select" select_fields)+
-    select_fields: ("[" select_field ("," select_field)*  "]")* \
+    select_fields: ("[" select_field ("," select_field)*  "]" )* \
                    (name*)
 
     select_field: name ( "|" "as" name )?
@@ -51,7 +54,7 @@
     func_args: ((NAME " ")* NAME)*
     func_body: pipe_body ("," pipe_body)*
 
-    func_call: NAME | \
+    func_call:  NAME | \
                 NAME value | \
                 NAME value value | \
                 NAME value value value | \

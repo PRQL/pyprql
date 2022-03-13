@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import Dict, List
 
 import pygments
 import rich
@@ -8,6 +9,7 @@ from prompt_toolkit import prompt
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.history import FileHistory
+from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.lexers import PygmentsLexer
 from pygments.formatters.terminal import TerminalFormatter as Formatter
 from pygments.lexers.sql import SqlLexer
@@ -17,38 +19,50 @@ from sqlalchemy import create_engine, inspect
 import prql
 from PRQLLexer import PRQLLexer
 
+bindings = KeyBindings()
 this_files_path = os.path.abspath(os.path.dirname(__file__))
+
+
+@bindings.add('c-l')
+def clear_screen(event):
+    print(chr(27) + '[2j')
+    print('\033c')
+    print('\x1bc')
 
 
 class PRQLCompleter(Completer):
 
-    def __init__(self, table_names, column_names, column_map):
+    @enforce_types
+    def __init__(self, table_names: List[str],
+                 column_names: List[str],
+                 column_map: Dict,
+                 prql_keywords: List[str]):
         self.table_names = table_names
         self.column_names = column_names
         self.column_map = column_map
+        self.prql_keywords = prql_keywords
 
         self.prev_word = None
         self.previous_selection = None
 
     def get_completions(self, document, complete_event):
         word_before_cursor = document.get_word_before_cursor(WORD=True)
-        selection = []
-        completion_operators = ['[', '+', ',']
+        completion_operators = ['[', '+', ',', ':']
         possible_matches = {
-            'from': self.table_names,
-            'join': self.table_names,
-            'columns': self.table_names,
-            'select': self.column_names,
-            ' ': self.column_names,
+                'from': self.table_names,
+                'join': self.table_names,
+                'columns': self.table_names,
+                'select': self.column_names,
+                ' ': self.column_names,
 
-            'sort': self.column_names,
-            'show': ['tables', 'columns', 'connection'],
-            'exit': None
+                'sort': self.column_names,
+                'show': ['tables', 'columns', 'connection'],
+                'exit': None
         }
         for op in completion_operators:
             possible_matches[op] = self.column_names
 
-        # This delays the completions until they hit space, or an completion operator
+        # This delays the completions until they hit space, or a completion operator
         if word_before_cursor in possible_matches:
             selection = possible_matches[word_before_cursor]
             selection = [f'{x}' for x in selection]
@@ -74,13 +88,19 @@ class PRQLCompleter(Completer):
                 self.previous_selection = selection
                 for m in selection:
                     yield Completion(m, start_position=0)
-        # This goes to the first if, this is the delayed completion finally completing
+        # This goes back to the first if, this is the delayed completion finally completing
         elif self.previous_selection:
             selection = [x for x in self.previous_selection if x.find(word_before_cursor) != -1]
             self.previous_selection = selection
 
             for m in selection:
                 yield Completion(m, start_position=-len(word_before_cursor))
+
+        # This is supposed to complete keywords, but its tromping all over the other completions
+        # else:
+        #     completer = FuzzyWordCompleter(self.prql_keywords)
+        #     for m in completer.get_completions(document, complete_event):
+        #         yield m
 
 
 class CLI:
@@ -161,20 +181,20 @@ class CLI:
 
             if self.sql_mode:
                 rich.print(
-                    '\tCommand [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n' +
-                    '\tCommand [cornflower_blue bold]show columns ${table}[/cornflower_blue bold]: To show all columns in a table.\n')
+                        '\tCommand [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n' +
+                        '\tCommand [cornflower_blue bold]show columns ${table}[/cornflower_blue bold]: To show all columns in a table.\n')
 
             else:
                 rich.print(
-                    '\tCommand [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n' +
-                    '\tCommand [cornflower_blue bold]show columns ${table}[/cornflower_blue bold]: To show all columns in a table.\n')
+                        '\tCommand [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n' +
+                        '\tCommand [cornflower_blue bold]show columns ${table}[/cornflower_blue bold]: To show all columns in a table.\n')
 
                 rich.print('\tCommand [cornflower_blue bold]sql[/cornflower_blue bold]: Switch to SQL mode')
                 rich.print('\tCommand [cornflower_blue bold]prql[/cornflower_blue bold]: Switch to PRQL mode')
                 rich.print(
-                    '\tCommand [cornflower_blue bold]<enter>[/cornflower_blue bold]: Hit enter twice to execute your query')
+                        '\tCommand [cornflower_blue bold]<enter>[/cornflower_blue bold]: Hit enter twice to execute your query')
                 rich.print(
-                    '\n\tCommand [cornflower_blue bold]examples[/cornflower_blue bold]: Displays sql-to-prql examples for reference')
+                        '\n\tCommand [cornflower_blue bold]examples[/cornflower_blue bold]: Displays sql-to-prql examples for reference')
 
                 self.prompt_text = 'PRQL> '
 
@@ -235,13 +255,14 @@ class CLI:
                 self.prompt_text = '....>'
 
     def run(self):
-        # PRQLKeywords = ['select', 'from', 'filter', 'derive', 'aggregate', 'sort', 'take', 'order']
+        prql_keywords = ['select', 'from', 'filter', 'derive', 'aggregate', 'sort', 'take', 'order']
         while True:
             all_columns, columns_map = self.get_all_columns()
             user_input = prompt(self.prompt_text,
                                 history=FileHistory('.prql-history.txt'),
                                 auto_suggest=AutoSuggestFromHistory(),
-                                completer=PRQLCompleter(self.inspector.get_table_names(), all_columns, columns_map),
+                                completer=PRQLCompleter(self.inspector.get_table_names(), all_columns, columns_map,
+                                                        prql_keywords),
                                 lexer=PygmentsLexer(PRQLLexer),
                                 )
             try:
