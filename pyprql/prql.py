@@ -628,7 +628,9 @@ def replace_variables(_param: Any, symbol_table: Dict[str, List[_Ast]]) -> str:
 
 @enforce_types
 def execute_function(
-        f: FuncCall, roots: Union[Root, List], symbol_table: Dict[str, List[_Ast]]
+        f: FuncCall,
+        roots: Union[Root, List],
+        symbol_table: Dict[str, List[_Ast]],
 ) -> str:
     msg = ""
     name = str(f.name)

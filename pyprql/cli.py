@@ -11,8 +11,11 @@ from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.lexers import PygmentsLexer
+from prompt_toolkit.styles import style_from_pygments_dict
 from pygments.formatters.terminal import TerminalFormatter as Formatter
 from pygments.lexers.sql import SqlLexer
+from pygments.style import Style
+from pygments.token import Comment, Error, Generic, Keyword, Name, Number, Operator, String, Token, Whitespace
 from rich.table import Table
 from sqlalchemy import create_engine, inspect
 
@@ -28,6 +31,64 @@ def clear_screen(event):
     print(chr(27) + '[2j')
     print('\033c')
     print('\x1bc')
+
+
+# Shortlist material ,pastie, trac, native, paraiso-dark, dracula
+
+# PRQLStyle = style_from_pygments_cls(get_style_by_name('prql'))
+class PRQLStyle(Style):
+    """
+    Pygments version of the "native" vim theme.
+    """
+
+    background_color = '#202020'
+    highlight_color = '#404040'
+    line_number_color = '#aaaaaa'
+
+    styles = {
+            Token: '#d0d0d0',
+            Whitespace: '#666666',
+
+            Comment: 'italic #999999',
+            Comment.Preproc: 'noitalic bold #cd2828',
+            Comment.Special: 'noitalic bold #e50808 bg:#520000',
+
+            Keyword: 'bold #6ab825',
+            Keyword.Pseudo: 'nobold',
+            Operator.Word: 'bold #6ab825',
+
+            String: '#ed9d13',
+            String.Other: '#ffa500',
+
+            Number: '#3677a9',
+
+            Name.Builtin: '#24909d',
+            Name.Variable: '#40ffff',
+            Name.Constant: '#40ffff',
+            Name.Class: 'underline #447fcf',
+            Name.Function: '#447fcf',
+            Name.Namespace: 'underline #447fcf',
+            Name.Exception: '#bbbbbb',
+            Name.Tag: 'bold #6ab825',
+            Name.Attribute: '#bbbbbb',
+            Name.Decorator: '#ffa500',
+
+            Generic.Heading: 'bold #ffffff',
+            Generic.Subheading: 'underline #ffffff',
+            Generic.Deleted: '#d22323',
+            Generic.Inserted: '#589819',
+            Generic.Error: '#d22323',
+            Generic.Emph: 'italic',
+            Generic.Strong: 'bold',
+            Generic.Prompt: '#aaaaaa',
+            Generic.Output: '#cccccc',
+            Generic.Traceback: '#d22323',
+
+            Error: 'bg:#e3d2d2 #a61717'
+    }
+
+
+PRQLStyle = style_from_pygments_dict(PRQLStyle.styles)
 
 
 class PRQLCompleter(Completer):
@@ -56,6 +117,8 @@ class PRQLCompleter(Completer):
                 ' ': self.column_names,
 
                 'sort': self.column_names,
+                'filter': self.column_names,
+
                 'show': ['tables', 'columns', 'connection'],
                 'exit': None
         }
@@ -70,7 +133,8 @@ class PRQLCompleter(Completer):
             if word_before_cursor == 'from' or word_before_cursor == 'join' or \
                     word_before_cursor == 'sort' or word_before_cursor == 'select' or \
                     word_before_cursor == 'columns' or word_before_cursor == 'show' or \
-                    word_before_cursor == ',' or word_before_cursor == '[':
+                    word_before_cursor == ',' or word_before_cursor == '[' or \
+                    word_before_cursor == 'filter':
                 pass
             else:
                 for m in selection:
@@ -264,6 +328,7 @@ class CLI:
                                 completer=PRQLCompleter(self.inspector.get_table_names(), all_columns, columns_map,
                                                         prql_keywords),
                                 lexer=PygmentsLexer(PRQLLexer),
+                                style=PRQLStyle
                                 )
             try:
                 self.handle_input(user_input)
@@ -297,6 +362,13 @@ def print_usage():
     print('''
     Notes:
         The connection string syntax is detailed here https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
+        To install database drivers, see https://docs.sqlalchemy.org/en/13/dialects/index.html
+        
+        Mysql      : pip install mysqlclient
+        Postgresql : pip install psycopg2-binary
+        MariaDB    : pip install mariadb
+        Oracle     : pip install cx_oracle
+        SQLite     : <built-in>
     ''')
 
 
