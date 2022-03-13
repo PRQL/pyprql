@@ -10,7 +10,6 @@ PACKAGE: str = "pyprql"
 LOCATIONS: List[str] = [
     PACKAGE,
     "noxfile.py",
-    "tests",
 ]
 VERSIONS: List[str] = [
     "3.7",
@@ -60,7 +59,10 @@ def type(session: Session) -> None:
     """Type check files with mypy."""
     args = session.posargs or LOCATIONS
     constrained_install(session, "mypy")
-    session.run("mypy", "--ignore-missing-imports", *args)
+    session.run("mypy",
+                "--ignore-missing-imports",
+                "--show-error-codes",
+                *args)
 
 
 @nox.session(python="3.10")

@@ -8,6 +8,8 @@ import pytest
 from pyprql import prql
 
 
+# ignore type# type: ignore[operator]
+
 class TestStdlib(unittest.TestCase):
     def setUpClass() -> None:
         # Use Path for robust construction, but sqlite3 py3.6 requires str
