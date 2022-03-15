@@ -34,8 +34,16 @@ jobs:
         uses: snok/install-poetry@v1.3.1
         with:
           version: ${{ env.POETRY_VERSION }}
-      - name: Format and Lint
-        run: nox -s form lint type
+      - name: Format
+        run: nox -s form
+      - name: Configure git
+        run: |
+          git config --global user.name 'qorrect'
+          git config --global user.email 'qorrect@users.noreply.github.com'
+      - name: Commit changes
+        run: bash ./.github/commit_changes.bash
+      - name: Lint
+        run: nox -s lint type
 
   security:
     runs-on: ubuntu-latest
