@@ -1,8 +1,8 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
 from typing import Dict, List
 
-import prql
 import pygments
 import rich
 from enforce_typing import enforce_types
@@ -13,7 +13,6 @@ from prompt_toolkit.history import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.lexers import PygmentsLexer
 from prompt_toolkit.styles import style_from_pygments_dict
-from PRQLLexer import PRQLLexer
 from pygments.formatters.terminal import TerminalFormatter as Formatter
 from pygments.lexers.sql import SqlLexer
 from pygments.style import Style
@@ -31,6 +30,9 @@ from pygments.token import (
 )
 from rich.table import Table
 from sqlalchemy import create_engine, inspect
+
+import pyprql.prql as prql
+from pyprql.PRQLLexer import PRQLLexer
 
 bindings = KeyBindings()
 this_files_path = os.path.abspath(os.path.dirname(__file__))
@@ -248,10 +250,10 @@ class CLI:
                 """
             [pale_turquoise1]SQL  : SELECT * from employees[/pale_turquoise1]
             [sandy_brown]PRQL : from employees[/sandy_brown]
-            
+
             [pale_turquoise1]SQL  : SELECT name, salary from employees WHERE salary > 100000[/pale_turquoise1]
             [sandy_brown]PRQL : from employees | select \[name,salary] | filter salary > 100000[/sandy_brown]
-                          
+
             """
             )
             return
@@ -403,7 +405,7 @@ def print_usage():
     Test Database:
         python cli.py chinook
         python cli.py factbook
-        
+
     """
     )
 
@@ -412,7 +414,7 @@ def print_usage():
     Notes:
         The connection string syntax is detailed here https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
         To install database drivers, see https://docs.sqlalchemy.org/en/13/dialects/index.html
-        
+
         Mysql      : pip install mysqlclient
         Postgresql : pip install psycopg2-binary
         MariaDB    : pip install mariadb
