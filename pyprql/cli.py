@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import pygments
 import rich
@@ -424,10 +424,12 @@ def print_usage():
     )
 
 
-if __name__ == "__main__":
+def main(params: Optional[List[str]] = None) -> None:
+    if params is None:
+        params = sys.argv
     try:
-        if len(sys.argv) > 1:
-            cli = CLI(sys.argv[1])
+        if len(params) > 1:
+            cli = CLI(params[1])
             cli.run()
         else:
             print_usage()
