@@ -70,49 +70,49 @@ class PRQLStyle(Style):
     line_number_color = '#aaaaaa'
 
     styles = {
-        Token: "#d0d0d0",
-        Whitespace: "#666666",
-        Comment: "italic #999999",
-        Comment.Preproc: "noitalic bold #cd2828",
-        Comment.Special: "noitalic bold #e50808 bg:#520000",
-        Keyword: "bold #6ab825",
-        Keyword.Pseudo: "nobold",
-        Operator.Word: "bold #6ab825",
-        String: "#ed9d13",
-        String.Other: "#ffa500",
-        Number: "#3677a9",
-        Name.Builtin: "#24909d",
-        Name.Variable: "#40ffff",
-        Name.Constant: "#40ffff",
-        Name.Class: "underline #447fcf",
-        Name.Function: "#447fcf",
-        Name.Namespace: "underline #447fcf",
-        Name.Exception: "#bbbbbb",
-        Name.Tag: "bold #6ab825",
-        Name.Attribute: "#bbbbbb",
-        Name.Decorator: "#ffa500",
-        Generic.Heading: "bold #ffffff",
-        Generic.Subheading: "underline #ffffff",
-        Generic.Deleted: "#d22323",
-        Generic.Inserted: "#589819",
-        Generic.Error: "#d22323",
-        Generic.Emph: "italic",
-        Generic.Strong: "bold",
-        Generic.Prompt: "#aaaaaa",
-        Generic.Output: "#cccccc",
-        Generic.Traceback: "#d22323",
-        Error: "bg:#e3d2d2 #a61717",
+            Token: "#d0d0d0",
+            Whitespace: "#666666",
+            Comment: "italic #999999",
+            Comment.Preproc: "noitalic bold #cd2828",
+            Comment.Special: "noitalic bold #e50808 bg:#520000",
+            Keyword: "bold #6ab825",
+            Keyword.Pseudo: "nobold",
+            Operator.Word: "bold #6ab825",
+            String: "#ed9d13",
+            String.Other: "#ffa500",
+            Number: "#3677a9",
+            Name.Builtin: "#24909d",
+            Name.Variable: "#40ffff",
+            Name.Constant: "#40ffff",
+            Name.Class: "underline #447fcf",
+            Name.Function: "#447fcf",
+            Name.Namespace: "underline #447fcf",
+            Name.Exception: "#bbbbbb",
+            Name.Tag: "bold #6ab825",
+            Name.Attribute: "#bbbbbb",
+            Name.Decorator: "#ffa500",
+            Generic.Heading: "bold #ffffff",
+            Generic.Subheading: "underline #ffffff",
+            Generic.Deleted: "#d22323",
+            Generic.Inserted: "#589819",
+            Generic.Error: "#d22323",
+            Generic.Emph: "italic",
+            Generic.Strong: "bold",
+            Generic.Prompt: "#aaaaaa",
+            Generic.Output: "#cccccc",
+            Generic.Traceback: "#d22323",
+            Error: "bg:#e3d2d2 #a61717",
     }
 
 
 class PRQLCompleter(Completer):
     @enforce_types
     def __init__(
-        self,
-        table_names: List[str],
-        column_names: List[str],
-        column_map: Dict,
-        prql_keywords: List[str],
+            self,
+            table_names: List[str],
+            column_names: List[str],
+            column_map: Dict,
+            prql_keywords: List[str],
     ):
         self.table_names = table_names
         self.column_names = column_names
@@ -126,15 +126,15 @@ class PRQLCompleter(Completer):
         word_before_cursor = document.get_word_before_cursor(WORD=True)
         completion_operators = ["[", "+", ",", ":"]
         possible_matches = {
-            "from": self.table_names,
-            "join": self.table_names,
-            "columns": self.table_names,
-            "select": self.column_names,
-            " ": self.column_names,
-            "sort": self.column_names,
-            "filter": self.column_names,
-            "show": ["tables", "columns", "connection"],
-            "exit": None,
+                "from": self.table_names,
+                "join": self.table_names,
+                "columns": self.table_names,
+                "select": self.column_names,
+                " ": self.column_names,
+                "sort": self.column_names,
+                "filter": self.column_names,
+                "show": ["tables", "columns", "connection"],
+                "exit": None,
         }
         for op in completion_operators:
             possible_matches[op] = self.column_names
@@ -145,15 +145,15 @@ class PRQLCompleter(Completer):
             selection = [f"{x}" for x in selection]
             self.previous_selection = selection
             if (
-                word_before_cursor == "from"
-                or word_before_cursor == "join"
-                or word_before_cursor == "sort"
-                or word_before_cursor == "select"
-                or word_before_cursor == "columns"
-                or word_before_cursor == "show"
-                or word_before_cursor == ","
-                or word_before_cursor == "["
-                or word_before_cursor == "filter"
+                    word_before_cursor == "from"
+                    or word_before_cursor == "join"
+                    or word_before_cursor == "sort"
+                    or word_before_cursor == "select"
+                    or word_before_cursor == "columns"
+                    or word_before_cursor == "show"
+                    or word_before_cursor == ","
+                    or word_before_cursor == "["
+                    or word_before_cursor == "filter"
             ):
                 pass
             else:
@@ -162,8 +162,8 @@ class PRQLCompleter(Completer):
 
         # If its an operator
         elif (
-            len(word_before_cursor) >= 1
-            and word_before_cursor[-1] in completion_operators
+                len(word_before_cursor) >= 1
+                and word_before_cursor[-1] in completion_operators
         ):
             selection = possible_matches[word_before_cursor[-1]]
             self.previous_selection = selection
@@ -178,7 +178,7 @@ class PRQLCompleter(Completer):
         # This goes back to the first if, this is the delayed completion finally completing
         elif self.previous_selection:
             selection = [
-                x for x in self.previous_selection if x.find(word_before_cursor) != -1
+                    x for x in self.previous_selection if x.find(word_before_cursor) != -1
             ]
             self.previous_selection = selection
 
@@ -205,7 +205,7 @@ class CLI:
             connect_str = f"sqlite:///{this_files_path}/../resources/factbook.db"
 
         rich.print(
-            "Connecting to [pale_turquoise1]{}[/pale_turquoise1]".format(connect_str)
+                "Connecting to [pale_turquoise1]{}[/pale_turquoise1]".format(connect_str)
         )
         self.engine = create_engine(connect_str)
         self.inspector = inspect(self.engine)
@@ -259,47 +259,47 @@ class CLI:
             return
         elif user_input == "examples":
             rich.print(
+                    """
+                [pale_turquoise1]SQL  : SELECT * from employees[/pale_turquoise1]
+                [sandy_brown]PRQL : from employees[/sandy_brown]
+        
+                [pale_turquoise1]SQL  : SELECT name, salary from employees WHERE salary > 100000[/pale_turquoise1]
+                [sandy_brown]PRQL : from employees | select \[name,salary] | filter salary > 100000[/sandy_brown]
+        
                 """
-            [pale_turquoise1]SQL  : SELECT * from employees[/pale_turquoise1]
-            [sandy_brown]PRQL : from employees[/sandy_brown]
-
-            [pale_turquoise1]SQL  : SELECT name, salary from employees WHERE salary > 100000[/pale_turquoise1]
-            [sandy_brown]PRQL : from employees | select \[name,salary] | filter salary > 100000[/sandy_brown]
-
-            """
             )
             return
         elif user_input == "?" or user_input == "help":
 
             if self.sql_mode:
                 rich.print(
-                    "\tCommand [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n"
-                    + "\tCommand [cornflower_blue bold]show columns ${table}[/cornflower_blue bold]: To show all columns in a table.\n"
+                        "\tCommand [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n"
+                        + "\tCommand [cornflower_blue bold]show columns ${table}[/cornflower_blue bold]: To show all columns in a table.\n"
                 )
 
             else:
                 rich.print(
-                    "\tCommand [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n"
-                    + "\tCommand [cornflower_blue bold]show columns ${table}[/cornflower_blue bold]: To show all columns in a table.\n"
+                        "\tCommand [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n"
+                        + "\tCommand [cornflower_blue bold]show columns ${table}[/cornflower_blue bold]: To show all columns in a table.\n"
                 )
 
                 rich.print(
-                    "\tCommand [cornflower_blue bold]sql[/cornflower_blue bold]: Switch to SQL mode"
+                        "\tCommand [cornflower_blue bold]sql[/cornflower_blue bold]: Switch to SQL mode"
                 )
                 rich.print(
-                    "\tCommand [cornflower_blue bold]prql[/cornflower_blue bold]: Switch to PRQL mode"
+                        "\tCommand [cornflower_blue bold]prql[/cornflower_blue bold]: Switch to PRQL mode"
                 )
                 rich.print(
-                    "\tCommand [cornflower_blue bold]<enter>[/cornflower_blue bold]: Hit enter twice to execute your query"
+                        "\tCommand [cornflower_blue bold]<enter>[/cornflower_blue bold]: Hit enter twice to execute your query"
                 )
                 rich.print(
-                    "\n\tCommand [cornflower_blue bold]examples[/cornflower_blue bold]: Displays sql-to-prql examples for reference"
+                        "\n\tCommand [cornflower_blue bold]examples[/cornflower_blue bold]: Displays sql-to-prql examples for reference"
                 )
 
                 self.prompt_text = "PRQL> "
 
             rich.print(
-                "\nPRQL Syntax documentation is here https://github.com/max-sixty/prql\n"
+                    "\nPRQL Syntax documentation is here https://github.com/max-sixty/prql\n"
             )
 
             return
@@ -317,7 +317,7 @@ class CLI:
             rich.print(table)
             return
         elif user_input.startswith("show columns"):
-            table_name = user_input["show columns ".__len__() :]
+            table_name = user_input["show columns ".__len__():]
             # tables = self.engine.list_tables()
             columns = self.inspector.get_columns(table_name)
             rich.print(columns)
@@ -349,7 +349,7 @@ class CLI:
                     rich.print("[pale_green3 bold]SQL:[/pale_green3 bold]")
                     print("\t" + self.highlight_sql(sql))
                     rich.print(
-                        "[medium_turquoise bold]Results:[/medium_turquoise bold]"
+                            "[medium_turquoise bold]Results:[/medium_turquoise bold]"
                     )
                     self.execute_sql(sql)
                     self.command = ""
@@ -360,36 +360,36 @@ class CLI:
 
     def run(self):
         prql_keywords = [
-            "select",
-            "from",
-            "filter",
-            "derive",
-            "aggregate",
-            "sort",
-            "take",
-            "order",
+                "select",
+                "from",
+                "filter",
+                "derive",
+                "aggregate",
+                "sort",
+                "take",
+                "order",
         ]
         while True:
             all_columns, columns_map = self.get_all_columns()
             user_input = prompt(
-                self.prompt_text,
-                history=FileHistory(".prql-history.txt"),
-                auto_suggest=AutoSuggestFromHistory(),
-                completer=PRQLCompleter(
-                    self.inspector.get_table_names(),
-                    all_columns,
-                    columns_map,
-                    prql_keywords,
-                ),
-                lexer=PygmentsLexer(PRQLLexer),
-                style=style_from_pygments_dict(PRQLStyle.styles),
-            bottom_toolbar=bottom_toolbar
-                                )
+                    self.prompt_text,
+                    history=FileHistory(".prql-history.txt"),
+                    auto_suggest=AutoSuggestFromHistory(),
+                    completer=PRQLCompleter(
+                            self.inspector.get_table_names(),
+                            all_columns,
+                            columns_map,
+                            prql_keywords,
+                    ),
+                    lexer=PygmentsLexer(PRQLLexer),
+                    style=style_from_pygments_dict(PRQLStyle.styles),
+                    bottom_toolbar=bottom_toolbar
+            )
             try:
                 self.handle_input(user_input)
             except Exception as e:
                 print(
-                    f"Exception when handling the input: {e},{repr(e)}\nContinuing..."
+                        f"Exception when handling the input: {e},{repr(e)}\nContinuing..."
                 )
                 self.command = ""
                 self.prompt_text = "PRQL> "
@@ -398,43 +398,43 @@ class CLI:
 
 def print_usage():
     print(
-        """
-    Usage:
-        python cli.py connection_string"""
+            """
+        Usage:
+            python cli.py connection_string"""
     )
 
     print(
-        """
-    Examples:
-        python cli.py 'sqlite:///file.db'
-        python cli.py 'postgresql://user:password@localhost:5432/database'
-        python cli.py 'postgresql+psycopg2://user:password@localhost:5432/database'
-        python cli.py 'mysql://scott:tiger@localhost/foo'
+            """
+        Examples:
+            python cli.py 'sqlite:///file.db'
+            python cli.py 'postgresql://user:password@localhost:5432/database'
+            python cli.py 'postgresql+psycopg2://user:password@localhost:5432/database'
+            python cli.py 'mysql://scott:tiger@localhost/foo'
+            """
+    )
+
+    print(
+            """
+        Test Database:
+            python cli.py chinook
+            python cli.py northwind        
+            python cli.py factbook
+    
         """
     )
 
     print(
+            """
+        Notes:
+            The connection string syntax is detailed here https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
+            To install database drivers, see https://docs.sqlalchemy.org/en/13/dialects/index.html
+    
+            Mysql      : pip install mysqlclient
+            Postgresql : pip install psycopg2-binary
+            MariaDB    : pip install mariadb
+            Oracle     : pip install cx_oracle
+            SQLite     : <built-in>
         """
-    Test Database:
-        python cli.py chinook
-        python cli.py northwind        
-        python cli.py factbook
-
-    """
-    )
-
-    print(
-        """
-    Notes:
-        The connection string syntax is detailed here https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
-        To install database drivers, see https://docs.sqlalchemy.org/en/13/dialects/index.html
-
-        Mysql      : pip install mysqlclient
-        Postgresql : pip install psycopg2-binary
-        MariaDB    : pip install mariadb
-        Oracle     : pip install cx_oracle
-        SQLite     : <built-in>
-    """
     )
 
 
