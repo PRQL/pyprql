@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyprql"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python Implementation of Pipelined Relational Query Language (PRQL)"
 authors = ["qorrect <charlie.fats@gmail.com>"]
 license = "Apache-2.0"
