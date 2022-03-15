@@ -11,8 +11,14 @@ from enforce_typing import enforce_types
 from icecream import ic
 from lark import Lark, Token, Transformer, ast_utils
 
+# Used for lark magic and prql.lark file loading
 this_module = sys.modules[__name__]
 script_path = os.path.dirname(__file__)
+
+# We cache these for longer running processes
+STDLIB_AST = None
+GLOBAL_PARSER = None
+GLOBAL_TRANSFORMER = None
 
 
 class _Ast(ast_utils.Ast):
@@ -44,8 +50,8 @@ class Name(_Ast, ast_utils.AsList):
 
 
 @dataclass
-class Expression(_Statement, ast_utils.AsList):
-    statements: List[_Statement]
+class Expression(_Ast, ast_utils.AsList):
+    statements: List[_Ast]
 
     def __str__(self):
         msg = ""
@@ -56,35 +62,30 @@ class Expression(_Statement, ast_utils.AsList):
 
 
 class _JoinType(_Ast):
-
     def __str__(self):
         return "JOIN"
 
 
 @dataclass
 class InnerJoin(_JoinType):
-
     def __str__(self):
         return "INNER JOIN"
 
 
 @dataclass
 class LeftJoin(_JoinType):
-
     def __str__(self):
         return "LEFT JOIN"
 
 
 @dataclass
 class RightJoin(_JoinType):
-
     def __str__(self):
         return "RIGHT JOIN"
 
 
 @dataclass
 class OuterJoin(_JoinType):
-
     def __str__(self):
         return "OUTER JOIN"
 
@@ -101,7 +102,7 @@ class JoinType(_JoinType):
 
 
 @dataclass
-class Join(_Statement):
+class Join(_Ast):
     name: Name
     join_type: Optional[_JoinType] = None
     left_id: Optional[Name] = None  # Has to have a default argument now
@@ -133,7 +134,7 @@ class Join(_Statement):
 
 
 @dataclass
-class SelectField(_Statement):
+class SelectField(_Ast):
     name: Name
     cast_type: Optional[Name] = None
 
@@ -144,7 +145,7 @@ class SelectField(_Statement):
 
 
 @dataclass()
-class SelectFields(_Statement, ast_utils.AsList):
+class SelectFields(_Ast, ast_utils.AsList):
     fields: List[SelectField]
 
     def __str__(self):
@@ -152,7 +153,7 @@ class SelectFields(_Statement, ast_utils.AsList):
 
 
 @dataclass()
-class SortField(_Statement):
+class SortField(_Ast):
     name: Name
 
     def __str__(self):
@@ -160,7 +161,7 @@ class SortField(_Statement):
 
 
 @dataclass()
-class SortFields(_Statement, ast_utils.AsList):
+class SortFields(_Ast, ast_utils.AsList):
     fields: List[SortField]
 
     def __str__(self):
@@ -168,7 +169,7 @@ class SortFields(_Statement, ast_utils.AsList):
 
 
 @dataclass()
-class PipeBody(_Statement):
+class PipeBody(_Ast):
     body: str
 
     def __str__(self):
@@ -176,7 +177,7 @@ class PipeBody(_Statement):
 
 
 @dataclass
-class Select(_Statement):
+class Select(_Ast):
     fields: SelectFields
 
     def __str__(self):
@@ -184,7 +185,7 @@ class Select(_Statement):
 
 
 @dataclass
-class DeriveBody(_Statement):
+class DeriveBody(_Ast):
     val: Union[str, Expression]
 
     def __str__(self):
@@ -192,7 +193,7 @@ class DeriveBody(_Statement):
 
 
 @dataclass
-class Operator(_Statement):
+class Operator(_Ast):
     op: Token
 
     def __str__(self):
@@ -200,7 +201,7 @@ class Operator(_Statement):
 
 
 @dataclass
-class GroupBy(_Statement, ast_utils.AsList):
+class GroupBy(_Ast, ast_utils.AsList):
     fields: List[str]
 
     def __str__(self):
@@ -208,8 +209,8 @@ class GroupBy(_Statement, ast_utils.AsList):
 
 
 @dataclass
-class AggregateBody(_Statement, ast_utils.AsList):
-    statements: List[_Statement]
+class AggregateBody(_Ast, ast_utils.AsList):
+    statements: List[_Ast]
 
     def __str__(self):
         return f"{[str(s) for s in self.statements]}"
@@ -227,7 +228,7 @@ class Aggregate(_Statement):
 
 
 @dataclass
-class DeriveLine(_Statement):
+class DeriveLine(_Ast):
     name: str
     expression: Expression
 
@@ -236,16 +237,16 @@ class DeriveLine(_Statement):
 
 
 @dataclass
-class Derive(_Statement, ast_utils.AsList):
+class Derive(_Ast, ast_utils.AsList):
     fields: List[DeriveLine]
 
 
-class _Direction(_Statement):
+class _Direction(_Ast):
     pass
 
 
 @dataclass
-class Direction(_Statement):
+class Direction(_Ast):
     direction: Optional[_Direction] = None
 
     def __str__(self):
@@ -269,7 +270,7 @@ class Descending(_Direction):
 
 
 @dataclass
-class Sort(_Statement):
+class Sort(_Ast):
     fields: SortFields
     direction: Optional[Direction] = None
 
@@ -280,7 +281,7 @@ class Sort(_Statement):
 
 
 @dataclass
-class Take(_Statement):
+class Take(_Ast):
     qty: str
     offset: Optional[str] = None
 
@@ -296,13 +297,13 @@ class Take(_Statement):
 
 
 @dataclass
-class Filter(_Statement, ast_utils.AsList):
+class Filter(_Ast, ast_utils.AsList):
     fields: List[str]
     name: str = "filter"
 
 
 @dataclass
-class FilterLine(_Statement):
+class FilterLine(_Ast):
     val: Any = None
 
     def __str__(self):
@@ -310,8 +311,8 @@ class FilterLine(_Statement):
 
 
 @dataclass
-class Pipes(_Statement, ast_utils.AsList):
-    operations: List[_Statement]
+class Pipes(_Ast, ast_utils.AsList):
+    operations: List[_Ast]
 
 
 @dataclass
@@ -331,7 +332,7 @@ class From(_Statement):
 
 
 @dataclass
-class FuncArgs(_Statement, ast_utils.AsList):
+class FuncArgs(_Ast, ast_utils.AsList):
     fields: Optional[List] = None
 
     def __str__(self):
@@ -339,7 +340,7 @@ class FuncArgs(_Statement, ast_utils.AsList):
 
 
 @dataclass
-class FuncBody(_Statement, ast_utils.AsList):
+class FuncBody(_Ast, ast_utils.AsList):
     fields: List[str]
 
 
@@ -357,7 +358,7 @@ class FuncDef(_Statement):
 
 
 @dataclass
-class FuncCall(_Statement):
+class FuncCall(_Ast):
     name: Optional[Name] = None
     parm1: Any = None
     parm2: Any = None
@@ -365,29 +366,29 @@ class FuncCall(_Statement):
 
 
 @dataclass
-class PipedCall(_Statement):
+class PipedCall(_Ast):
     parm1: Name
     func_body: FuncCall
 
 
 @dataclass
-class ValueDef(_Statement):
+class ValueDef(_Ast):
     name: Name
     value_body: From
 
 
 @dataclass
-class ValueDefs(_Statement, ast_utils.AsList):
+class ValueDefs(_Ast, ast_utils.AsList):
     fields: List[ValueDef]
 
 
 @dataclass
-class FuncDefs(_Statement, ast_utils.AsList):
+class FuncDefs(_Ast, ast_utils.AsList):
     fields: List[FuncDef]
 
 
 @dataclass
-class WithDef(_Statement):
+class WithDef(_Ast):
     name: Name
     _from: From
 
@@ -455,26 +456,33 @@ def get_func_str(func: Optional[str]) -> str:
 
 @enforce_types
 def parse(_text: str) -> Root:
+    global GLOBAL_PARSER
+    global GLOBAL_TRANSFORMER
     text = _text + "\n"
-    parser = Lark(
-            read_file("/../resources/prql.lark"),
-            start="root",
-            parser="lalr",
-            transformer=ToAst(),
-    )
-    tree = parser.parse(text)
-    transformer = ast_utils.create_transformer(this_module, ToAst())
-    return transformer.transform(tree)
+    if GLOBAL_PARSER is None:
+        GLOBAL_PARSER = Lark(
+                read_file("/../resources/prql.lark"),
+                start="root",
+                parser="lalr",
+                transformer=ToAst(),
+        )
+    tree = GLOBAL_PARSER.parse(text)
+
+    if GLOBAL_TRANSFORMER is None:
+        GLOBAL_TRANSFORMER = ast_utils.create_transformer(this_module, ToAst())
+    return GLOBAL_TRANSFORMER.transform(tree)
 
 
 @enforce_types
 def to_sql(prql: str, verbose: bool = False) -> str:
+    global STDLIB_AST
     ast = parse(prql)
     if verbose:
         rich.print(ast)
-    stdlib = parse(read_file("/../resources/stdlib.prql"))
+    if STDLIB_AST is None:
+        STDLIB_AST = parse(read_file("/../resources/stdlib.prql"))
     return (
-            ast_to_sql(ast._from, [ast, stdlib], verbose=verbose).replace("   ", " ").replace("  ", " ")
+            ast_to_sql(ast._from, [ast, STDLIB_AST], verbose=verbose).replace("   ", " ").replace("  ", " ")
     )
 
 
@@ -485,13 +493,13 @@ def pretty_print(root: Root) -> None:
 
 @enforce_types
 def get_operation(
-        ops: List[_Statement],
-        class_type: Type[_Statement],
+        ops: List[_Ast],
+        class_type: Type[_Ast],
         last_match: bool = False,
         return_all: bool = False,
         before: Type = None,
         after: Type = None,
-) -> Union[List, _Statement]:
+) -> Union[List, _Ast]:
     ops_list = ops
     ret = []
     is_before = True
@@ -581,9 +589,9 @@ def build_symbol_table(roots: List[Root]) -> Dict[str, List[_Ast]]:
             table[str(n.name)].append(n)
         for n in root.func_defs.fields:
             table[str(n.name)].append(n)
-        if root._from.get_pipes():
+        if root.get_from().get_pipes():
             derives = get_operation(
-                    root._from.get_pipes().operations, Derive, return_all=True
+                    root.get_from().get_pipes().operations, Derive, return_all=True
             )
             for d in derives:
                 for line in d.fields:
@@ -604,22 +612,23 @@ def replace_variables(_param: Any, symbol_table: Dict[str, List[_Ast]]) -> str:
         if not symbol_table[param]:
             return _param
         if isinstance(symbol_table[param][0], NameValuePair):
-            if isinstance(symbol_table[param][0].value, Expression):
+            nvp: NameValuePair = symbol_table[param][0]
+            if isinstance(nvp.value, Expression):
                 msg = ""
-                exp: Expression = symbol_table[param][0].value
+                exp: Expression = nvp.value
                 for s in exp.statements:
                     msg += str(replace_variables(str(s), symbol_table))
 
                 return msg
-            if isinstance(symbol_table[param][0].value, DeriveBody):
+            if isinstance(nvp.value, DeriveBody):
                 msg = ""
-                body_exp: Expression = symbol_table[param][0].value.val
+                body_exp: Expression = nvp.value.val  # type: ignore[assignment]
                 for s in body_exp.statements:
                     msg += str(replace_variables(str(s), symbol_table))
 
                 return msg
             else:
-                return symbol_table[param][0].value
+                return nvp.value
         else:
             return str(symbol_table[param][0])
     else:

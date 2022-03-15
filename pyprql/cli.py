@@ -6,6 +6,7 @@ import pygments
 import rich
 from enforce_typing import enforce_types
 from prompt_toolkit import prompt
+from prompt_toolkit.application import get_app
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.history import FileHistory
@@ -26,6 +27,16 @@ bindings = KeyBindings()
 this_files_path = os.path.abspath(os.path.dirname(__file__))
 
 
+def bottom_toolbar():
+    display_text = 'Type help or ? to display documentation'
+    try:
+        text = get_app().current_buffer.text
+        display_text = prql.to_sql(text)
+    except Exception:
+        pass
+    return [('class:bottom-toolbar', display_text)]
+
+
 @bindings.add('c-l')
 def clear_screen(event):
     print(chr(27) + '[2j')
@@ -33,14 +44,7 @@ def clear_screen(event):
     print('\x1bc')
 
 
-# Shortlist material ,pastie, trac, native, paraiso-dark, dracula
-
-# PRQLStyle = style_from_pygments_cls(get_style_by_name('prql'))
 class PRQLStyle(Style):
-    """
-    Pygments version of the "native" vim theme.
-    """
-
     background_color = '#202020'
     highlight_color = '#404040'
     line_number_color = '#aaaaaa'
@@ -86,9 +90,6 @@ class PRQLStyle(Style):
 
             Error: 'bg:#e3d2d2 #a61717'
     }
-
-
-
 
 
 class PRQLCompleter(Completer):
@@ -179,6 +180,8 @@ class CLI:
             connect_str = f'sqlite:///{this_files_path}/../resources/chinook.db'
         elif connect_str == 'factbook':
             connect_str = f'sqlite:///{this_files_path}/../resources/factbook.db'
+        elif connect_str == 'northwind':
+            connect_str = f'sqlite:///{this_files_path}/../resources/northwind.db'
 
         rich.print('Connecting to [pale_turquoise1]{}[/pale_turquoise1]'.format(connect_str))
         self.engine = create_engine(connect_str)
@@ -328,7 +331,8 @@ class CLI:
                                 completer=PRQLCompleter(self.inspector.get_table_names(), all_columns, columns_map,
                                                         prql_keywords),
                                 lexer=PygmentsLexer(PRQLLexer),
-                                style=style_from_pygments_dict(PRQLStyle.styles)
+                                style=style_from_pygments_dict(PRQLStyle.styles),
+                                bottom_toolbar=bottom_toolbar
                                 )
             try:
                 self.handle_input(user_input)
@@ -342,10 +346,10 @@ class CLI:
 def print_usage():
     print('''
     Usage:
-        python cli.py connection_string''')
-
+        python cli.py connection_string
+    ''')
     print('''
-    Examples:
+    Examples:   
         python cli.py 'sqlite:///file.db'
         python cli.py 'postgresql://user:password@localhost:5432/database'
         python cli.py 'postgresql+psycopg2://user:password@localhost:5432/database'
@@ -355,6 +359,7 @@ def print_usage():
     print('''
     Test Database:
         python cli.py chinook
+        python cli.py northwind        
         python cli.py factbook
         
     ''')
