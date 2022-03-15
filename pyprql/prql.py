@@ -487,7 +487,7 @@ def to_sql(prql: str, verbose: bool = False) -> str:
     if STDLIB_AST is None:
         STDLIB_AST = parse(read_file("/../resources/stdlib.prql"))
     return (
-        ast_to_sql(ast._from, [ast, stdlib], verbose=verbose)
+        ast_to_sql(ast.get_from(), [ast, STDLIB_AST], verbose=verbose)
         .replace("   ", " ")
         .replace("  ", " ")
     )
