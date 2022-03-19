@@ -1,6 +1,9 @@
 [flake8]
-
-ignore =  W293, W291, W503, W504, E203, W605, E126
-max-line-length = 165
+select = ANN, C90, D, DAR, E, F, W
+ignore = W291, W293, W503, W504, W605, E126, E203, E501
+max-line-length = 88
 exclude = tests/*
 max-complexity = 100
+docstring-convention = numpy
+docstring-style = numpy
+strictness = short
