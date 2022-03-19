@@ -97,5 +97,6 @@ def tests(session: Session) -> None:
         "pytest-clarity",
         "pytest-sugar",
         "pytest-xdist",
+        "xdoctest",
     )
     session.run("pytest", *args)
