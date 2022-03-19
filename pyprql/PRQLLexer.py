@@ -1,12 +1,22 @@
+# -*- coding: utf-8 -*-
+"""A Pygments RegexLexer for the PyPRQL CLI.
+
+Attributes
+----------
+__all__ : List[str]
+    List of available lexers.
+"""
+from typing import List
+
 from pygments.lexer import RegexLexer, include, words
 from pygments.token import Comment, Keyword, Name, Number, Punctuation, String, Text
 
-__all__ = ["PRQLLexer"]
+__all__: List[str] = ["PRQLLexer"]
 
 
 class PRQLLexer(RegexLexer):
     """
-    For `PRQL
+    For PRQL.
 
     .. versionadded:: 1
     """
