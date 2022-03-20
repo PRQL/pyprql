@@ -1057,6 +1057,7 @@ def ast_to_sql(
                         + ast_to_sql(table.value_body, roots, symbol_table, verbose)
                         + ")"
                     )
+        # TODO , should we use replace_variables here ?
         if val in symbol_table:
             replacement = symbol_table[val][0]  # type: ignore [index]
             if not isinstance(replacement, FuncDef):
