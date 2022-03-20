@@ -4,7 +4,37 @@ Python implementation of [PRQL](https://github.com/max-sixty/prql).
 
 Documentation of PRQL is at https://github.com/max-sixty/prql
 
+### Installation
+```
+    pip install pyprql
+```
+
+## CLI
+
+Usage:
+
+```bash
+    prql 'connection_string'
+    prql 'postgresql://user:password@localhost:5432/database'    
+```
+Examples:
+
+```bash
+    prql 'sqlite:///chinook.db'
+```
+Try it out:
+
+```
+curl https://github.com/qorrect/PyPrql/blob/main/resources/chinook.db?raw=true -o chinook.db 
+prql "sqlite:///chinook.db"
+
+PRQL> show tables 
+```
+
+## pyprql.to_sql 
+
 ```elm
+query='''
 from employees
 filter country = "USA"
 derive [
@@ -24,14 +54,15 @@ aggregate by:[title, country] [
 sort sum_gross_cost
 filter row_count > 200
 take 20
+'''
 ```
+
 ---
 
 ```python
 
-from pyprql.lang import prql
-
-sql = prql.to_sql(q)
+from pyprql import to_sql
+sql = to_sql(query)
 print(sql)
 ```
 
@@ -47,7 +78,7 @@ SELECT AVG(salary),
        COUNT(salary)                             as row_count,
        salary + payroll_tax                      as gross_salary,
        (salary + payroll_tax) + benefits_cost    as gross_cost
-FROM ` employees ` employees_e
+FROM `employees` employees_e
 WHERE country="USA" AND (gross_salary+benefits_cost)>0
 GROUP BY title, country
 HAVING row_count >200
@@ -56,7 +87,7 @@ LIMIT 20
 
 ```
 
-### Differences from the spec
+#### Differences from the spec
 
 The parser is only able to parse casts in select statements insde of `[ ]`, so
 
