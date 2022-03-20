@@ -565,7 +565,7 @@ def print_usage() -> None:
 
     print(
         """
-        Test Database:
+        Try it out:
             curl https://github.com/qorrect/PyPrql/blob/main/resources/chinook.db?raw=true -o chinook.db
             prql 'sqlite:///chinook.db'
         """
