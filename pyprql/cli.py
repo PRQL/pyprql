@@ -1,7 +1,16 @@
 # -*- coding: utf-8 -*-
+"""The python command line interface of PRQL.
+
+Attributes
+----------
+bindings : KeyBindings
+    A container for key bindings.
+this_files_path : str
+    The Path to this file.
+    """
 import os
 import sys
-from typing import Dict, List, Optional
+from typing import Dict, Iterable, List, Optional, Tuple
 
 import pygments
 import rich
@@ -9,7 +18,8 @@ from enforce_typing import enforce_types
 from prompt_toolkit import prompt
 from prompt_toolkit.application import get_app
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from prompt_toolkit.completion import Completer, Completion
+from prompt_toolkit.completion import CompleteEvent, Completer, Completion
+from prompt_toolkit.document import Document
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.lexers import PygmentsLexer
@@ -40,7 +50,14 @@ this_files_path = os.path.abspath(os.path.dirname(__file__))
 
 
 @bindings.add("c-l")
-def bottom_toolbar():
+def bottom_toolbar() -> List[Tuple[str, str]]:
+    """Create bottom toolbar for prql prompt.
+
+    Returns
+    -------
+    List[Tuple[str, str]]
+        An identifier and the desired display text wrapped in a list.
+    """
     display_text = "Type help or ? to display documentation"
     try:
         text = get_app().current_buffer.text
@@ -51,15 +68,22 @@ def bottom_toolbar():
 
 
 @bindings.add("c-l")
-def clear_screen(event):
+def clear_screen() -> None:
+    """Create clear screen keybinding."""
     print(chr(27) + "[2j")
     print("\033c")
     print("\x1bc")
 
 
 class PRQLStyle(Style):
-    """
-    Pygments version of the "native" vim theme.
+    """Pygments version of the "native" vim theme.
+
+    Inherits from pygments ``Style``,
+    overriding values to create our colour scheme.
+    The various style attributes are self-descriptive,
+    and thoroughly documented on the `pygments`_ page.
+
+    .. _pygments: https://pygments.org/docs/styledevelopment/
     """
 
     background_color = "#202020"
@@ -106,23 +130,59 @@ class PRQLStyle(Style):
 
 
 class PRQLCompleter(Completer):
+    """Prompt_toolkit completion engine for PyPRQL CLI."""
+
     @enforce_types
     def __init__(
         self,
         table_names: List[str],
         column_names: List[str],
-        column_map: Dict,
+        column_map: Dict[str, List[str]],
         prql_keywords: List[str],
-    ):
+    ) -> None:
+        """Initialise a completer instance.
+
+        This provides some of the root completion material.
+        Inherits from  prompt_toolkit's ``Completer`` class,
+        and overrides methods to achieve desired functionality.
+
+        Parameters
+        ----------
+        table_names : List[str]
+            List of available tables.
+        column_names : List[str]
+            List of available columns.
+        column_map : Dict[str, List[str]]
+            A column-to-table map.
+        prql_keywords : List[str]
+            list of PRQL keywords.
+        """
         self.table_names = table_names
         self.column_names = column_names
         self.column_map = column_map
         self.prql_keywords = prql_keywords
 
-        self.prev_word = None
-        self.previous_selection = None
+        self.prev_word: Optional[str] = None
+        self.previous_selection: Optional[List[str]] = None
 
-    def get_completions(self, document, complete_event):
+    def get_completions(
+        self, document: Document, complete_event: CompleteEvent
+    ) -> Iterable[Completion]:
+        """Retrieve completion options.
+
+        Parameters
+        ----------
+        document : Document
+            Implements all text operations/querying.
+        complete_event : CompleteEvent
+            Event that called the Completer.
+            Unused in current implementation, but required to match signature.
+
+        Yields
+        ------
+        Completion
+            The completion object.
+        """
         word_before_cursor = document.get_word_before_cursor(WORD=True)
         completion_operators = ["[", "+", ",", ":"]
         possible_matches = {
@@ -144,6 +204,7 @@ class PRQLCompleter(Completer):
             selection = possible_matches[word_before_cursor]
             selection = [f"{x}" for x in selection]
             self.previous_selection = selection
+            # This can be reworked to a if not in operator. No pass required.
             if (
                 word_before_cursor == "from"
                 or word_before_cursor == "join"
@@ -193,7 +254,26 @@ class PRQLCompleter(Completer):
 
 
 class CLI:
-    def __init__(self, connect_str: str = "chinook"):
+    """The command line interface object."""
+
+    def __init__(self, connect_str: Optional[str] = "chinook") -> None:
+        """Instantiate a CLI object.
+
+        Parameters
+        ----------
+        connect_str : str, default "chinook"
+            The SQL alchemy connection string.
+
+        Notes
+        -----
+            This additionally defines a number of default parameter values,
+            generally used to control state of the connection and prompt.
+
+            has_one_blank : bool, default False
+            prompt_test : str, default "PRQL>"
+            command : str, default ""
+            sql_mode : bool, default False
+        """
         self.has_one_blank = False
         self.prompt_text = "PRQL> "
         self.command = ""
@@ -210,7 +290,18 @@ class CLI:
         self.engine = create_engine(connect_str)
         self.inspector = inspect(self.engine)
 
-    def get_all_columns(self):
+    def get_all_columns(self) -> Tuple[List[str], Dict[str, List[str]]]:
+        """Retrive all columns in the database.
+
+        Iterates over all tables to construct a dictionary of table:columns
+        pairs, before condensing this into a single list of all columns to return.
+
+        Returns
+        -------
+        Tuple[List[str], Dict[str, List[str]]
+            A list of all column names in the database,
+            and a dictionary mapping each table to its columns.
+        """
         tables = self.inspector.get_table_names()
         columns = {}
         for table in tables:
@@ -218,6 +309,7 @@ class CLI:
             columns[table] = [x["name"] for x in columns[table]]
             columns[table].sort()
 
+        # This could be sum(columns.values(), [])
         column_names = []
         for col in columns.keys():
             for column in columns[col]:
@@ -226,7 +318,17 @@ class CLI:
         column_names.sort()
         return column_names, columns
 
-    def execute_sql(self, sql):
+    def execute_sql(self, sql: str) -> None:
+        """Perform an SQL query.
+
+        No value is returned, as ``rich.print`` is used to dumpt the results
+        to the CLI.
+
+        Parameters
+        ----------
+        sql : str
+            The SQL query to be performed.
+        """
         with self.engine.connect() as con:
             rs = con.execute(sql)
             columns = rs.keys()
@@ -240,37 +342,77 @@ class CLI:
 
             rich.print(table)
 
-    def highlight_prql(self, text):
+    def highlight_prql(self, text: str) -> str:
+        """Provide highlighting for PRQL inputs.
 
+        Uses a custom-defined PRQLLexer to highlight the prompt inputs.
+
+        Parameters
+        ----------
+        text : str
+            The inputs to be highlighted
+
+        Returns
+        -------
+        str
+            The highlighted inputs.
+        """
         highlighted = pygments.highlight(text, PRQLLexer(), Formatter())
         return highlighted
 
-    def highlight_sql(self, text):
+    def highlight_sql(self, text: str) -> str:
+        """Provide highlighting for SQL inputs.
+
+        Uses a default Pygments SqlLexer to highlight the prompt inputs.
+
+        Parameters
+        ----------
+        text : str
+            The inputs to be highlighted
+
+        Returns
+        -------
+        str
+            The highlighted inputs.
+        """
         highlighted = pygments.highlight(text, SqlLexer(), Formatter())
         return highlighted
 
     @enforce_types
     def handle_input(self, _user_input: str) -> None:
+        """Process user input.
 
+        Currently, uses if/elif/else logic to check possible inputs against
+        actions to be taken for those inputs.
+
+        Parameters
+        ----------
+        _user_input : str
+            The input given by the user at the CLI.
+        """
+        # Thoughts on adding exit as a command here?
         user_input: str = _user_input.strip().rstrip(";")
         if user_input == "prql":
             self.sql_mode = False
             self.prompt_text = "PRQL> "
             return
         elif user_input == "examples":
+            # Possibly store these in a file and read in here?
+            # That would likely increase maintainability
             rich.print(
                 """
                 [pale_turquoise1]SQL  : SELECT * from employees[/pale_turquoise1]
                 [sandy_brown]PRQL : from employees[/sandy_brown]
-        
+
                 [pale_turquoise1]SQL  : SELECT name, salary from employees WHERE salary > 100000[/pale_turquoise1]
                 [sandy_brown]PRQL : from employees | select \[name,salary] | filter salary > 100000[/sandy_brown]
-        
+
                 """
             )
             return
         elif user_input == "?" or user_input == "help":
-
+            # Possibly store these in a file and read in here?
+            # That would likely increase maintainability
             if self.sql_mode:
                 rich.print(
                     "\tCommand [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n"
@@ -358,7 +500,17 @@ class CLI:
             else:
                 self.prompt_text = "....>"
 
-    def run(self):
+    def run(self) -> None:
+        """Run the CLI.
+
+        While there is no error,
+        this function uses the prompt_toolkit ``prompt`` to handle
+        completions, colouring, etc.
+        If an error occurs while hanndling input,
+        a message is printed to the terminal,
+        but the CLI is *NOT* aborted,
+        as this error is likely not critical.
+        """
         prql_keywords = [
             "select",
             "from",
@@ -396,7 +548,9 @@ class CLI:
                 self.has_one_blank = False
 
 
-def print_usage():
+def print_usage() -> None:
+    """Display example queries and commands as a help message."""
+    # Again, possibly change to reading from file?
     print(
         """
         Usage:
@@ -417,9 +571,9 @@ def print_usage():
         """
         Test Database:
             python cli.py chinook
-            python cli.py northwind        
+            python cli.py northwind
             python cli.py factbook
-    
+
         """
     )
 
@@ -428,7 +582,7 @@ def print_usage():
         Notes:
             The connection string syntax is detailed here https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
             To install database drivers, see https://docs.sqlalchemy.org/en/13/dialects/index.html
-    
+
             Mysql      : pip install mysqlclient
             Postgresql : pip install psycopg2-binary
             MariaDB    : pip install mariadb
@@ -439,6 +593,20 @@ def print_usage():
 
 
 def main(params: Optional[List[str]] = None) -> None:
+    """Serve the CLI entrypoint.
+
+    If ``params`` is left as it's default ``None``,
+    then ``params`` is set to ``sys.argv``.
+    If no parameters are passed,
+    then the help message is printed.
+    Otherwise,
+    a prompt is activated until a keyboard interrupt.
+
+    Parameters
+    ----------
+    params : Optional[List[str]], default None
+        The parameters passed to the CLI.
+    """
     if params is None:
         params = sys.argv
     try:

@@ -50,7 +50,9 @@ def form(session: Session) -> None:
 def lint(session: Session) -> None:
     """Lint files with flake8."""
     args = session.posargs or LOCATIONS
-    constrained_install(session, "flake8")
+    constrained_install(
+        session, "flake8", "flake8-annotations", "flake8-docstrings", "darglint"
+    )
     session.run("flake8", *args)
 
 
@@ -95,5 +97,6 @@ def tests(session: Session) -> None:
         "pytest-clarity",
         "pytest-sugar",
         "pytest-xdist",
+        "xdoctest",
     )
     session.run("pytest", *args)

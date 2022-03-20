@@ -1,8 +1,24 @@
 # -*- coding: utf-8 -*-
+"""The Python implementation of PRQL.
+
+Attributes
+----------
+this_module : ModuleType
+    The calling module.
+script_path : str
+    The path to the calling script.
+STDLIB_AST : Optional[Root]
+    Cache used for long running processes.
+GLOBAL_PARSER : Optional[Lark]
+    Cache used for long running processes.
+GLOBAL_TRANSFORMER : Optional[Transformer]
+    Cache used for long running processes.
+"""
 import os
 import sys
 from collections import defaultdict
 from dataclasses import dataclass
+from types import ModuleType
 from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 import lark
@@ -12,13 +28,13 @@ from icecream import ic
 from lark import Lark, Token, Transformer, ast_utils
 
 # Used for lark magic and prql.lark file loading
-this_module = sys.modules[__name__]
-script_path = os.path.dirname(__file__)
+this_module: ModuleType = sys.modules[__name__]
+script_path: str = os.path.dirname(__file__)
 
 # We cache these for longer running processes
-STDLIB_AST = None
-GLOBAL_PARSER = None
-GLOBAL_TRANSFORMER = None
+STDLIB_AST: Optional["Root"] = None
+GLOBAL_PARSER: Optional[Lark] = None
+GLOBAL_TRANSFORMER: Optional[Transformer] = None
 
 
 class _Ast(ast_utils.Ast):
