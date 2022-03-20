@@ -135,6 +135,7 @@ jobs:
         run: |
           git config --global user.name 'qorrect'
           git config --global user.email 'qorrect@users.noreply.github.com'
+          git pull
       - name: Python Semantic Release
         run: |
           semantic-release -v DEBUG publish
