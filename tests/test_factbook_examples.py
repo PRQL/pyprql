@@ -3,7 +3,7 @@ import sqlite3
 import unittest
 from pathlib import Path
 
-from pyprql import prql
+from pyprql.lang import prql
 
 
 class TestSQLGeneratorForFactbook(unittest.TestCase):
@@ -16,7 +16,7 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
     def run_query(self, text, expected):
         print(text.replace("\n\n", "\n"))
         print("-" * 40)
-        sql = prql.to_sql(text,True)
+        sql = prql.to_sql(text, True)
         print(sql)
         rows = TestSQLGeneratorForFactbook.cur.execute(sql)
         columns = [d[0] for d in rows.description]
@@ -131,7 +131,7 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         sort city_pop order:desc
         take 6
         """
-        sql = prql.to_sql(text,True)
+        sql = prql.to_sql(text, True)
         print(sql)
         self.run_query(text, 6)
 

@@ -29,7 +29,7 @@ take 20
 
 ```python
 
-from pyprql import prql
+from pyprql.lang import prql
 
 sql = prql.to_sql(q)
 print(sql)

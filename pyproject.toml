@@ -52,7 +52,7 @@ myst-parser = "^0.17.0"
 sphinx-rtd-theme = "^1.0.0"
 
 [tool.poetry.scripts]
-prql = "pyprql.cli:main"
+prql = "pyprql.cli.cli:main"
 
 [tool.semantic_release]
 branch = "main"

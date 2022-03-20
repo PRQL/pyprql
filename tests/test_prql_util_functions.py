@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from pyprql import prql
+from pyprql.lang import prql
 
 
 class TestSQLGeneratorForFactbook(unittest.TestCase):

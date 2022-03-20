@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from pyprql import prql
+from pyprql.lang import prql
 
 
 # ignore type# type: ignore[operator]

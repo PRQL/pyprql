@@ -463,7 +463,7 @@ class ToAst(Transformer):
 
 @enforce_types
 def read_file(filename: str, path: str = script_path) -> str:
-    with open(path + filename, "r") as f:
+    with open(path + os.sep + filename, "r") as f:
         x = f.read()
     return x
 
@@ -482,7 +482,7 @@ def parse(_text: str) -> Root:
     text = _text + "\n"
     if GLOBAL_PARSER is None:
         GLOBAL_PARSER = Lark(
-            read_file("/../resources/prql.lark"),
+            read_file("prql.lark"),
             start="root",
             parser="lalr",
             transformer=ToAst(),
@@ -501,7 +501,7 @@ def to_sql(prql: str, verbose: bool = False) -> str:
     if verbose:
         rich.print(ast)
     if STDLIB_AST is None:
-        STDLIB_AST = parse(read_file("/../resources/stdlib.prql"))
+        STDLIB_AST = parse(read_file("stdlib.prql"))
     return (
         ast_to_sql(ast.get_from(), [ast, STDLIB_AST], verbose=verbose)
         .replace("   ", " ")

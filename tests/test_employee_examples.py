@@ -3,7 +3,7 @@ import sqlite3
 import unittest
 from pathlib import Path
 
-from pyprql import prql
+from pyprql.lang import prql
 
 
 class TestEmployeeExamples(unittest.TestCase):

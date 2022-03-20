@@ -42,8 +42,8 @@ from pygments.token import (
 from rich.table import Table
 from sqlalchemy import create_engine, inspect
 
-import pyprql.prql as prql
-from pyprql.PRQLLexer import PRQLLexer
+import pyprql.lang.prql as prql
+from pyprql.cli.PRQLLexer import PRQLLexer
 
 bindings = KeyBindings()
 this_files_path = os.path.abspath(os.path.dirname(__file__))
@@ -256,7 +256,7 @@ class PRQLCompleter(Completer):
 class CLI:
     """The command line interface object."""
 
-    def __init__(self, connect_str: Optional[str] = "chinook") -> None:
+    def __init__(self, connect_str: Optional[str] = "") -> None:
         """Instantiate a CLI object.
 
         Parameters
@@ -279,10 +279,6 @@ class CLI:
         self.command = ""
         self.sql_mode = False
         self.connect_str = connect_str
-        if connect_str == "chinook":
-            connect_str = f"sqlite:///{this_files_path}/../resources/chinook.db"
-        elif connect_str == "factbook":
-            connect_str = f"sqlite:///{this_files_path}/../resources/factbook.db"
 
         rich.print(
             "Connecting to [pale_turquoise1]{}[/pale_turquoise1]".format(connect_str)
@@ -554,26 +550,24 @@ def print_usage() -> None:
     print(
         """
         Usage:
-            python cli.py connection_string"""
+            prql connection_string"""
     )
 
     print(
         """
         Examples:
-            python cli.py 'sqlite:///file.db'
-            python cli.py 'postgresql://user:password@localhost:5432/database'
-            python cli.py 'postgresql+psycopg2://user:password@localhost:5432/database'
-            python cli.py 'mysql://scott:tiger@localhost/foo'
+            prql 'sqlite:///file.db'
+            prql 'postgresql://user:password@localhost:5432/database'
+            prql 'postgresql+psycopg2://user:password@localhost:5432/database'
+            prql 'mysql://scott:tiger@localhost/foo'
             """
     )
 
     print(
         """
         Test Database:
-            python cli.py chinook
-            python cli.py northwind
-            python cli.py factbook
-
+            curl https://github.com/qorrect/PyPrql/blob/main/resources/chinook.db?raw=true -o chinook.db
+            prql 'sqlite:///chinook.db'
         """
     )
 
@@ -618,3 +612,6 @@ def main(params: Optional[List[str]] = None) -> None:
             sys.exit(0)
     except KeyboardInterrupt:
         sys.exit(0)
+
+if __name__ == "__main__":
+    main()
