@@ -466,10 +466,10 @@ def parse(_text: str) -> Root:
     text = _text + "\n"
     if GLOBAL_PARSER is None:
         GLOBAL_PARSER = Lark(
-                read_file("/../resources/prql.lark"),
-                start="root",
-                parser="lalr",
-                transformer=ToAst(),
+            read_file("/../resources/prql.lark"),
+            start="root",
+            parser="lalr",
+            transformer=ToAst(),
         )
     tree = GLOBAL_PARSER.parse(text)
 
