@@ -71,20 +71,18 @@
     operator: (OP_ADD | OP_SUB | OP_MUL | OP_DIV  | OP_EQ | OP_NE  | OP_LT | OP_GE | OP_LE | OP_GT)
     ?atom:  "(" expression ")" | value | piped_call
 
-
     OP_ADD: "+"
     OP_SUB: "-"
     OP_MUL: "*"
     OP_DIV: "/"
     OP_MOD: "%"
+    OP_COLON: ":"
     OP_EQ: "="
-    OP_NE: "!="
     OP_LT: "<"
     OP_GT: ">"
-
+    OP_NE: "!="
     OP_LE: "<="
     OP_GE: ">="
-    OP_COLON: ":"
 
     %import python (NAME, STRING, INTEGER)
     %import common (WS,INT,SIGNED_INT,NUMBER,SIGNED_NUMBER,FLOAT,SIGNED_FLOAT,ESCAPED_STRING)
