@@ -20,7 +20,7 @@ Usage:
 Examples:
 
 ```bash
-    prql 'sqlite:///chinook.dbg'
+    prql 'sqlite:///chinook.db'
 ```
 Try it out:
 
