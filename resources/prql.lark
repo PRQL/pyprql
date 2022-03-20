@@ -62,7 +62,6 @@
 
     piped_call: (name | "(" piped_call ")" ) "|" func_call
 
-
     value: name | STRING | NUMBER | SIGNED_NUMBER | FLOAT | SIGNED_FLOAT | SSTRING
     name.1: NAME ( "." NAME)*
 
