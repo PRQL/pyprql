@@ -515,7 +515,7 @@ class CLI:
 
 
 def print_usage() -> None:
-    print(prql.read_file("../assets/cli_usage.txt", this_files_path));
+    print(prql.read_file("../assets/cli_usage.txt", this_files_path))
 
 
 def main(params: Optional[List[str]] = None) -> None:
