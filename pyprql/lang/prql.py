@@ -19,7 +19,7 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from types import ModuleType
-from typing import Any, Callable, Dict, List, Optional, Type, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Type, Union
 
 import lark
 import rich
@@ -43,17 +43,19 @@ class _Ast(ast_utils.Ast):
 
 class _Statement(_Ast):
     @enforce_types
-    def assign_field(self, clazz: Type, values: List[Any]):
+    def assign_field(self, clazz: Type, values: List[Any]) -> Optional[Type]:
         for v in values:
             if isinstance(v, clazz):
                 return v
+        # Explicit statement of prior implicit behaviour to silence MyPy
+        return None
 
 
 @dataclass
 class Value(_Ast):
     value: str
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.value)
 
 
@@ -61,7 +63,7 @@ class Value(_Ast):
 class Name(_Ast, ast_utils.AsList):
     name: List[str]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return ".".join([str(x) for x in self.name])
 
 
@@ -69,7 +71,7 @@ class Name(_Ast, ast_utils.AsList):
 class Expression(_Ast, ast_utils.AsList):
     statements: List[_Ast]
 
-    def __str__(self):
+    def __str__(self) -> str:
         msg = ""
         for s in self.statements:
             msg += f"{s}"
@@ -78,31 +80,31 @@ class Expression(_Ast, ast_utils.AsList):
 
 
 class _JoinType(_Ast):
-    def __str__(self):
+    def __str__(self) -> str:
         return "JOIN"
 
 
 @dataclass
 class InnerJoin(_JoinType):
-    def __str__(self):
+    def __str__(self) -> Literal["INNER JOIN"]:
         return "INNER JOIN"
 
 
 @dataclass
 class LeftJoin(_JoinType):
-    def __str__(self):
+    def __str__(self) -> Literal["LEFT JOIN"]:
         return "LEFT JOIN"
 
 
 @dataclass
 class RightJoin(_JoinType):
-    def __str__(self):
+    def __str__(self) -> Literal["RIGHT JOIN"]:
         return "RIGHT JOIN"
 
 
 @dataclass
 class OuterJoin(_JoinType):
-    def __str__(self):
+    def __str__(self) -> Literal["OUTER JOIN"]:
         return "OUTER JOIN"
 
 
@@ -110,7 +112,7 @@ class OuterJoin(_JoinType):
 class JoinType(_JoinType):
     join_type: _JoinType
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.join_type is None:
             return "JOIN"
         else:
@@ -128,9 +130,9 @@ class Join(_Ast):
         self,
         name: Name,
         join_type: Optional[_JoinType] = None,
-        left_id: Name = None,
+        left_id: Optional[Name] = None,
         right_id: Optional[Name] = None,
-    ):
+    ) -> None:
         self.name = name
         self.join_type = join_type
 
@@ -159,7 +161,7 @@ class SelectField(_Ast):
     name: Name
     cast_type: Optional[Name] = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.cast_type is not None:
             return f"CAST({self.name} as {self.cast_type})"
         return str(self.name)
@@ -169,15 +171,15 @@ class SelectField(_Ast):
 class SelectFields(_Ast, ast_utils.AsList):
     fields: List[SelectField]
 
-    def __str__(self):
-        return [str(x) for x in self.fields]
+    def __str__(self) -> str:
+        return ",".join([str(x) for x in self.fields])
 
 
 @dataclass()
 class SortField(_Ast):
     name: Name
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.name)
 
 
@@ -185,7 +187,7 @@ class SortField(_Ast):
 class SortFields(_Ast, ast_utils.AsList):
     fields: List[SortField]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return ",".join([str(x) for x in self.fields])
 
 
@@ -193,7 +195,7 @@ class SortFields(_Ast, ast_utils.AsList):
 class PipeBody(_Ast):
     body: str
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.body)
 
 
@@ -201,7 +203,7 @@ class PipeBody(_Ast):
 class Select(_Ast):
     fields: SelectFields
 
-    def __str__(self):
+    def __str__(self) -> str:
         return ",".join([str(f) for f in self.fields.fields])
 
 
@@ -209,7 +211,7 @@ class Select(_Ast):
 class DeriveBody(_Ast):
     val: Union[str, Expression]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.val)
 
 
@@ -217,7 +219,7 @@ class DeriveBody(_Ast):
 class Operator(_Ast):
     op: Token
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.op.value
 
 
@@ -225,7 +227,7 @@ class Operator(_Ast):
 class GroupBy(_Ast, ast_utils.AsList):
     fields: List[str]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return ",".join([str(f) for f in self.fields])
 
 
@@ -233,7 +235,7 @@ class GroupBy(_Ast, ast_utils.AsList):
 class AggregateBody(_Ast, ast_utils.AsList):
     statements: List[_Ast]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{[str(s) for s in self.statements]}"
 
 
@@ -242,7 +244,9 @@ class Aggregate(_Statement):
     group_by: GroupBy
     aggregate_body: Optional[AggregateBody] = None
 
-    def __init__(self, group_by, aggregate_body=None):
+    def __init__(
+        self, group_by: GroupBy, aggregate_body: Optional[AggregateBody] = None
+    ) -> None:
         values = [group_by, aggregate_body]
         self.aggregate_body = self.assign_field(AggregateBody, values)
         self.group_by = self.assign_field(GroupBy, values)
@@ -253,7 +257,7 @@ class DeriveLine(_Ast):
     name: str
     expression: Expression
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.expression)
 
 
@@ -270,7 +274,7 @@ class _Direction(_Ast):
 class Direction(_Ast):
     direction: Optional[_Direction] = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.direction)
 
 
@@ -278,7 +282,7 @@ class Direction(_Ast):
 class Ascending(_Direction):
     direction = "ASC"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.direction
 
 
@@ -286,7 +290,7 @@ class Ascending(_Direction):
 class Descending(_Direction):
     direction = "DESC"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.direction
 
 
@@ -295,7 +299,7 @@ class Sort(_Ast):
     fields: SortFields
     direction: Optional[Direction] = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f'{str(self.fields)} {self.direction if self.direction is not None else ""}'
         )
@@ -306,7 +310,7 @@ class Take(_Ast):
     qty: str
     offset: Optional[str] = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         sql = f"LIMIT {self.qty}"
         if (
             self.offset is not None
@@ -327,7 +331,7 @@ class Filter(_Ast, ast_utils.AsList):
 class FilterLine(_Ast):
     val: Any = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.val)
 
 
@@ -341,14 +345,16 @@ class From(_Statement):
     name: str
     pipes: Optional[Pipes] = None
 
-    def __init__(self, name, pipes=None, join=None):
+    def __init__(
+        self, name: str, pipes: Optional[Pipes] = None, join: Optional[Join] = None
+    ) -> None:
         self.name = name
         values = [pipes, join]
 
         self.pipes = self.assign_field(Pipes, values)
         self.join = self.assign_field(Join, values)
 
-    def get_pipes(self):
+    def get_pipes(self) -> Optional[Pipes]:
         return self.pipes
 
 
@@ -356,7 +362,7 @@ class From(_Statement):
 class FuncArgs(_Ast, ast_utils.AsList):
     fields: Optional[List] = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return ",".join([str(x) for x in self.fields])
 
 
@@ -371,7 +377,12 @@ class FuncDef(_Statement):
     func_args: FuncArgs
     func_body: Optional[FuncBody] = None
 
-    def __init__(self, name, func_args=None, func_body=None):
+    def __init__(
+        self,
+        name: Name,
+        func_args: Optional[FuncArgs] = None,
+        func_body: Optional[FuncBody] = None,
+    ) -> None:
         self.name = name
         values = [func_args, func_body]
         self.func_args = self.assign_field(FuncArgs, values)
@@ -422,17 +433,23 @@ class Root(_Statement):
     value_defs: Optional[ValueDefs] = None
     func_defs: Optional[FuncDefs] = None
 
-    def __init__(self, with_def=None, _from=None, value_def=None, func_def=None):
+    def __init__(
+        self,
+        with_def: Optional[WithDef] = None,
+        _from: Optional[From] = None,
+        value_def: Optional[ValueDefs] = None,
+        func_def: Optional[FuncDefs] = None,
+    ) -> None:
         values = [with_def, _from, value_def, func_def]
         self.with_def = self.assign_field(WithDef, values)
         self._from = self.assign_field(From, values)
         self.value_defs = self.assign_field(ValueDefs, values)
         self.func_defs = self.assign_field(FuncDefs, values)
 
-    def get_from(self):
+    def get_from(self) -> Optional[From]:
         return self._from
 
-    def get_cte(self):
+    def get_cte(self) -> Optional[WithDef]:
         return self.with_def
 
 
@@ -442,22 +459,22 @@ class NameValuePair(_Ast):
     name: str
     value: str
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"({self.value})"
 
 
 class ToAst(Transformer):
-    def STRING(self, s):
+    def STRING(self, s: str) -> str:
         # Remove quotation marks
         return s  # s[1:-1]
 
-    def SSTRING(self, s):
+    def SSTRING(self, s: str) -> str:
         return s[2:-1]
 
-    def ESCAPED_STRING(self, s):
+    def ESCAPED_STRING(self, s: str) -> str:
         return s  # s.replace('\\"', '"').replace("\\'", "'")
 
-    def NEWLINE(self, s):
+    def NEWLINE(self, s: str) -> str:
         return s
 
 
@@ -560,14 +577,14 @@ def get_operation(
 
 
 @enforce_types
-def alias(s: str, n: int = 1):
+def alias(s: str, n: int = 1) -> str:
     return s + "_" + s[0:n]
 
 
 @enforce_types
 def replace_all_tables_standalone(
     from_long: str, from_short: str, join_long: List[str], join_short: List[str], s: str
-):
+) -> str:
     s = s.replace(f"{from_long}.", f"{from_short}.")
     if join_long and len(join_long) > 0:
         for i in range(len(join_long)):
@@ -578,8 +595,8 @@ def replace_all_tables_standalone(
 @enforce_types
 def wrap_replace_all_tables(
     from_long: str, from_short: str, join_long: List[str], join_short: List[str]
-) -> Callable:
-    def inner(x):
+) -> Callable[[str], str]:
+    def inner(x: str) -> str:
         return replace_all_tables_standalone(
             from_long, from_short, join_long, join_short, x
         )
@@ -600,8 +617,8 @@ def replace_tables_standalone(
 @enforce_types
 def wrap_replace_tables(
     from_long: str, from_short: str, join_long: str, join_short: str
-) -> Callable:
-    def inner(x):
+) -> Callable[[str], str]:
+    def inner(x: str) -> str:
         return replace_tables_standalone(
             from_long, from_short, join_long, join_short, x
         )
@@ -758,13 +775,20 @@ def safe_to_sql(
     roots: Union[Root, List],
     symbol_table: Optional[Dict] = None,  # Dict[str, List[_Ast]]
     verbose: bool = False,
-):
+) -> Optional[str]:
+    # Return must be Optional[str] as no else clause is provided.
+    # In python, this makes the check non-exhaustive, so the implicit None
+    # return is a possibility.
     if isinstance(rule, str):
         return rule
     elif isinstance(rule, Token) or isinstance(rule, Name):
         return str(rule)
     elif isinstance(rule, _Ast):
         return ast_to_sql(rule, roots, symbol_table, verbose)
+    # I've added the else clause explicitly to quiet mypy.
+    # This is just an explicit statement of previous behaviour.
+    else:
+        return None
 
 
 @enforce_types
@@ -773,7 +797,7 @@ def ast_to_sql(
     roots: Union[Root, List],
     symbol_table: Optional[Dict] = None,  # Optional[Dict[str, List[_Ast]]]
     verbose: bool = True,
-):
+) -> str:
     if isinstance(roots, Root):
         root = roots
     else:
