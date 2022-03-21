@@ -1,0 +1,16 @@
+                
+                    Command [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n
+                    Command [cornflower_blue bold]show columns {table}[/cornflower_blue bold]: To show all columns in a table.\n
+
+
+                
+                    Command [cornflower_blue bold]sql[/cornflower_blue bold]: Switch to SQL mode
+
+                
+                    Command [cornflower_blue bold]prql[/cornflower_blue bold]: Switch to PRQL mode
+
+                
+                    Command [cornflower_blue bold]<enter>[/cornflower_blue bold]: Hit enter twice to execute your query
+
+                
+                    Command [cornflower_blue bold]examples[/cornflower_blue bold]: Displays sql-to-prql examples for reference

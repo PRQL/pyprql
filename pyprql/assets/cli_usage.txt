@@ -1,0 +1,22 @@
+            Usage:
+                prql connection_string
+
+            Examples:
+                prql 'sqlite:///file.db'
+                prql 'postgresql://user:password@localhost:5432/database'
+                prql 'postgresql+psycopg2://user:password@localhost:5432/database'
+                prql 'mysql://scott:tiger@localhost/foo'
+
+            Try it out:
+                curl https://github.com/qorrect/PyPrql/blob/main/resources/chinook.db?raw=true -o chinook.db
+                prql 'sqlite:///chinook.db'
+
+            Notes:
+                The connection string syntax is detailed here https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
+                To install database drivers, see https://docs.sqlalchemy.org/en/13/dialects/index.html
+
+                Mysql      : pip install mysqlclient
+                Postgresql : pip install psycopg2-binary
+                MariaDB    : pip install mariadb
+                Oracle     : pip install cx_oracle
+                SQLite     : <built-in>

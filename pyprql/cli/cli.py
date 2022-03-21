@@ -43,6 +43,7 @@ from rich.table import Table
 from sqlalchemy import create_engine, inspect
 
 import pyprql.lang.prql as prql
+from pyprql import __version__ as pyprql_version
 from pyprql.cli.PRQLLexer import PRQLLexer
 
 bindings = KeyBindings()
@@ -94,38 +95,38 @@ class PRQLStyle(Style):
     line_number_color = "#aaaaaa"
 
     styles = {
-        Token: "#d0d0d0",
-        Whitespace: "#666666",
-        Comment: "italic #999999",
-        Comment.Preproc: "noitalic bold #cd2828",
-        Comment.Special: "noitalic bold #e50808 bg:#520000",
-        Keyword: "bold #6ab825",
-        Keyword.Pseudo: "nobold",
-        Operator.Word: "bold #6ab825",
-        String: "#ed9d13",
-        String.Other: "#ffa500",
-        Number: "#3677a9",
-        Name.Builtin: "#24909d",
-        Name.Variable: "#40ffff",
-        Name.Constant: "#40ffff",
-        Name.Class: "underline #447fcf",
-        Name.Function: "#447fcf",
-        Name.Namespace: "underline #447fcf",
-        Name.Exception: "#bbbbbb",
-        Name.Tag: "bold #6ab825",
-        Name.Attribute: "#bbbbbb",
-        Name.Decorator: "#ffa500",
-        Generic.Heading: "bold #ffffff",
-        Generic.Subheading: "underline #ffffff",
-        Generic.Deleted: "#d22323",
-        Generic.Inserted: "#589819",
-        Generic.Error: "#d22323",
-        Generic.Emph: "italic",
-        Generic.Strong: "bold",
-        Generic.Prompt: "#aaaaaa",
-        Generic.Output: "#cccccc",
-        Generic.Traceback: "#d22323",
-        Error: "bg:#e3d2d2 #a61717",
+            Token: "#d0d0d0",
+            Whitespace: "#666666",
+            Comment: "italic #999999",
+            Comment.Preproc: "noitalic bold #cd2828",
+            Comment.Special: "noitalic bold #e50808 bg:#520000",
+            Keyword: "bold #6ab825",
+            Keyword.Pseudo: "nobold",
+            Operator.Word: "bold #6ab825",
+            String: "#ed9d13",
+            String.Other: "#ffa500",
+            Number: "#3677a9",
+            Name.Builtin: "#24909d",
+            Name.Variable: "#40ffff",
+            Name.Constant: "#40ffff",
+            Name.Class: "underline #447fcf",
+            Name.Function: "#447fcf",
+            Name.Namespace: "underline #447fcf",
+            Name.Exception: "#bbbbbb",
+            Name.Tag: "bold #6ab825",
+            Name.Attribute: "#bbbbbb",
+            Name.Decorator: "#ffa500",
+            Generic.Heading: "bold #ffffff",
+            Generic.Subheading: "underline #ffffff",
+            Generic.Deleted: "#d22323",
+            Generic.Inserted: "#589819",
+            Generic.Error: "#d22323",
+            Generic.Emph: "italic",
+            Generic.Strong: "bold",
+            Generic.Prompt: "#aaaaaa",
+            Generic.Output: "#cccccc",
+            Generic.Traceback: "#d22323",
+            Error: "bg:#e3d2d2 #a61717",
     }
 
 
@@ -134,11 +135,11 @@ class PRQLCompleter(Completer):
 
     @enforce_types
     def __init__(
-        self,
-        table_names: List[str],
-        column_names: List[str],
-        column_map: Dict[str, List[str]],
-        prql_keywords: List[str],
+            self,
+            table_names: List[str],
+            column_names: List[str],
+            column_map: Dict[str, List[str]],
+            prql_keywords: List[str],
     ) -> None:
         """Initialise a completer instance.
 
@@ -166,7 +167,7 @@ class PRQLCompleter(Completer):
         self.previous_selection: Optional[List[str]] = None
 
     def get_completions(
-        self, document: Document, complete_event: CompleteEvent
+            self, document: Document, complete_event: CompleteEvent
     ) -> Iterable[Completion]:
         """Retrieve completion options.
 
@@ -186,15 +187,15 @@ class PRQLCompleter(Completer):
         word_before_cursor = document.get_word_before_cursor(WORD=True)
         completion_operators = ["[", "+", ",", ":"]
         possible_matches = {
-            "from": self.table_names,
-            "join": self.table_names,
-            "columns": self.table_names,
-            "select": self.column_names,
-            " ": self.column_names,
-            "sort": self.column_names,
-            "filter": self.column_names,
-            "show": ["tables", "columns", "connection"],
-            "exit": None,
+                "from": self.table_names,
+                "join": self.table_names,
+                "columns": self.table_names,
+                "select": self.column_names,
+                " ": self.column_names,
+                "sort": self.column_names,
+                "filter": self.column_names,
+                "show": ["tables", "columns", "connection"],
+                "exit": None,
         }
         for op in completion_operators:
             possible_matches[op] = self.column_names
@@ -206,15 +207,15 @@ class PRQLCompleter(Completer):
             self.previous_selection = selection
             # This can be reworked to a if not in operator. No pass required.
             if (
-                word_before_cursor == "from"
-                or word_before_cursor == "join"
-                or word_before_cursor == "sort"
-                or word_before_cursor == "select"
-                or word_before_cursor == "columns"
-                or word_before_cursor == "show"
-                or word_before_cursor == ","
-                or word_before_cursor == "["
-                or word_before_cursor == "filter"
+                    word_before_cursor == "from"
+                    or word_before_cursor == "join"
+                    or word_before_cursor == "sort"
+                    or word_before_cursor == "select"
+                    or word_before_cursor == "columns"
+                    or word_before_cursor == "show"
+                    or word_before_cursor == ","
+                    or word_before_cursor == "["
+                    or word_before_cursor == "filter"
             ):
                 pass
             else:
@@ -223,8 +224,8 @@ class PRQLCompleter(Completer):
 
         # If its an operator
         elif (
-            len(word_before_cursor) >= 1
-            and word_before_cursor[-1] in completion_operators
+                len(word_before_cursor) >= 1
+                and word_before_cursor[-1] in completion_operators
         ):
             selection = possible_matches[word_before_cursor[-1]]
             self.previous_selection = selection
@@ -239,7 +240,7 @@ class PRQLCompleter(Completer):
         # This goes back to the first if, this is the delayed completion finally completing
         elif self.previous_selection:
             selection = [
-                x for x in self.previous_selection if x.find(word_before_cursor) != -1
+                    x for x in self.previous_selection if x.find(word_before_cursor) != -1
             ]
             self.previous_selection = selection
 
@@ -281,7 +282,7 @@ class CLI:
         self.connect_str = connect_str
 
         rich.print(
-            "Connecting to [pale_turquoise1]{}[/pale_turquoise1]".format(connect_str)
+                "Connecting to [pale_turquoise1]{}[/pale_turquoise1]".format(connect_str)
         )
         self.engine = create_engine(connect_str)
         self.inspector = inspect(self.engine)
@@ -386,59 +387,28 @@ class CLI:
         _user_input : str
             The input given by the user at the CLI.
         """
-        # Thoughts on adding exit as a command here?
         user_input: str = _user_input.strip().rstrip(";")
         if user_input == "prql":
             self.sql_mode = False
             self.prompt_text = "PRQL> "
             return
+        elif user_input == "exit":
+            sys.exit(0)
         elif user_input == "examples":
-            # Possibly store these in a file and read in here?
             # That would likely increase maintainability
-            rich.print(
-                """
-                    [pale_turquoise1]SQL  : SELECT * from employees[/pale_turquoise1]
-                    [sandy_brown]PRQL : from employees[/sandy_brown]
-    
-                    [pale_turquoise1]SQL  : SELECT name, salary from employees WHERE salary > 100000[/pale_turquoise1]
-                    [sandy_brown]PRQL : from employees | select \[name,salary] | filter salary > 100000[/sandy_brown]
-    
-                    """
-            )
+            rich.print(prql.read_file("examples.txt", this_files_path))
             return
         elif user_input == "?" or user_input == "help":
-            # Possibly store these in a file and read in here?
-            # That would likely increase maintainability
+            rich.print("\nPyPRQL version: {}".format(pyprql_version))
+
             if self.sql_mode:
-                rich.print(
-                    "\tCommand [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n"
-                    + "\tCommand [cornflower_blue bold]show columns ${table}[/cornflower_blue bold]: To show all columns in a table.\n"
-                )
+                rich.print(prql.read_file("../assets/sql_mode_help.txt", this_files_path))
 
             else:
-                rich.print(
-                    "\tCommand [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n"
-                    + "\tCommand [cornflower_blue bold]show columns ${table}[/cornflower_blue bold]: To show all columns in a table.\n"
-                )
-
-                rich.print(
-                    "\tCommand [cornflower_blue bold]sql[/cornflower_blue bold]: Switch to SQL mode"
-                )
-                rich.print(
-                    "\tCommand [cornflower_blue bold]prql[/cornflower_blue bold]: Switch to PRQL mode"
-                )
-                rich.print(
-                    "\tCommand [cornflower_blue bold]<enter>[/cornflower_blue bold]: Hit enter twice to execute your query"
-                )
-                rich.print(
-                    "\n\tCommand [cornflower_blue bold]examples[/cornflower_blue bold]: Displays sql-to-prql examples for reference"
-                )
-
+                rich.print(prql.read_file("../assets/prql_mode_help.txt", this_files_path))
                 self.prompt_text = "PRQL> "
 
-            rich.print(
-                "\nPRQL Syntax documentation is here https://github.com/max-sixty/prql\n"
-            )
+            rich.print("\nPRQL Syntax documentation is here https://github.com/max-sixty/prql\n")
 
             return
         elif user_input == "sql":
@@ -455,7 +425,7 @@ class CLI:
             rich.print(table)
             return
         elif user_input.startswith("show columns"):
-            table_name = user_input["show columns ".__len__() :]
+            table_name = user_input["show columns ".__len__():]
             # tables = self.engine.list_tables()
             columns = self.inspector.get_columns(table_name)
             rich.print(columns)
@@ -487,7 +457,7 @@ class CLI:
                     rich.print("[pale_green3 bold]SQL:[/pale_green3 bold]")
                     print("\t" + self.highlight_sql(sql))
                     rich.print(
-                        "[medium_turquoise bold]Results:[/medium_turquoise bold]"
+                            "[medium_turquoise bold]Results:[/medium_turquoise bold]"
                     )
                     self.execute_sql(sql)
                     self.command = ""
@@ -508,36 +478,36 @@ class CLI:
         as this error is likely not critical.
         """
         prql_keywords = [
-            "select",
-            "from",
-            "filter",
-            "derive",
-            "aggregate",
-            "sort",
-            "take",
-            "order",
+                "select",
+                "from",
+                "filter",
+                "derive",
+                "aggregate",
+                "sort",
+                "take",
+                "order",
         ]
         while True:
             all_columns, columns_map = self.get_all_columns()
             user_input = prompt(
-                self.prompt_text,
-                history=FileHistory(".prql-history.txt"),
-                auto_suggest=AutoSuggestFromHistory(),
-                completer=PRQLCompleter(
-                    self.inspector.get_table_names(),
-                    all_columns,
-                    columns_map,
-                    prql_keywords,
-                ),
-                lexer=PygmentsLexer(PRQLLexer),
-                style=style_from_pygments_dict(PRQLStyle.styles),
-                bottom_toolbar=bottom_toolbar,
+                    self.prompt_text,
+                    history=FileHistory(".prql-history.txt"),
+                    auto_suggest=AutoSuggestFromHistory(),
+                    completer=PRQLCompleter(
+                            self.inspector.get_table_names(),
+                            all_columns,
+                            columns_map,
+                            prql_keywords,
+                    ),
+                    lexer=PygmentsLexer(PRQLLexer),
+                    style=style_from_pygments_dict(PRQLStyle.styles),
+                    bottom_toolbar=bottom_toolbar,
             )
             try:
                 self.handle_input(user_input)
             except Exception as e:
                 print(
-                    f"Exception when handling the input: {e},{repr(e)}\nContinuing..."
+                        f"Exception when handling the input: {e},{repr(e)}\nContinuing..."
                 )
                 self.command = ""
                 self.prompt_text = "PRQL> "
@@ -545,45 +515,7 @@ class CLI:
 
 
 def print_usage() -> None:
-    """Display example queries and commands as a help message."""
-    # Again, possibly change to reading from file?
-    print(
-        """
-            Usage:
-                prql connection_string"""
-    )
-
-    print(
-        """
-            Examples:
-                prql 'sqlite:///file.db'
-                prql 'postgresql://user:password@localhost:5432/database'
-                prql 'postgresql+psycopg2://user:password@localhost:5432/database'
-                prql 'mysql://scott:tiger@localhost/foo'
-                """
-    )
-
-    print(
-        """
-            Try it out:
-                curl https://github.com/qorrect/PyPrql/blob/main/resources/chinook.db?raw=true -o chinook.db
-                prql 'sqlite:///chinook.db'
-            """
-    )
-
-    print(
-        """
-            Notes:
-                The connection string syntax is detailed here https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
-                To install database drivers, see https://docs.sqlalchemy.org/en/13/dialects/index.html
-    
-                Mysql      : pip install mysqlclient
-                Postgresql : pip install psycopg2-binary
-                MariaDB    : pip install mariadb
-                Oracle     : pip install cx_oracle
-                SQLite     : <built-in>
-            """
-    )
+    print(prql.read_file("../assets/cli_usage.txt", this_files_path));
 
 
 def main(params: Optional[List[str]] = None) -> None:
