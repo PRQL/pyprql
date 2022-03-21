@@ -1,15 +1,15 @@
             Usage:
-                prql connection_string
+                pyprql connection_string
 
             Examples:
-                prql 'sqlite:///file.db'
-                prql 'postgresql://user:password@localhost:5432/database'
-                prql 'postgresql+psycopg2://user:password@localhost:5432/database'
-                prql 'mysql://scott:tiger@localhost/foo'
+                pyprql 'sqlite:///file.db'
+                pyprql 'postgresql://user:password@localhost:5432/database'
+                pyprql 'postgresql+psycopg2://user:password@localhost:5432/database'
+                pyprql 'mysql://scott:tiger@localhost/foo'
 
             Try it out:
                 curl https://github.com/qorrect/PyPrql/blob/main/resources/chinook.db?raw=true -o chinook.db
-                prql 'sqlite:///chinook.db'
+                pyprql 'sqlite:///chinook.db'
 
             Notes:
                 The connection string syntax is detailed here https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
