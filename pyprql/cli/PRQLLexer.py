@@ -51,7 +51,7 @@ class PRQLLexer(RegexLexer):
         "-",
         "-=",
         "%",
-        "\\"
+        "\\",
     )
 
     reservedWords = words(
