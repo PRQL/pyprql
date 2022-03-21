@@ -1,16 +1,16 @@
-                
-                    Command [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.\n
-                    Command [cornflower_blue bold]show columns {table}[/cornflower_blue bold]: To show all columns in a table.\n
 
+Commands:
+    Command [cornflower_blue bold]show tables[/cornflower_blue bold] or [cornflower_blue bold]\dt[/cornflower_blue bold]: To show all tables in the database.
+    Command [cornflower_blue bold]show columns {table}[/cornflower_blue bold] or [cornflower_blue bold]\d+[/cornflower_blue bold]: To show all columns in a table.
 
-                
-                    Command [cornflower_blue bold]sql[/cornflower_blue bold]: Switch to SQL mode
+    Command [cornflower_blue bold]sql[/cornflower_blue bold]: Switch to SQL mode
+    Command [cornflower_blue bold]prql[/cornflower_blue bold]: Switch to PRQL mode
+    Command [cornflower_blue bold]<enter>[/cornflower_blue bold]: Hit enter twice to execute your query
 
-                
-                    Command [cornflower_blue bold]prql[/cornflower_blue bold]: Switch to PRQL mode
+    Command [cornflower_blue bold]examples[/cornflower_blue bold]: Displays sql-to-prql examples for reference
 
-                
-                    Command [cornflower_blue bold]<enter>[/cornflower_blue bold]: Hit enter twice to execute your query
-
-                
-                    Command [cornflower_blue bold]examples[/cornflower_blue bold]: Displays sql-to-prql examples for reference
+Editor:
+    Key [cornflower_blue bold]tab[/cornflower_blue bold] completes auto complete suggestions ( [white bold]from a list[/white bold] )
+    Key [cornflower_blue bold]Ctrl+f[/cornflower_blue bold] completes history ( [light_slate_gray]in grey[/light_slate_gray] )
+    Key [cornflower_blue bold]Up and Down[/cornflower_blue bold] navigates the history
+    Key [cornflower_blue bold]Ctrl+a/Ctrl+e[/cornflower_blue bold] home / end , ( emacs keybindings )
