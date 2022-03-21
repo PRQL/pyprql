@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.0 (2022-03-20)
+### Feature
+* Restructuring for redistribution ([`29b75bf`](https://github.com/qorrect/PyPrql/commit/29b75bf6f38adb213e4b4443672dee3dea15f388))
+
+### Fix
+* Fixing imports ([`1031cce`](https://github.com/qorrect/PyPrql/commit/1031cce38abdf704aec63a637ccadccd1429c670))
+* Clean-up for redistribution ([`e8080d4`](https://github.com/qorrect/PyPrql/commit/e8080d4bf8b39a2a043820a8d8f58f2070b03fd0))
+* Fixing imports for redistribution ([`896234a`](https://github.com/qorrect/PyPrql/commit/896234a288e22e922d9b89d368ed76b51ec13762))
+
 ## v0.1.2 (2022-03-20)
 ### Documentation
 * **cli.py:** Add docstrings throughout ([`fd28c49`](https://github.com/qorrect/PyPrql/commit/fd28c49f71a88b34ddac478f929142a1a33446cc))
