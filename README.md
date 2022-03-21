@@ -14,19 +14,19 @@ Documentation of PRQL is at https://github.com/max-sixty/prql
 Usage:
 
 ```bash
-    prql 'connection_string'
-    prql 'postgresql://user:password@localhost:5432/database'    
+    pyprql 'connection_string'
+    pyprql 'postgresql://user:password@localhost:5432/database'    
 ```
 Examples:
 
 ```bash
-    prql 'sqlite:///chinook.db'
+    pyprql 'sqlite:///chinook.db'
 ```
 Try it out:
 
 ```
 curl https://github.com/qorrect/PyPrql/blob/main/resources/chinook.db?raw=true -o chinook.db 
-prql "sqlite:///chinook.db"
+pyprql "sqlite:///chinook.db"
 
 PRQL> show tables 
 ```
