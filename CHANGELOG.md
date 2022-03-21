@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.3 (2022-03-21)
+### Fix
+* Fixes examples command in the cli ([`30d2b2f`](https://github.com/qorrect/PyPrql/commit/30d2b2f27e4bf64d59d64f8f4fa566a2c8111e6b))
+
 ## v0.2.2 (2022-03-21)
 ### Fix
 * Fixes inline documentation and bottom toolbar of CLI ([`b5d32d5`](https://github.com/qorrect/PyPrql/commit/b5d32d5f0bccb131e090b63617844666e646ff6c))
