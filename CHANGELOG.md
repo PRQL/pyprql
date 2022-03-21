@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.2 (2022-03-21)
+### Fix
+* Fixes inline documentation and bottom toolbar of CLI ([`b5d32d5`](https://github.com/qorrect/PyPrql/commit/b5d32d5f0bccb131e090b63617844666e646ff6c))
+
 ## v0.2.1 (2022-03-21)
 ### Fix
 * Changing cli name to pyprql to prevent name collision with prql proper - fixing lint ([`22fd6bd`](https://github.com/qorrect/PyPrql/commit/22fd6bdcc22a647cc5b10533620b74fd03cd74cf))
