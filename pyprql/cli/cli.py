@@ -7,7 +7,7 @@ bindings : KeyBindings
     A container for key bindings.
 this_files_path : str
     The Path to this file.
-    """
+"""
 import os
 import sys
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -532,6 +532,7 @@ class CLI:
 
 
 def print_usage() -> None:
+    """Prints the usage information for the CLI."""
     print(prql.read_file("../assets/cli_usage.txt", this_files_path))
 
 
