@@ -1,5 +1,5 @@
-                    [pale_turquoise1]SQL  : SELECT * from employees[/pale_turquoise1]
+                    SQL  : SELECT * from employees
                     [sandy_brown]PRQL : from employees[/sandy_brown]
 
-                    [pale_turquoise1]SQL  : SELECT name, salary from employees WHERE salary > 100000[/pale_turquoise1]
+                    SQL  : SELECT name, salary from employees WHERE salary > 100000
                     [sandy_brown]PRQL : from employees | select \[name,salary] | filter salary > 100000[/sandy_brown]

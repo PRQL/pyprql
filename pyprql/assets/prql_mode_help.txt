@@ -16,3 +16,4 @@ Editor:
       Key   [tan bold]Ctrl+a/Ctrl+e[/tan bold] home / end , ( emacs keybindings )
       Key   [tan bold]Ctrl+k[/tan bold] kill line forward from cursor
       Key   [tan bold]Ctrl+l[/tan bold] clear screen
+      Key   [tan bold]Alt+backspace[/tan bold] backward delete word
