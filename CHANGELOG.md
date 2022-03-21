@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.1 (2022-03-21)
+### Fix
+* Changing cli name to pyprql to prevent name collision with prql proper - fixing lint ([`22fd6bd`](https://github.com/qorrect/PyPrql/commit/22fd6bdcc22a647cc5b10533620b74fd03cd74cf))
+* Changing cli name to pyprql to prevent name collision with prql proper ([`8125fff`](https://github.com/qorrect/PyPrql/commit/8125fff32bf1c351ca64825bed763f83fa88b639))
+
+### Documentation
+* Updating README ([`b84e771`](https://github.com/qorrect/PyPrql/commit/b84e771d242d91ef42f25492420c5bc08aef124b))
+
 ## v0.2.0 (2022-03-20)
 ### Feature
 * Restructuring for redistribution ([`29b75bf`](https://github.com/qorrect/PyPrql/commit/29b75bf6f38adb213e4b4443672dee3dea15f388))
