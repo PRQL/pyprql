@@ -396,7 +396,7 @@ class CLI:
             sys.exit(0)
         elif user_input == "examples":
             # That would likely increase maintainability
-            rich.print(prql.read_file("examples.txt", this_files_path))
+            rich.print(prql.read_file("../assets/examples.txt", this_files_path))
             return
         elif user_input == "?" or user_input == "help":
             rich.print("PyPRQL version: {}".format(pyprql_version))

@@ -10,7 +10,9 @@ Commands:
     Command [cornflower_blue bold]examples[/cornflower_blue bold]: Displays sql-to-prql examples for reference
 
 Editor:
-    Key [cornflower_blue bold]tab[/cornflower_blue bold] completes auto complete suggestions ( [white bold]from a list[/white bold] )
-    Key [cornflower_blue bold]Ctrl+f[/cornflower_blue bold] completes history ( [light_slate_gray]in grey[/light_slate_gray] )
-    Key [cornflower_blue bold]Up and Down[/cornflower_blue bold] navigates the history
-    Key [cornflower_blue bold]Ctrl+a/Ctrl+e[/cornflower_blue bold] home / end , ( emacs keybindings )
+      Key   [tan bold]tab[/tan bold] completes auto complete suggestions ( [white bold]from a list[/white bold] )
+      Key   [tan bold]Alt+f[/tan bold] completes history ( [light_slate_gray]in grey[/light_slate_gray] )
+      Key   [tan bold]Up and Down[/tan bold] navigates the history
+      Key   [tan bold]Ctrl+a/Ctrl+e[/tan bold] home / end , ( emacs keybindings )
+      Key   [tan bold]Ctrl+k[/tan bold] kill line forward from cursor
+      Key   [tan bold]Ctrl+l[/tan bold] clear screen
