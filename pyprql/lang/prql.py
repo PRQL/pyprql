@@ -79,6 +79,7 @@ class Expression(_Ast, ast_utils.AsList):
         return msg
 
 
+@dataclass
 class _JoinType(_Ast):
     def __str__(self) -> str:
         return "JOIN"
@@ -126,34 +127,17 @@ class Join(_Ast):
     left_id: Optional[Name] = None  # Has to have a default argument now
     right_id: Optional[Name] = None
 
-    def __init__(
-        self,
-        name: Name,
-        join_type: Optional[_JoinType] = None,
-        left_id: Optional[Name] = None,
-        right_id: Optional[Name] = None,
-    ) -> None:
-        self.name = name
-        self.join_type = join_type
-
+    def __post_init__(self) -> None:
         if isinstance(self.name, JoinType):
             temp = self.join_type
             self.join_type = self.name
             self.name = temp  # type: ignore[assignment]
-
         if isinstance(self.join_type, Name):
             # Now we need to shift everything , since join_type is now our left_id
-
-            temp = left_id
+            temp = self.left_id
             self.left_id = self.join_type
             self.right_id = temp
             self.join_type = None
-        else:
-            self.left_id = left_id
-            self.right_id = right_id
-
-        # self.left_id = left_id
-        # self.right_id = right_id
 
 
 @dataclass
@@ -239,11 +223,7 @@ class AggregateBody(_Ast, ast_utils.AsList):
         return f"{[str(s) for s in self.statements]}"
 
 
-@dataclass
 class Aggregate(_Statement):
-    group_by: GroupBy
-    aggregate_body: Optional[AggregateBody] = None
-
     def __init__(
         self, group_by: GroupBy, aggregate_body: Optional[AggregateBody] = None
     ) -> None:
@@ -340,17 +320,12 @@ class Pipes(_Ast, ast_utils.AsList):
     operations: List[_Ast]
 
 
-@dataclass
 class From(_Statement):
-    name: str
-    pipes: Optional[Pipes] = None
-
     def __init__(
         self, name: str, pipes: Optional[Pipes] = None, join: Optional[Join] = None
     ) -> None:
         self.name = name
         values = [pipes, join]
-
         self.pipes = self.assign_field(Pipes, values)
         self.join = self.assign_field(Join, values)
 
@@ -371,12 +346,7 @@ class FuncBody(_Ast, ast_utils.AsList):
     fields: List[str]
 
 
-@dataclass
 class FuncDef(_Statement):
-    name: Name
-    func_args: FuncArgs
-    func_body: Optional[FuncBody] = None
-
     def __init__(
         self,
         name: Name,
@@ -426,13 +396,7 @@ class WithDef(_Ast):
 
 
 # The top level definition that holds all other definitions
-@dataclass
 class Root(_Statement):
-    with_def: Optional[WithDef] = None
-    _from: Optional[From] = None
-    value_defs: Optional[ValueDefs] = None
-    func_defs: Optional[FuncDefs] = None
-
     def __init__(
         self,
         with_def: Optional[WithDef] = None,
