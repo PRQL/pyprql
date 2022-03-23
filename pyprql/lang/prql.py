@@ -491,8 +491,8 @@ def to_sql(prql: str, verbose: bool = False) -> str:
         STDLIB_AST = parse(read_file("stdlib.prql"))
     return (
             ast_to_sql(ast.get_from(), [ast, STDLIB_AST], verbose=verbose)
-                .replace("   ", " ")
-                .replace("  ", " ")
+            .replace("   ", " ")
+            .replace("  ", " ")
     )
 
 
