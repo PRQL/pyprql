@@ -5,7 +5,7 @@
 
     value_def: "value" NAME "=" "(" from ")"
     with_def: "table" NAME "=" "(" from ")"
-    from: "from" NAME "|"?  pipes
+    from: "from" NAME "|"? pipes
 
     pipes: ((join | select | derive | filter | sort | take| aggregate) ("|")? )*
     join: "join"  ( "side" ":" join_type)? name "[" name ("=" name)? "]"
@@ -15,9 +15,8 @@
     right_join: "right"
     outer_join: "outer"
 
-    aggregate: "aggregate"  \
-            ("by" ":" ("[" group_by "]"| group_by) )? \
-            "["? aggregate_body "]"?
+    aggregate: "aggregate" ["by" ":" ("[" group_by "]"| group_by)] "["? aggregate_body "]"?
+
     group_by: name ("," name)*
     aggregate_body: ( (NAME ":")?  pipe_body)? \
              ( "," ((NAME ":")?  pipe_body))*
@@ -50,9 +49,9 @@
     derive_body: (ESCAPED_STRING|expression)
     expression:  atom | atom operator atom
 
-    func_def: "func" NAME (func_args)? "=" "("? func_body ")"?
+    func_def: "func" NAME [func_args] "=" "("? func_body ")"?
     func_args: ((NAME " ")* NAME)*
-    func_body: pipe_body ("," pipe_body)*
+    func_body: expression ("," expression)*
 
     func_call:  NAME | \
                 NAME value | \

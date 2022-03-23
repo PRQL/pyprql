@@ -25,7 +25,7 @@ from typing import Any, Callable, Dict, List, Optional, Type, Union
 try:
     from typing import Literal
 except ImportError:
-    from typing_extensions import Literal
+    from typing_extensions import Literal  # type: ignore
 
 import lark
 import rich
@@ -45,16 +45,6 @@ GLOBAL_TRANSFORMER: Optional[Transformer] = None
 
 class _Ast(ast_utils.Ast):
     pass
-
-
-class _Statement(_Ast):
-    @enforce_types
-    def assign_field(self, clazz: Type, values: List[Any]) -> Optional[Type]:
-        for v in values:
-            if isinstance(v, clazz):
-                return v
-        # Explicit statement of prior implicit behaviour to silence MyPy
-        return None
 
 
 @dataclass
@@ -229,13 +219,10 @@ class AggregateBody(_Ast, ast_utils.AsList):
         return f"{[str(s) for s in self.statements]}"
 
 
-class Aggregate(_Statement):
-    def __init__(
-            self, group_by: GroupBy, aggregate_body: Optional[AggregateBody] = None
-    ) -> None:
-        values = [group_by, aggregate_body]
-        self.aggregate_body = self.assign_field(AggregateBody, values)
-        self.group_by = self.assign_field(GroupBy, values)
+@dataclass
+class Aggregate(_Ast):
+    group_by: Optional[GroupBy] = None
+    aggregate_body: Optional[AggregateBody] = None
 
 
 @dataclass
@@ -287,7 +274,7 @@ class Sort(_Ast):
 
     def __str__(self) -> str:
         return (
-                f'{str(self.fields)} {self.direction if self.direction is not None else ""}'
+            f'{str(self.fields)} {self.direction if self.direction is not None else ""}'
         )
 
 
@@ -299,9 +286,9 @@ class Take(_Ast):
     def __str__(self) -> str:
         sql = f"LIMIT {self.qty}"
         if (
-                self.offset is not None
-                and self.offset
-                and isinstance(self.offset, lark.lexer.Token)
+            self.offset is not None
+            and self.offset
+            and isinstance(self.offset, lark.lexer.Token)
         ):
             sql += f" OFFSET {self.offset} "
         return sql
@@ -326,17 +313,10 @@ class Pipes(_Ast, ast_utils.AsList):
     operations: List[_Ast]
 
 
-class From(_Statement):
-    def __init__(
-            self, name: str, pipes: Optional[Pipes] = None, join: Optional[Join] = None
-    ) -> None:
-        self.name = name
-        values = [pipes, join]
-        self.pipes = self.assign_field(Pipes, values)
-        self.join = self.assign_field(Join, values)
-
-    def get_pipes(self) -> Optional[Pipes]:
-        return self.pipes
+@dataclass
+class From(_Ast):
+    name: Optional[Name] = None
+    pipes: Optional[Pipes] = None
 
 
 @dataclass
@@ -352,17 +332,11 @@ class FuncBody(_Ast, ast_utils.AsList):
     fields: List[str]
 
 
-class FuncDef(_Statement):
-    def __init__(
-            self,
-            name: Name,
-            func_args: Optional[FuncArgs] = None,
-            func_body: Optional[FuncBody] = None,
-    ) -> None:
-        self.name = name
-        values = [func_args, func_body]
-        self.func_args = self.assign_field(FuncArgs, values)
-        self.func_body = self.assign_field(FuncBody, values)
+@dataclass
+class FuncDef(_Ast):
+    name: Name
+    func_args: Optional[FuncArgs] = None
+    func_body: Optional[FuncBody] = None
 
 
 @dataclass
@@ -402,13 +376,13 @@ class WithDef(_Ast):
 
 
 # The top level definition that holds all other definitions
-class Root(_Statement):
+class Root(_Ast):
     def __init__(
-            self,
-            with_def: Optional[WithDef] = None,
-            _from: Optional[From] = None,
-            value_def: Optional[ValueDefs] = None,
-            func_def: Optional[FuncDefs] = None,
+        self,
+        with_def: Optional[WithDef] = None,
+        _from: Optional[From] = None,
+        value_def: Optional[ValueDefs] = None,
+        func_def: Optional[FuncDefs] = None,
     ) -> None:
         values = [with_def, _from, value_def, func_def]
         self.with_def = self.assign_field(WithDef, values)
@@ -421,6 +395,14 @@ class Root(_Statement):
 
     def get_cte(self) -> Optional[WithDef]:
         return self.with_def
+
+    @enforce_types
+    def assign_field(self, clazz: Type, values: List[Any]) -> Optional[Type]:
+        for v in values:
+            if isinstance(v, clazz):
+                return v
+        # Explicit statement of prior implicit behaviour to silence MyPy
+        return None
 
 
 # This is a helper class, its not actually parsed
@@ -456,26 +438,20 @@ def read_file(filename: str, path: str = script_path) -> str:
 
 
 @enforce_types
-def get_func_str(func: Optional[str]) -> str:
-    if func == "average":
-        return "avg"
-    return func if isinstance(func, str) else str(func)
-
-
-@enforce_types
-def parse(_text: str) -> Root:
+def parse(_text: str, verbose: bool = False) -> Root:
     global GLOBAL_PARSER
     global GLOBAL_TRANSFORMER
     text = _text + "\n"
     if GLOBAL_PARSER is None:
         GLOBAL_PARSER = Lark(
-                read_file("prql.lark"),
-                start="root",
-                parser="lalr",
-                transformer=ToAst(),
+            read_file("prql.lark"),
+            start="root",
+            parser="lalr",
+            transformer=ToAst(),
         )
     tree = GLOBAL_PARSER.parse(text)
-
+    if verbose:
+        rich.print(tree)
     if GLOBAL_TRANSFORMER is None:
         GLOBAL_TRANSFORMER = ast_utils.create_transformer(this_module, ToAst())
     return GLOBAL_TRANSFORMER.transform(tree)
@@ -484,15 +460,16 @@ def parse(_text: str) -> Root:
 @enforce_types
 def to_sql(prql: str, verbose: bool = False) -> str:
     global STDLIB_AST
-    ast = parse(prql)
+    ast = parse(prql, verbose)
     if verbose:
         rich.print(ast)
     if STDLIB_AST is None:
         STDLIB_AST = parse(read_file("stdlib.prql"))
+    # @formatter:off
     return (
-            ast_to_sql(ast.get_from(), [ast, STDLIB_AST], verbose=verbose)
-                .replace("   ", " ")
-                .replace("  ", " ")
+        ast_to_sql(ast.get_from(), [ast, STDLIB_AST], verbose=verbose)
+        .replace("   ", " ")
+        .replace("  ", " ")
     )
 
 
@@ -503,12 +480,12 @@ def pretty_print(root: Root) -> None:
 
 @enforce_types
 def get_operation(
-        ops: List[_Ast],
-        class_type: Type[_Ast],
-        last_match: bool = False,
-        return_all: bool = False,
-        before: Type = None,
-        after: Type = None,
+    ops: List[_Ast],
+    class_type: Type[_Ast],
+    last_match: bool = False,
+    return_all: bool = False,
+    before: Type = None,
+    after: Type = None,
 ) -> Union[List, _Ast]:
     ops_list = ops
     ret = []
@@ -553,7 +530,7 @@ def alias(s: str, n: int = 1) -> str:
 
 @enforce_types
 def replace_all_tables_standalone(
-        from_long: str, from_short: str, join_long: List[str], join_short: List[str], s: str
+    from_long: str, from_short: str, join_long: List[str], join_short: List[str], s: str
 ) -> str:
     s = s.replace(f"{from_long}.", f"{from_short}.")
     if join_long and len(join_long) > 0:
@@ -564,11 +541,11 @@ def replace_all_tables_standalone(
 
 @enforce_types
 def wrap_replace_all_tables(
-        from_long: str, from_short: str, join_long: List[str], join_short: List[str]
+    from_long: str, from_short: str, join_long: List[str], join_short: List[str]
 ) -> Callable[[str], str]:
     def inner(x: str) -> str:
         return replace_all_tables_standalone(
-                from_long, from_short, join_long, join_short, x
+            from_long, from_short, join_long, join_short, x
         )
 
     return inner
@@ -576,7 +553,7 @@ def wrap_replace_all_tables(
 
 @enforce_types
 def replace_tables_standalone(
-        from_long: str, from_short: str, join_long: str, join_short: str, s: str
+    from_long: str, from_short: str, join_long: str, join_short: str, s: str
 ) -> str:
     s = s.replace(f"{from_long}.", f"{from_short}.")
     if join_long:
@@ -586,11 +563,11 @@ def replace_tables_standalone(
 
 @enforce_types
 def wrap_replace_tables(
-        from_long: str, from_short: str, join_long: str, join_short: str
+    from_long: str, from_short: str, join_long: str, join_short: str
 ) -> Callable[[str], str]:
     def inner(x: str) -> str:
         return replace_tables_standalone(
-                from_long, from_short, join_long, join_short, x
+            from_long, from_short, join_long, join_short, x
         )
 
     return inner
@@ -605,14 +582,14 @@ def build_symbol_table(roots: List[Root]) -> Dict[str, List[_Ast]]:
             table[str(n.name)].append(n)
         for n in root.func_defs.fields:
             table[str(n.name)].append(n)
-        if root.get_from().get_pipes():
+        if root.get_from().pipes:
             derives = get_operation(
-                    root.get_from().get_pipes().operations, Derive, return_all=True
+                root.get_from().pipes.operations, Derive, return_all=True
             )
             for d in derives:
                 for line in d.fields:
                     table[str(line.name)].append(
-                            NameValuePair(str(line.name), line.expression)
+                        NameValuePair(str(line.name), line.expression)
                     )
     return table
 
@@ -653,9 +630,9 @@ def replace_variables(_param: Any, symbol_table: Dict[str, List[_Ast]]) -> str:
 
 @enforce_types
 def execute_function(
-        f: FuncCall,
-        roots: Union[Root, List],
-        symbol_table: Dict[str, List[_Ast]],
+    f: FuncCall,
+    roots: Union[Root, List],
+    symbol_table: Dict[str, List[_Ast]],
 ) -> str:
     msg = ""
     name = str(f.name)
@@ -680,25 +657,33 @@ def execute_function(
             for line in func_def.func_body.fields:
                 if isinstance(line, PipeBody):
                     line = line.body
+                if isinstance(line, Expression):
+                    exp: Expression = line
+                    if len(exp.statements) != 1:
+                        raise PRQLException(
+                            "Currently only single statement functions that are text based are supported"
+                        )
+                    else:
+                        line = str(exp.statements[0])
                 if type(line) == str:
                     args = {}
 
                     vals = [
-                            safe_to_sql(
-                                    replace_variables(f.parm1, symbol_table),
-                                    roots,
-                                    symbol_table,
-                            ),
-                            safe_to_sql(
-                                    replace_variables(f.parm2, symbol_table),
-                                    roots,
-                                    symbol_table,
-                            ),
-                            safe_to_sql(
-                                    replace_variables(f.parm3, symbol_table),
-                                    roots,
-                                    symbol_table,
-                            ),
+                        safe_to_sql(
+                            replace_variables(f.parm1, symbol_table),
+                            roots,
+                            symbol_table,
+                        ),
+                        safe_to_sql(
+                            replace_variables(f.parm2, symbol_table),
+                            roots,
+                            symbol_table,
+                        ),
+                        safe_to_sql(
+                            replace_variables(f.parm3, symbol_table),
+                            roots,
+                            symbol_table,
+                        ),
                     ]
 
                     if func_def.func_args is not None:
@@ -741,10 +726,10 @@ def get_function_parm_count(f: Union[FuncCall, FuncDef]) -> int:
 
 @enforce_types
 def safe_to_sql(
-        rule: Any,
-        roots: Union[Root, List],
-        symbol_table: Optional[Dict] = None,  # Dict[str, List[_Ast]]
-        verbose: bool = False,
+    rule: Any,
+    roots: Union[Root, List],
+    symbol_table: Optional[Dict] = None,  # Dict[str, List[_Ast]]
+    verbose: bool = False,
 ) -> Optional[str]:
     # Return must be Optional[str] as no else clause is provided.
     # In python, this makes the check non-exhaustive, so the implicit None
@@ -763,10 +748,10 @@ def safe_to_sql(
 
 @enforce_types
 def ast_to_sql(
-        rule: Union[_Ast, Token],
-        roots: Union[Root, List],
-        symbol_table: Optional[Dict] = None,  # Optional[Dict[str, List[_Ast]]]
-        verbose: bool = True,
+    rule: Union[_Ast, Token],
+    roots: Union[Root, List],
+    symbol_table: Optional[Dict] = None,  # Optional[Dict[str, List[_Ast]]]
+    verbose: bool = True,
 ) -> str:
     if isinstance(roots, Root):
         root = roots
@@ -798,20 +783,20 @@ def ast_to_sql(
         ###
 
         _from = rule
-        ops = _from.get_pipes()
+        ops = _from.pipes
         joins: List[Join] = get_operation(ops.operations, Join, return_all=True)
         agg: Aggregate = get_operation(ops.operations, Aggregate)
         take: Take = get_operation(ops.operations, Take, last_match=True)
         sort: Sort = get_operation(ops.operations, Sort, last_match=True)
 
         filters = get_operation(
-                ops.operations, Filter, return_all=True, before=Aggregate
+            ops.operations, Filter, return_all=True, before=Aggregate
         )
         wheres_from_derives = get_operation(
-                ops.operations, Derive, return_all=True, before=Aggregate
+            ops.operations, Derive, return_all=True, before=Aggregate
         )
         havings = get_operation(
-                ops.operations, Filter, return_all=True, after=Aggregate
+            ops.operations, Filter, return_all=True, after=Aggregate
         )
         selects = get_operation(ops.operations, Select, return_all=True)
 
@@ -830,7 +815,7 @@ def ast_to_sql(
                 all_join_longs.append(join_long)
 
         replace_tables = wrap_replace_all_tables(
-                from_long, from_short, all_join_longs, all_join_shorts
+            from_long, from_short, all_join_longs, all_join_shorts
         )
 
         for join in joins:
@@ -846,31 +831,31 @@ def ast_to_sql(
 
                 if left_id.find(".") == -1:
                     left_side = str(from_short + "." + left_id).replace(
-                            from_short + "." + from_short + ".", from_short + "."
+                        from_short + "." + from_short + ".", from_short + "."
                     )
                 else:
                     left_side = str(left_id).replace(
-                            from_short + "." + from_short + ".", from_short + "."
+                        from_short + "." + from_short + ".", from_short + "."
                     )
 
                 if right_id.find(".") == -1:
                     right_side = replace_tables(
-                            str(join_long + "." + right_id).replace(
-                                    join_short + "." + join_short + ".", join_short + "."
-                            )
+                        str(join_long + "." + right_id).replace(
+                            join_short + "." + join_short + ".", join_short + "."
+                        )
                     )
                 else:
                     right_side = replace_tables(
-                            str(right_id).replace(
-                                    join_short + "." + join_short + ".", join_short + "."
-                            )
+                        str(right_id).replace(
+                            join_short + "." + join_short + ".", join_short + "."
+                        )
                     )
 
                 join_type = "JOIN"
                 if join.join_type is not None:
                     join_type = str(join.join_type)
                 join_str += replace_tables(
-                        f"{join_type} {join.name} {join_short} ON {left_side} = {right_side} "
+                    f"{join_type} {join.name} {join_short} ON {left_side} = {right_side} "
                 )
 
         if selects:
@@ -889,8 +874,8 @@ def ast_to_sql(
                         for func in filter.fields:
                             if func.val is not None:
                                 havings_str += (
-                                        ast_to_sql(func.val, roots, symbol_table, verbose)
-                                        + " AND "
+                                    ast_to_sql(func.val, roots, symbol_table, verbose)
+                                    + " AND "
                                 )
                 havings_str = havings_str.rstrip(" AND ")
 
@@ -910,7 +895,7 @@ def ast_to_sql(
                             agg_str += f"{function_call} as {name},"
                         elif isinstance(function_call, PipeBody):
                             if isinstance(function_call.body, PipedCall) or isinstance(
-                                    function_call.body, FuncCall
+                                function_call.body, FuncCall
                             ):
                                 agg_str += f"{ast_to_sql(function_call.body, roots, symbol_table, verbose)} as {name},"
                             else:
@@ -920,7 +905,7 @@ def ast_to_sql(
                             agg_str += f"{ast_to_sql(function_call, roots, symbol_table, verbose)} as {name},"
                         else:
                             raise PRQLException(
-                                    f"Unknown type for aggregate body {type(line)}, {str(line)}"
+                                f"Unknown type for aggregate body {type(line)}, {str(line)}"
                             )
                     elif isinstance(line, FuncCall):
                         function_call = line
@@ -937,17 +922,17 @@ def ast_to_sql(
                         agg_str += f"{line},"
                     elif isinstance(line, PipeBody):
                         agg_str += (
-                                ast_to_sql(
-                                        line.body,
-                                        roots,
-                                        symbol_table=symbol_table,
-                                        verbose=verbose,
-                                )
-                                + ","
+                            ast_to_sql(
+                                line.body,
+                                roots,
+                                symbol_table=symbol_table,
+                                verbose=verbose,
+                            )
+                            + ","
                         )
                     else:
                         raise PRQLException(
-                                f"Unknown type for aggregate body {type(line)}, {str(line)}"
+                            f"Unknown type for aggregate body {type(line)}, {str(line)}"
                         )
                 i += 1
 
@@ -962,12 +947,12 @@ def ast_to_sql(
                     for function_call in filter.fields:
                         if function_call.val is not None:
                             filter_str += (
-                                    replace_tables(
-                                            ast_to_sql(
-                                                    function_call.val, roots, symbol_table, verbose
-                                            )
+                                replace_tables(
+                                    ast_to_sql(
+                                        function_call.val, roots, symbol_table, verbose
                                     )
-                                    + " AND "
+                                )
+                                + " AND "
                             )
             filter_str = filter_str.rstrip(" AND ")
 
@@ -997,16 +982,16 @@ def ast_to_sql(
             filter_str = "1=1"
         if verbose:
             ic(
-                    select_str,
-                    agg_str,
-                    derives_str,
-                    from_str,
-                    join_str,
-                    filter_str,
-                    group_by_str,
-                    havings_str,
-                    order_by_str,
-                    limit_str,
+                select_str,
+                agg_str,
+                derives_str,
+                from_str,
+                join_str,
+                filter_str,
+                group_by_str,
+                havings_str,
+                order_by_str,
+                limit_str,
             )
         sql = f"SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {havings_str} {order_by_str} {limit_str}"
         if verbose:
@@ -1063,9 +1048,9 @@ def ast_to_sql(
             for table in root.value_defs.fields:
                 if table.name == val:
                     return (
-                            "("
-                            + ast_to_sql(table.value_body, roots, symbol_table, verbose)
-                            + ")"
+                        "("
+                        + ast_to_sql(table.value_body, roots, symbol_table, verbose)
+                        + ")"
                     )
         # TODO , should we use replace_variables here ?
         if val in symbol_table:

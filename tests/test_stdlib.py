@@ -101,7 +101,7 @@ class TestStdlib(unittest.TestCase):
 
     def test_count(self):
         q = """from table | select [ foo, bar ] | aggregate foo | count"""
-        res = prql.to_sql(q)
+        res = prql.to_sql(q, True)
         print(res)
         self.assertTrue(res.index("COUNT(foo)") != -1)
         self.run_query(q, 1)
