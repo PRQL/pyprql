@@ -25,7 +25,7 @@ from typing import Any, Callable, Dict, List, Optional, Type, Union
 try:
     from typing import Literal
 except ImportError:
-    from typing_extensions import Literal
+    from typing_extensions import Literal  # type: ignore
 
 import lark
 import rich
@@ -45,16 +45,6 @@ GLOBAL_TRANSFORMER: Optional[Transformer] = None
 
 class _Ast(ast_utils.Ast):
     pass
-
-
-class _Statement(_Ast):
-    @enforce_types
-    def assign_field(self, clazz: Type, values: List[Any]) -> Optional[Type]:
-        for v in values:
-            if isinstance(v, clazz):
-                return v
-        # Explicit statement of prior implicit behaviour to silence MyPy
-        return None
 
 
 @dataclass
@@ -229,13 +219,10 @@ class AggregateBody(_Ast, ast_utils.AsList):
         return f"{[str(s) for s in self.statements]}"
 
 
-class Aggregate(_Statement):
-    def __init__(
-        self, group_by: GroupBy, aggregate_body: Optional[AggregateBody] = None
-    ) -> None:
-        values = [group_by, aggregate_body]
-        self.aggregate_body = self.assign_field(AggregateBody, values)
-        self.group_by = self.assign_field(GroupBy, values)
+@dataclass
+class Aggregate(_Ast):
+    group_by: Optional[GroupBy] = None
+    aggregate_body: Optional[AggregateBody] = None
 
 
 @dataclass
@@ -326,17 +313,10 @@ class Pipes(_Ast, ast_utils.AsList):
     operations: List[_Ast]
 
 
-class From(_Statement):
-    def __init__(
-        self, name: str, pipes: Optional[Pipes] = None, join: Optional[Join] = None
-    ) -> None:
-        self.name = name
-        values = [pipes, join]
-        self.pipes = self.assign_field(Pipes, values)
-        self.join = self.assign_field(Join, values)
-
-    def get_pipes(self) -> Optional[Pipes]:
-        return self.pipes
+@dataclass
+class From(_Ast):
+    name: Optional[Name] = None
+    pipes: Optional[Pipes] = None
 
 
 @dataclass
@@ -352,17 +332,11 @@ class FuncBody(_Ast, ast_utils.AsList):
     fields: List[str]
 
 
-class FuncDef(_Statement):
-    def __init__(
-        self,
-        name: Name,
-        func_args: Optional[FuncArgs] = None,
-        func_body: Optional[FuncBody] = None,
-    ) -> None:
-        self.name = name
-        values = [func_args, func_body]
-        self.func_args = self.assign_field(FuncArgs, values)
-        self.func_body = self.assign_field(FuncBody, values)
+@dataclass
+class FuncDef(_Ast):
+    name: Name
+    func_args: Optional[FuncArgs] = None
+    func_body: Optional[FuncBody] = None
 
 
 @dataclass
@@ -402,7 +376,7 @@ class WithDef(_Ast):
 
 
 # The top level definition that holds all other definitions
-class Root(_Statement):
+class Root(_Ast):
     def __init__(
         self,
         with_def: Optional[WithDef] = None,
@@ -421,6 +395,14 @@ class Root(_Statement):
 
     def get_cte(self) -> Optional[WithDef]:
         return self.with_def
+
+    @enforce_types
+    def assign_field(self, clazz: Type, values: List[Any]) -> Optional[Type]:
+        for v in values:
+            if isinstance(v, clazz):
+                return v
+        # Explicit statement of prior implicit behaviour to silence MyPy
+        return None
 
 
 # This is a helper class, its not actually parsed
@@ -456,14 +438,7 @@ def read_file(filename: str, path: str = script_path) -> str:
 
 
 @enforce_types
-def get_func_str(func: Optional[str]) -> str:
-    if func == "average":
-        return "avg"
-    return func if isinstance(func, str) else str(func)
-
-
-@enforce_types
-def parse(_text: str) -> Root:
+def parse(_text: str, verbose: bool = False) -> Root:
     global GLOBAL_PARSER
     global GLOBAL_TRANSFORMER
     text = _text + "\n"
@@ -475,7 +450,8 @@ def parse(_text: str) -> Root:
             transformer=ToAst(),
         )
     tree = GLOBAL_PARSER.parse(text)
-
+    if verbose:
+        rich.print(tree)
     if GLOBAL_TRANSFORMER is None:
         GLOBAL_TRANSFORMER = ast_utils.create_transformer(this_module, ToAst())
     return GLOBAL_TRANSFORMER.transform(tree)
@@ -484,11 +460,12 @@ def parse(_text: str) -> Root:
 @enforce_types
 def to_sql(prql: str, verbose: bool = False) -> str:
     global STDLIB_AST
-    ast = parse(prql)
+    ast = parse(prql, verbose)
     if verbose:
         rich.print(ast)
     if STDLIB_AST is None:
         STDLIB_AST = parse(read_file("stdlib.prql"))
+    # @formatter:off
     return (
         ast_to_sql(ast.get_from(), [ast, STDLIB_AST], verbose=verbose)
         .replace("   ", " ")
@@ -605,9 +582,9 @@ def build_symbol_table(roots: List[Root]) -> Dict[str, List[_Ast]]:
             table[str(n.name)].append(n)
         for n in root.func_defs.fields:
             table[str(n.name)].append(n)
-        if root.get_from().get_pipes():
+        if root.get_from().pipes:
             derives = get_operation(
-                root.get_from().get_pipes().operations, Derive, return_all=True
+                root.get_from().pipes.operations, Derive, return_all=True
             )
             for d in derives:
                 for line in d.fields:
@@ -680,6 +657,14 @@ def execute_function(
             for line in func_def.func_body.fields:
                 if isinstance(line, PipeBody):
                     line = line.body
+                if isinstance(line, Expression):
+                    exp: Expression = line
+                    if len(exp.statements) != 1:
+                        raise PRQLException(
+                            "Currently only single statement functions that are text based are supported"
+                        )
+                    else:
+                        line = str(exp.statements[0])
                 if type(line) == str:
                     args = {}
 
@@ -798,7 +783,7 @@ def ast_to_sql(
         ###
 
         _from = rule
-        ops = _from.get_pipes()
+        ops = _from.pipes
         joins: List[Join] = get_operation(ops.operations, Join, return_all=True)
         agg: Aggregate = get_operation(ops.operations, Aggregate)
         take: Take = get_operation(ops.operations, Take, last_match=True)
