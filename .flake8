@@ -1,6 +1,6 @@
 [flake8]
 select = ANN, C90, D, DAR, E, F, W
-ignore = ANN101, E126, E203, E501, W291, W293, W503, W504, W605
+ignore = ANN101, E126, E203, E501, W291, W293, W503, W504, W605, D101, D105, D103, D102, D401
 max-line-length = 88
 exclude = tests/*
 max-complexity = 100
