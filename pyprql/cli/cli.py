@@ -199,7 +199,7 @@ class PRQLCompleter(Completer):
             "max": self.column_names,
             "count": self.column_names,
             "filter": self.column_names,
-            "exit": None,
+            "exit": [],
         }
         matches_that_need_prev_word = {
             "show": ["tables", "columns", "connection"],
