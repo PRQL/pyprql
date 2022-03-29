@@ -458,7 +458,7 @@ class CLI:
 
                 self.has_one_blank = False
                 sql = self.command
-                if "LIMIT" not in sql:
+                if "SELECT" in sql and "LIMIT" not in sql:
                     sql += " LIMIT 5"
 
                 print("\t" + self.highlight_sql(sql))
