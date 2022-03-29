@@ -41,6 +41,7 @@ from pygments.token import (
 )
 from rich.table import Table
 from sqlalchemy import create_engine, inspect
+from sqlalchemy.exc import ResourceClosedError
 
 import pyprql.lang.prql as prql
 from pyprql import __version__ as pyprql_version
@@ -348,11 +349,14 @@ class CLI:
             for column in columns:
                 table.add_column(column, justify="left")
 
-            for _row in rs:
-                row = list(_row)
-                table.add_row(*[str(x) for x in row])
-
-            rich.print(table)
+            try:
+                for _row in rs:
+                    row = list(_row)
+                    table.add_row(*[str(x) for x in row])
+            except ResourceClosedError:
+                rich.print("")
+            else:
+                rich.print(table)
 
     def highlight_prql(self, text: str) -> str:
         """Provide highlighting for PRQL inputs.
@@ -458,8 +462,8 @@ class CLI:
 
                 self.has_one_blank = False
                 sql = self.command
-                if "LIMIT" not in sql:
-                    sql += " LIMIT 5"
+                if "SELECT" in sql and "LIMIT" not in sql:
+                    sql += " LIMIT 25"
 
                 print("\t" + self.highlight_sql(sql))
                 self.prompt_text = "SQL> "
