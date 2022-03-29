@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.5 (2022-03-29)
+### Fix
+* **cli.py:** Remove sql print ([`fdf639e`](https://github.com/qorrect/PyPrql/commit/fdf639e65e8522c57ea1c9400bd1c41de78833ac))
+* **cli.py:** Match exit to [""] ([`aa40c42`](https://github.com/qorrect/PyPrql/commit/aa40c421c99ad52ee798294f1c5ebe4059352575))
+* **cli.py:** Match exit to empty list ([`f8c04a3`](https://github.com/qorrect/PyPrql/commit/f8c04a359190009d2aa121e13a3d4261aee5b7cc))
+
 ## v0.2.4 (2022-03-29)
 ### Fix
 * **cli.py:** Check for sqlalchemy error ([`fe2c804`](https://github.com/qorrect/PyPrql/commit/fe2c804470139699a3708a286167ba1c297b0aaa))
