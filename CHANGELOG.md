@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.4 (2022-03-29)
+### Fix
+* **cli.py:** Check for sqlalchemy error ([`fe2c804`](https://github.com/qorrect/PyPrql/commit/fe2c804470139699a3708a286167ba1c297b0aaa))
+* **cli.py:** Increase default limit ([`b5e7be4`](https://github.com/qorrect/PyPrql/commit/b5e7be4b574e476495367dd5af26df3633d47b38))
+* **cli.py:** Append limit to select only ([`66f1d57`](https://github.com/qorrect/PyPrql/commit/66f1d57cdd3e69141383f712a2ae71c1eb34a2ec))
+
+### Documentation
+* **prql.py:** Add annotations ([`a03b653`](https://github.com/qorrect/PyPrql/commit/a03b653590a8fd4daef26f9ae26f718498ccf75a))
+* **cli.py:** Correct docstrings ([`ee2a5f2`](https://github.com/qorrect/PyPrql/commit/ee2a5f2eeee8c8ce8b5e8cdc3aad8022c591527a))
+* ***:** Add module level docstings ([`a9d30de`](https://github.com/qorrect/PyPrql/commit/a9d30de78450f24953b4e27b16532a6baa5a777f))
+
 ## v0.2.3 (2022-03-21)
 ### Fix
 * Fixes examples command in the cli ([`30d2b2f`](https://github.com/qorrect/PyPrql/commit/30d2b2f27e4bf64d59d64f8f4fa566a2c8111e6b))
