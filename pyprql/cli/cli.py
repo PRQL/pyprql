@@ -465,7 +465,6 @@ class CLI:
                 if "SELECT" in sql and "LIMIT" not in sql:
                     sql += " LIMIT 25"
 
-                print("\t" + self.highlight_sql(sql))
                 self.prompt_text = "SQL> "
                 self.execute_sql(sql)
 
