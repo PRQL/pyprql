@@ -23,7 +23,7 @@ from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 # For Python 3.7
 try:
-    from typing import Literal
+    from typing import Literal  # type: ignore
 except ImportError:
     from typing_extensions import Literal  # type: ignore
 
