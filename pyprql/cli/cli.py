@@ -7,10 +7,12 @@ bindings : KeyBindings
     A container for key bindings.
 this_files_path : str
     The Path to this file.
+BOTTOM_TOOLBAR_TXT : str
+    The text for the help bar of the CLI.
 """
 import os
 import sys
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import pygments
 import rich
@@ -18,55 +20,25 @@ from enforce_typing import enforce_types
 from prompt_toolkit import prompt
 from prompt_toolkit.application import get_app
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from prompt_toolkit.completion import CompleteEvent, Completer, Completion
-from prompt_toolkit.document import Document
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.lexers import PygmentsLexer
 from prompt_toolkit.styles import style_from_pygments_dict
 from pygments.formatters.terminal import TerminalFormatter as Formatter
 from pygments.lexers.sql import SqlLexer
-from pygments.style import Style
-from pygments.token import (
-    Comment,
-    Error,
-    Generic,
-    Keyword,
-    Name,
-    Number,
-    Operator,
-    String,
-    Token,
-    Whitespace,
-)
 from rich.table import Table
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.exc import ResourceClosedError
 
 import pyprql.lang.prql as prql
 from pyprql import __version__ as pyprql_version
+from pyprql.cli.PRQLCompleter import PRQLCompleter
 from pyprql.cli.PRQLLexer import PRQLLexer
+from pyprql.cli.PRQLStyle import PRQLStyle
 
 bindings = KeyBindings()
 this_files_path = os.path.abspath(os.path.dirname(__file__))
 BOTTOM_TOOLBAR_TXT = prql.read_file("../assets/cli_bottom_toolbar.txt", this_files_path)
-
-
-def bottom_toolbar() -> List[Tuple[str, str]]:
-    """Create bottom toolbar for prql prompt.
-
-    Returns
-    -------
-    List[Tuple[str, str]]
-        An identifier and the desired display text wrapped in a list.
-    """
-    display_text = BOTTOM_TOOLBAR_TXT
-    try:
-        text = get_app().current_buffer.text
-        display_text = prql.to_sql(text)
-    except Exception:
-        pass
-    return [("class:bottom-toolbar", display_text)]
 
 
 @bindings.add("c-l")
@@ -75,199 +47,6 @@ def clear_screen() -> None:
     print(chr(27) + "[2j")
     print("\033c")
     print("\x1bc")
-
-
-class PRQLStyle(Style):
-    """Pygments version of the "native" vim theme.
-
-    Inherits from pygments ``Style``,
-    overriding values to create our colour scheme.
-    The various style attributes are self-descriptive,
-    and thoroughly documented on the `pygments`_ page.
-
-    .. _pygments: https://pygments.org/docs/styledevelopment/
-    """
-
-    background_color = "#202020"
-    highlight_color = "#404040"
-    line_number_color = "#aaaaaa"
-    background_color = "#202020"
-    highlight_color = "#404040"
-    line_number_color = "#aaaaaa"
-
-    styles = {
-        Token: "#d0d0d0",
-        Whitespace: "#666666",
-        Comment: "italic #999999",
-        Comment.Preproc: "noitalic bold #cd2828",
-        Comment.Special: "noitalic bold #e50808 bg:#520000",
-        Keyword: "bold #6ab825",
-        Keyword.Pseudo: "nobold",
-        Operator.Word: "bold #6ab825",
-        String: "#ed9d13",
-        String.Other: "#ffa500",
-        Number: "#3677a9",
-        Name.Builtin: "#24909d",
-        Name.Variable: "#40ffff",
-        Name.Constant: "#40ffff",
-        Name.Class: "underline #447fcf",
-        Name.Function: "#447fcf",
-        Name.Namespace: "underline #447fcf",
-        Name.Exception: "#bbbbbb",
-        Name.Tag: "bold #6ab825",
-        Name.Attribute: "#bbbbbb",
-        Name.Decorator: "#ffa500",
-        Generic.Heading: "bold #ffffff",
-        Generic.Subheading: "underline #ffffff",
-        Generic.Deleted: "#d22323",
-        Generic.Inserted: "#589819",
-        Generic.Error: "#d22323",
-        Generic.Emph: "italic",
-        Generic.Strong: "bold",
-        Generic.Prompt: "#aaaaaa",
-        Generic.Output: "#cccccc",
-        Generic.Traceback: "#d22323",
-        Error: "bg:#e3d2d2 #a61717",
-    }
-
-
-class PRQLCompleter(Completer):
-    """Prompt_toolkit completion engine for PyPRQL CLI."""
-
-    @enforce_types
-    def __init__(
-        self,
-        table_names: List[str],
-        column_names: List[str],
-        column_map: Dict[str, List[str]],
-        prql_keywords: List[str],
-    ) -> None:
-        """Initialise a completer instance.
-
-        This provides some of the root completion material.
-        Inherits from  prompt_toolkit's ``Completer`` class,
-        and overrides methods to achieve desired functionality.
-
-        Parameters
-        ----------
-        table_names : List[str]
-            List of available tables.
-        column_names : List[str]
-            List of available columns.
-        column_map : Dict[str, List[str]]
-            A column-to-table map.
-        prql_keywords : List[str]
-            list of PRQL keywords.
-        """
-        self.table_names = table_names
-        self.column_names = column_names
-        self.column_map = column_map
-        self.prql_keywords = prql_keywords
-
-        self.prev_word: Optional[str] = None
-        self.previous_selection: Optional[List[str]] = None
-
-    def get_completions(
-        self, document: Document, complete_event: CompleteEvent
-    ) -> Iterable[Completion]:
-        """Retrieve completion options.
-
-        Parameters
-        ----------
-        document : Document
-            Implements all text operations/querying.
-        complete_event : CompleteEvent
-            Event that called the Completer.
-            Unused in current implementation, but required to match signature.
-
-        Yields
-        ------
-        Completion
-            The completion object.
-        """
-        word_before_cursor = document.get_word_before_cursor(WORD=True)
-        completion_operators = ["[", "+", ",", ":"]
-        possible_matches = {
-            "from": self.table_names,
-            "join": self.table_names,
-            "columns": self.table_names,
-            "select": self.column_names,
-            " ": self.column_names,
-            "sort": self.column_names,
-            "sum": self.column_names,
-            "avg": self.column_names,
-            "min": self.column_names,
-            "max": self.column_names,
-            "count": self.column_names,
-            "filter": self.column_names,
-            "exit": [""],
-        }
-        matches_that_need_prev_word = {
-            "show": ["tables", "columns", "connection"],
-            "side:": ["left", "inner", "right", "outer"],
-            "order:": ["asc", "desc"],
-            "by:": self.column_names,
-        }
-        # print(word_before_cursor)
-        for op in completion_operators:
-            possible_matches[op] = self.column_names
-
-        # This delays the completions until they hit space, or a completion operator
-        if word_before_cursor in possible_matches:
-            selection = possible_matches[word_before_cursor]
-            selection = [f"{x}" for x in selection]
-            self.previous_selection = selection
-            # This can be reworked to a if not in operator. No pass required.
-            if (
-                word_before_cursor == "from"
-                or word_before_cursor == "join"
-                or word_before_cursor == "sort"
-                or word_before_cursor == "select"
-                or word_before_cursor == "columns"
-                or word_before_cursor == "show"
-                or word_before_cursor == ","
-                or word_before_cursor == "["
-                or word_before_cursor == "filter"
-            ):
-                pass
-            else:
-                for m in selection:
-                    yield Completion(m, start_position=-len(word_before_cursor))
-        elif word_before_cursor in matches_that_need_prev_word:
-            selection = matches_that_need_prev_word[word_before_cursor]
-            #            selection = [f"{x}" for x in selection]
-            for m in selection:
-                yield Completion(m, start_position=0)
-        # If its an operator
-        elif (
-            len(word_before_cursor) >= 1
-            and word_before_cursor[-1] in completion_operators
-        ):
-            selection = possible_matches[word_before_cursor[-1]]
-            self.previous_selection = selection
-        # If its a period, then we assume the first word was a table
-        elif len(word_before_cursor) >= 1 and word_before_cursor[-1] == ".":
-            table = word_before_cursor[:-1]
-            if table in self.column_map:
-                selection = self.column_map[table]
-                self.previous_selection = selection
-                for m in selection:
-                    yield Completion(m, start_position=0)
-        # This goes back to the first if, this is the delayed completion finally completing
-        elif self.previous_selection:
-            selection = [
-                x for x in self.previous_selection if x.find(word_before_cursor) != -1
-            ]
-            self.previous_selection = selection
-
-            for m in selection:
-                yield Completion(m, start_position=-len(word_before_cursor))
-
-        # This is supposed to complete keywords, but its tromping all over the other completions
-        # else:
-        #     completer = FuzzyWordCompleter(self.prql_keywords)
-        #     for m in completer.get_completions(document, complete_event):
-        #         yield m
 
 
 class CLI:
@@ -302,6 +81,27 @@ class CLI:
         )
         self.engine = create_engine(connect_str)
         self.inspector = inspect(self.engine)
+
+    @staticmethod
+    def print_usage() -> None:
+        """Prints the usage information for the CLI."""
+        print(prql.read_file("../assets/cli_usage.txt", this_files_path))
+
+    def bottom_toolbar(self) -> List[Tuple[str, str]]:
+        """Create bottom toolbar for prql prompt.
+
+        Returns
+        -------
+        List[Tuple[str, str]]
+            An identifier and the desired display text wrapped in a list.
+        """
+        display_text = BOTTOM_TOOLBAR_TXT
+        try:
+            text = get_app().current_buffer.text
+            display_text = prql.to_sql(text)
+        except Exception:
+            pass
+        return [("class:bottom-toolbar", display_text)]
 
     def get_all_columns(self) -> Tuple[List[str], Dict[str, List[str]]]:
         """Retrive all columns in the database.
@@ -521,7 +321,7 @@ class CLI:
                 ),
                 lexer=PygmentsLexer(PRQLLexer),
                 style=style_from_pygments_dict(PRQLStyle.styles),
-                bottom_toolbar=bottom_toolbar,
+                bottom_toolbar=self.bottom_toolbar,
             )
             try:
                 self.handle_input(user_input)
@@ -532,40 +332,3 @@ class CLI:
                 self.command = ""
                 self.prompt_text = "PRQL> "
                 self.has_one_blank = False
-
-
-def print_usage() -> None:
-    """Prints the usage information for the CLI."""
-    print(prql.read_file("../assets/cli_usage.txt", this_files_path))
-
-
-def main(params: Optional[List[str]] = None) -> None:
-    """Serve the CLI entrypoint.
-
-    If ``params`` is left as it's default ``None``,
-    then ``params`` is set to ``sys.argv``.
-    If no parameters are passed,
-    then the help message is printed.
-    Otherwise,
-    a prompt is activated until a keyboard interrupt.
-
-    Parameters
-    ----------
-    params : Optional[List[str]], default None
-        The parameters passed to the CLI.
-    """
-    if params is None:
-        params = sys.argv
-    try:
-        if len(params) > 1:
-            cli = CLI(params[1])
-            cli.run()
-        else:
-            print_usage()
-            sys.exit(0)
-    except KeyboardInterrupt:
-        sys.exit(0)
-
-
-if __name__ == "__main__":
-    main()
