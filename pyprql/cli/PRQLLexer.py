@@ -31,88 +31,82 @@ class PRQLLexer(RegexLexer):
     specialName = r"^main "
 
     builtinOps = (
-            "'",
-            ".",
-            "?",
-            ":",
-            "|",
-            "`",
-            ">=",
-            ">",
-            "=",
-            "==",
-            "+",
-            "+=",
-            "<=",
-            "<",
-            "!=",
-            "*",
-            "/",
-            "-",
-            "-=",
-            "%",
-            "\\",
+        "'",
+        ".",
+        "?",
+        ":",
+        "|",
+        "`",
+        ">=",
+        ">",
+        "=",
+        "==",
+        "+",
+        "+=",
+        "<=",
+        "<",
+        "!=",
+        "*",
+        "/",
+        "-",
+        "-=",
+        "%",
+        "\\",
     )
 
     reservedWords = words(
-            (
-                    "select",
-                    "from",
-                    "filter",
-                    "derive",
-                    "aggregate",
-                    "sort",
-                    "take",
-                    "order",
-                    "by",
-                    "asc",
-                    "desc",
-                    "join",
-                    "order",
-                    "side",
-            ),
-            suffix=r"\b",
+        (
+            "select",
+            "from",
+            "filter",
+            "derive",
+            "aggregate",
+            "sort",
+            "take",
+            "order",
+            "by",
+            "asc",
+            "desc",
+            "join",
+            "order",
+            "side",
+        ),
+        suffix=r"\b",
     )
 
     tokens = {
-            "root": [
-                    # Comments
-
-                    # Whitespace
-                    (r"\s+", Text),
-                    # Strings
-                    (r'"', String, "doublequote"),
-
-                    # Keywords
-                    (reservedWords, Keyword.Reserved),
-                    # Types
-                    (r"[A-Z][a-zA-Z0-9_]*", Keyword.Type),
-                    # Main
-                    (specialName, Keyword.Reserved),
-                    # Prefix Operators
-                    (words((builtinOps), prefix=r"\(", suffix=r"\)"), Name.Function),
-                    # Infix Operators
-                    (words(builtinOps), Name.Function),
-                    # Numbers
-                    include("numbers"),
-                    # Variable Names
-                    (validName, Name.Variable),
-                    # Parens
-                    (r"[,()\[\]{}]", Punctuation),
-            ],
-            "comment": [
-
-            ],
-            "doublequote": [
-                    (r"\\u[0-9a-fA-F]{4}", String.Escape),
-                    (r'\\[nrfvb\\"]', String.Escape),
-                    (r'[^"]', String),
-                    (r'"', String, "#pop"),
-            ],
-
-            "numbers": [
-                    (r"_?\d+\.(?=\d+)", Number.Float),
-                    (r"_?\d+", Number.Integer),
-            ]
-
+        "root": [
+            # Comments
+            # Whitespace
+            (r"\s+", Text),
+            # Strings
+            (r'"', String, "doublequote"),
+            # Keywords
+            (reservedWords, Keyword.Reserved),
+            # Types
+            (r"[A-Z][a-zA-Z0-9_]*", Keyword.Type),
+            # Main
+            (specialName, Keyword.Reserved),
+            # Prefix Operators
+            (words((builtinOps), prefix=r"\(", suffix=r"\)"), Name.Function),
+            # Infix Operators
+            (words(builtinOps), Name.Function),
+            # Numbers
+            include("numbers"),
+            # Variable Names
+            (validName, Name.Variable),
+            # Parens
+            (r"[,()\[\]{}]", Punctuation),
+        ],
+        "comment": [],
+        "doublequote": [
+            (r"\\u[0-9a-fA-F]{4}", String.Escape),
+            (r'\\[nrfvb\\"]', String.Escape),
+            (r'[^"]', String),
+            (r'"', String, "#pop"),
+        ],
+        "numbers": [
+            (r"_?\d+\.(?=\d+)", Number.Float),
+            (r"_?\d+", Number.Integer),
+        ],
     }
