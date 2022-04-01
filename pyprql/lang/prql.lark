@@ -6,10 +6,10 @@
     value_def: "value" NAME "=" "(" from ")"
     with_def: "table" NAME "=" "(" from ")"
     alias: NAME ":"
-    from: "from" alias? NAME "|"? pipes
+    from: "from" [alias] NAME "|"? pipes
 
     pipes: ((join | select | derive | filter | sort | take| aggregate) ("|")? )*
-    join: "join"  ( "side" ":" join_type)? alias? NAME "[" name ("=" name)? "]"
+    join: "join" ["side" ":" join_type] [alias] NAME ["side" ":" join_type] "[" name["=" name] "]"  ["side" ":" join_type]
     join_type: inner_join | left_join | right_join | outer_join
     inner_join: "inner"
     left_join: "left"
