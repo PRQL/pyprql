@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.0 (2022-04-01)
+### Feature
+* **prql.lark:** Add join aliases ([`94a405e`](https://github.com/qorrect/PyPrql/commit/94a405ee44632f378476645c4303e08e91a275ef))
+
 ## v0.2.5 (2022-03-29)
 ### Fix
 * **cli.py:** Remove sql print ([`fdf639e`](https://github.com/qorrect/PyPrql/commit/fdf639e65e8522c57ea1c9400bd1c41de78833ac))
