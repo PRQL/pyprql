@@ -117,23 +117,46 @@ class JoinType(_JoinType):
 
 
 @dataclass
-class Join(_Ast):
-    name: Name
-    join_type: Optional[_JoinType] = None
-    left_id: Optional[Name] = None  # Has to have a default argument now
-    right_id: Optional[Name] = None
+class Alias(_Ast):
+    name: str
 
-    def __post_init__(self) -> None:
-        if isinstance(self.name, JoinType):
-            temp = self.join_type
-            self.join_type = self.name
-            self.name = temp  # type: ignore[assignment]
-        if isinstance(self.join_type, Name):
-            # Now we need to shift everything , since join_type is now our left_id
-            temp = self.left_id
-            self.left_id = self.join_type
-            self.right_id = temp
-            self.join_type = None
+    def __str__(self) -> str:
+        return self.name
+
+
+# These extra join_types here are to allow for those to be in any position in the parsing rule
+@dataclass
+class Join(_Ast):
+    join_type: Optional[_JoinType] = None
+    alias: Optional[Alias] = None
+    name: Optional[Name] = None
+    join_type_2: Optional[_JoinType] = None
+    left_id: Optional[Name] = None
+    right_id: Optional[Name] = None
+    join_type_3: Optional[_JoinType] = None
+
+    def get_join_type(self) -> Optional[_JoinType]:
+        if self.join_type is not None:
+            return self.join_type
+        elif self.join_type_2 is not None:
+            return self.join_type_2
+        elif self.join_type_3 is not None:
+            return self.join_type_3
+        else:
+            return None
+
+    #
+    # def __post_init__(self) -> None:
+    #     if isinstance(self.name, JoinType):
+    #         temp = self.join_type
+    #         self.join_type = self.name
+    #         self.name = temp  # type: ignore[assignment]
+    #     if isinstance(self.join_type, Name):
+    #         # Now we need to shift everything , since join_type is now our left_id
+    #         temp = self.left_id
+    #         self.left_id = self.join_type
+    #         self.right_id = temp
+    #         self.join_type = None
 
 
 @dataclass
@@ -315,6 +338,7 @@ class Pipes(_Ast, ast_utils.AsList):
 
 @dataclass
 class From(_Ast):
+    alias: Optional[Alias] = None
     name: Optional[Name] = None
     pipes: Optional[Pipes] = None
 
@@ -462,7 +486,7 @@ def to_sql(prql: str, verbose: bool = False) -> str:
     global STDLIB_AST
     ast = parse(prql, verbose)
     if verbose:
-        rich.print(ast)
+        rich.print(ast.get_from())
     if STDLIB_AST is None:
         STDLIB_AST = parse(read_file("stdlib.prql"))
     # @formatter:off
@@ -524,7 +548,7 @@ def get_operation(
 
 
 @enforce_types
-def alias(s: str, n: int = 1) -> str:
+def _generate_alias(s: str, n: int = 1) -> str:
     return s + "_" + s[0:n]
 
 
@@ -747,6 +771,15 @@ def safe_to_sql(
 
 
 @enforce_types
+def safe_get_alias(join: Union[Join, From], join_long: str) -> str:
+    if join.alias is not None:
+        join_short = str(join.alias)
+    else:
+        join_short = _generate_alias(join_long)
+    return join_short
+
+
+@enforce_types
 def ast_to_sql(
     rule: Union[_Ast, Token],
     roots: Union[Root, List],
@@ -760,8 +793,8 @@ def ast_to_sql(
 
     if not symbol_table:
         symbol_table = build_symbol_table([roots] if isinstance(roots, Root) else roots)
-        if verbose:
-            rich.print(symbol_table)
+        # if verbose:
+        #     rich.print(symbol_table)
 
     if isinstance(rule, Token):
         return str(rule)
@@ -783,6 +816,8 @@ def ast_to_sql(
         ###
 
         _from = rule
+        from_long = ""
+        from_short = ""
         ops = _from.pipes
         joins: List[Join] = get_operation(ops.operations, Join, return_all=True)
         agg: Aggregate = get_operation(ops.operations, Aggregate)
@@ -801,15 +836,18 @@ def ast_to_sql(
         selects = get_operation(ops.operations, Select, return_all=True)
 
         from_long = str(_from.name)
-        from_short = alias(from_long)
+        from_short = safe_get_alias(_from, from_long)
 
         from_str = f"`{from_long}`" + " " + from_short
         all_join_longs = []
         all_join_shorts = []
+        # We have to run these twice, once to create the replace_tables function then
+        # once to replace_tables within the definitions
+
         for join in joins:
             if join:
                 join_long = str(join.name)
-                join_short = alias(join_long)
+                join_short = safe_get_alias(join, join_long)
 
                 all_join_shorts.append(join_short)
                 all_join_longs.append(join_long)
@@ -821,7 +859,7 @@ def ast_to_sql(
         for join in joins:
             if join:
                 join_long = str(join.name)
-                join_short = alias(join_long)
+                join_short = safe_get_alias(join, join_long)
 
                 left_id = replace_tables(str(join.left_id))
                 right_id = replace_tables(str(join.right_id))
@@ -851,9 +889,10 @@ def ast_to_sql(
                         )
                     )
 
-                join_type = "JOIN"
-                if join.join_type is not None:
-                    join_type = str(join.join_type)
+                join_type = str(join.get_join_type())
+                if join_type is None:
+                    join_type = "JOIN"
+
                 join_str += replace_tables(
                     f"{join_type} {join.name} {join_short} ON {left_side} = {right_side} "
                 )

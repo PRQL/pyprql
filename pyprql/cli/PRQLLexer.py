@@ -9,7 +9,7 @@ __all__ : List[str]
 from typing import List
 
 from pygments.lexer import RegexLexer, include, words
-from pygments.token import Comment, Keyword, Name, Number, Punctuation, String, Text
+from pygments.token import Keyword, Name, Number, Punctuation, String, Text
 
 __all__: List[str] = ["PRQLLexer"]
 
@@ -77,18 +77,10 @@ class PRQLLexer(RegexLexer):
     tokens = {
         "root": [
             # Comments
-            (r"\{-", Comment.Multiline, "comment"),
-            (r"--.*", Comment.Single),
             # Whitespace
             (r"\s+", Text),
             # Strings
             (r'"', String, "doublequote"),
-            # Modules
-            (r"^\s*module\s*", Keyword.Namespace, "imports"),
-            # Imports
-            (r"^\s*import\s*", Keyword.Namespace, "imports"),
-            # Shaders
-            (r"\[glsl\|.*", Name.Entity, "shader"),
             # Keywords
             (reservedWords, Keyword.Reserved),
             # Types
@@ -106,28 +98,15 @@ class PRQLLexer(RegexLexer):
             # Parens
             (r"[,()\[\]{}]", Punctuation),
         ],
-        "comment": [
-            (r"-(?!\})", Comment.Multiline),
-            (r"\{-", Comment.Multiline, "comment"),
-            (r"[^-}]", Comment.Multiline),
-            (r"-\}", Comment.Multiline, "#pop"),
-        ],
+        "comment": [],
         "doublequote": [
             (r"\\u[0-9a-fA-F]{4}", String.Escape),
             (r'\\[nrfvb\\"]', String.Escape),
             (r'[^"]', String),
             (r'"', String, "#pop"),
         ],
-        "imports": [
-            (r"\w+(\.\w+)*", Name.Class, "#pop"),
-        ],
         "numbers": [
             (r"_?\d+\.(?=\d+)", Number.Float),
             (r"_?\d+", Number.Integer),
-        ],
-        "shader": [
-            (r"\|(?!\])", Name.Entity),
-            (r"\|\]", Name.Entity, "#pop"),
-            (r".*\n", Name.Entity),
         ],
     }

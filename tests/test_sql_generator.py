@@ -54,7 +54,7 @@ class TestSqlGenerator(unittest.TestCase):
         q = """
         from table | select foo | sort foo order:desc 
         """
-        res = prql.to_sql(q,True)
+        res = prql.to_sql(q, True)
         print(res)
         self.assertTrue(res.index("ORDER BY foo DESC ") != -1)
         self.run_query(q)
@@ -72,7 +72,7 @@ class TestSqlGenerator(unittest.TestCase):
         q = """
         from table | select foo | sort [ foo, bar ] 
         """
-        res = prql.to_sql(q,True)
+        res = prql.to_sql(q, True)
         print(res)
         self.assertTrue(res.index("ORDER BY foo,bar ") != -1)
         self.run_query(q)
@@ -81,7 +81,7 @@ class TestSqlGenerator(unittest.TestCase):
         q = """
         from table | select foo | sort [ foo, bar ] order:desc 
         """
-        res = prql.to_sql(q,True)
+        res = prql.to_sql(q, True)
         print(res)
         self.assertTrue(res.index("ORDER BY foo,bar DESC") != -1)
         self.run_query(q)
@@ -207,7 +207,7 @@ class TestSqlGenerator(unittest.TestCase):
         from table
         join side:inner table2 [table.id=table2.id]
         """
-        res = prql.to_sql(q,True)
+        res = prql.to_sql(q, True)
         print(res)
         self.assertTrue(
             res.index("JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
@@ -251,7 +251,6 @@ class TestSqlGenerator(unittest.TestCase):
 
         # This fails beacuse SQLITE doesnt support RIGHT and FULL OUTTER
         # self.run_query(q, 6)
-
 
     def test_group_by_single_item_array(self):
         q = """
@@ -414,4 +413,103 @@ class TestSqlGenerator(unittest.TestCase):
         res = prql.to_sql(q)
         print(res)
         assert res.index('WHERE foo LIKE "%"') != -1
+        print(res)
+
+    def test_alias(self):
+        q = '''
+        from e:employees
+        derive [
+            foo: e.foo
+        ]
+        '''
+        print(q)
+        res = prql.to_sql(q)
+        assert res.index('FROM `employees` e ') != -1
+        print(res)
+
+    def test_alias_goes_the_extra_mile(self):
+        q = '''
+        from even_longer_foo:foo
+        derive [
+            val: foo.some_value,
+            other_val: even_longer_foo.other_value
+        ]
+        '''
+        print(q)
+        res = prql.to_sql(q)
+        print(res)
+        assert res.index('even_longer_foo.some_value as val') != -1
+        assert res.index('even_longer_foo.other_value as other_val') != -1
+
+        print(res)
+
+    def test_join_alias(self):
+        q = '''
+        from e:employees
+        join s:salaries [emp_no]
+        join d:departments [dept_no]
+        select [dept_name, gender, salary_avg, salary_sd]'''
+        res = prql.to_sql(q, True)
+        print('\n\n\n\n' + res)
+        assert res.index('JOIN salaries s ON e.emp_no = s.emp_no') != -1
+        assert res.index('JOIN departments d ON e.dept_no = d.dept_no') != -1
+
+    def test_join_type_any_side(self):
+        q = 'from employees | join salaries [emp_no] side:left'
+        res = prql.to_sql(q, True)
+        print('\n\n\n\n' + res)
+        assert res.index('LEFT JOIN') != -1
+        q = 'from employees | join salaries side:left [emp_no]'
+        res = prql.to_sql(q, True)
+        print('\n\n\n\n' + res)
+        assert res.index('LEFT JOIN') != -1
+
+    def test_join_alias_with_where(self):
+        q = '''
+        from e:employees
+        join s:salaries [emp_no]
+        join d:departments [dept_no]
+        filter e.salary > s.salary'''
+        res = prql.to_sql(q, True)
+        print('\n\n\n\n' + res)
+        assert res.index('WHERE e.salary>s.salary') != -1
+
+    def test_prql_employee_md(self):
+        q = '''
+        from employees
+        join salaries [emp_no]
+        aggregate by:[emp_no, gender] [
+          emp_salary: average salary
+        ]
+        join de:dept_emp [emp_no] side:left
+        aggregate by:[de.dept_no, gender] [
+          salary_avg: average emp_salary,
+          salary_sd: stddev emp_salary
+        ]
+        join departments [dept_no]
+        select [dept_name, gender, salary_avg, salary_sd]'''
+        res = prql.to_sql(q,True)
+        print(res)
+
+        assert res.index('AVG(salary) as emp_salary') != -1
+        assert res.index('GROUP BY emp_no,gender') != -1
+        assert res.index('FROM `employees` employees_e') != -1
+        assert res.index('JOIN salaries salaries_s ON employees_e.emp_no = salaries_s.emp_no') != -1
+        assert res.index('JOIN departments departments_d ON employees_e.dept_no = departments_d.dept_no') != -1
+
+
+    def test_prql_employee_md_with_join_alias(self):
+        q = '''
+        from salaries
+        aggregate by:[emp_no] [
+          emp_salary: average salary
+        ]
+        join t:titles [emp_no]
+        join dept_emp side:left [emp_no]
+        aggregate by:[dept_emp.dept_no, t.title] [
+          avg_salary: average emp_salary
+        ]
+        join departments [dept_no]
+        select [dept_name, title, avg_salary]'''
+        res = prql.to_sql(q,True)
         print(res)
