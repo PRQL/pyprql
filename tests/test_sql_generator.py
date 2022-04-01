@@ -54,8 +54,8 @@ class TestSqlGenerator(unittest.TestCase):
         q = """
         from table | select foo | sort foo order:desc 
         """
-        res = prql.to_sql(q, True)
-        print(res)
+        res = prql.to_sql(q)
+       # print(res)
         self.assertTrue(res.index("ORDER BY foo DESC ") != -1)
         self.run_query(q)
 
@@ -64,7 +64,7 @@ class TestSqlGenerator(unittest.TestCase):
         from table | select foo | sort bar order:asc 
         """
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         self.assertTrue(res.index("ORDER BY bar ASC ") != -1)
         self.run_query(q)
 
@@ -72,8 +72,8 @@ class TestSqlGenerator(unittest.TestCase):
         q = """
         from table | select foo | sort [ foo, bar ] 
         """
-        res = prql.to_sql(q, True)
-        print(res)
+        res = prql.to_sql(q)
+       # print(res)
         self.assertTrue(res.index("ORDER BY foo,bar ") != -1)
         self.run_query(q)
 
@@ -81,8 +81,8 @@ class TestSqlGenerator(unittest.TestCase):
         q = """
         from table | select foo | sort [ foo, bar ] order:desc 
         """
-        res = prql.to_sql(q, True)
-        print(res)
+        res = prql.to_sql(q)
+       # print(res)
         self.assertTrue(res.index("ORDER BY foo,bar DESC") != -1)
         self.run_query(q)
 
@@ -98,8 +98,8 @@ class TestSqlGenerator(unittest.TestCase):
         q = """
         from table | select [ foo | as float ,  bar | as string ]
         """
-        res = prql.to_sql(q, True)
-        print(res)
+        res = prql.to_sql(q)
+       # print(res)
         self.assertTrue(res.startswith("SELECT CAST(foo as float),CAST(bar as string)"))
         self.run_query(q)
 
@@ -108,7 +108,7 @@ class TestSqlGenerator(unittest.TestCase):
         from table | select [ foo | as float  ]
         """
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         self.assertTrue(res.startswith("SELECT CAST(foo as float)"))
         self.run_query(q)
 
@@ -118,7 +118,7 @@ class TestSqlGenerator(unittest.TestCase):
         """
         try:
             res = prql.to_sql(q)
-            print(res)
+           # print(res)
             self.assertTrue(res.startswith("SELECT CAST(foo as float)"))
             self.run_query(q)
         except Exception as e:
@@ -133,14 +133,14 @@ class TestSqlGenerator(unittest.TestCase):
     def test_take_with_offset(self):
         q = "from table | take 10 offset:10 "
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         self.assertTrue(res.index("LIMIT 10 OFFSET 10") != -1)
         self.run_query(q, 2)
 
     def test_take_with_offset_2(self):
         q = "from table | take 2 offset:10 "
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         self.assertTrue(res.index("LIMIT 2 OFFSET 10") != -1)
         self.run_query(q, 2)
 
@@ -159,7 +159,7 @@ class TestSqlGenerator(unittest.TestCase):
     def test_order_by_asc(self):
         q = "from table | sort country order:asc | take 10"
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         self.assertTrue(res.index("ORDER BY country ASC") != -1)
         self.run_query(q, 10)
 
@@ -184,7 +184,7 @@ class TestSqlGenerator(unittest.TestCase):
         from table
         join table2 [id=id]
         """
-        res = prql.to_sql(q, True)
+        res = prql.to_sql(q)
         self.assertTrue(
             res.index("JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
         )
@@ -196,7 +196,7 @@ class TestSqlGenerator(unittest.TestCase):
         join table2 [table.id=table2.id]
         """
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         self.assertTrue(
             res.index("JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
         )
@@ -207,8 +207,8 @@ class TestSqlGenerator(unittest.TestCase):
         from table
         join side:inner table2 [table.id=table2.id]
         """
-        res = prql.to_sql(q, True)
-        print(res)
+        res = prql.to_sql(q)
+       # print(res)
         self.assertTrue(
             res.index("JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
         )
@@ -220,7 +220,7 @@ class TestSqlGenerator(unittest.TestCase):
         join side:inner table2 [table.id=table2.id]
         """
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         self.assertTrue(
             res.index("INNER JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
         )
@@ -232,7 +232,7 @@ class TestSqlGenerator(unittest.TestCase):
         join side:left table2 [table.id=table2.id]
         """
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         self.assertTrue(
             res.index("LEFT JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
         )
@@ -244,7 +244,7 @@ class TestSqlGenerator(unittest.TestCase):
         join side:right table2 [table.id=table2.id]
         """
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         self.assertTrue(
             res.index("RIGHT JOIN table2 table2_t ON table_t.id = table2_t.id") != -1
         )
@@ -327,7 +327,7 @@ class TestSqlGenerator(unittest.TestCase):
          foo_only: foo
         ]"""
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         self.assertTrue(res.index("foo as foo_only") != -1)
         self.run_query(q, 12)
 
@@ -339,7 +339,7 @@ class TestSqlGenerator(unittest.TestCase):
          foo_only: table.foo
         ]"""
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         self.assertTrue(res.index("foo as foo_only") != -1)
         self.run_query(q, 12)
 
@@ -350,7 +350,7 @@ class TestSqlGenerator(unittest.TestCase):
         """
         res = prql.to_sql(q)
         assert res.index("WHERE foo>10") != -1
-        print(res)
+       # print(res)
 
     def test_filter_where_multi(self):
         q = """
@@ -359,7 +359,7 @@ class TestSqlGenerator(unittest.TestCase):
         """
         res = prql.to_sql(q)
         assert res.index("WHERE foo>10") != -1
-        print(res)
+       # print(res)
 
     def test_filter_fstring(self):
         q = """
@@ -367,9 +367,9 @@ class TestSqlGenerator(unittest.TestCase):
         filter s"foo > 10"
         """
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         assert res.index("WHERE foo > 10") != -1
-        print(res)
+       # print(res)
 
     def test_having(self):
         q = """
@@ -393,27 +393,27 @@ class TestSqlGenerator(unittest.TestCase):
                  filter row_count > 200
                  take 20"""
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         assert res.index("HAVING row_count>200") != -1
-        print(res)
+       # print(res)
 
     def test_like(self):
         q = '''
         from table
         filter foo | like "bar"'''
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         assert res.index('WHERE foo LIKE "bar"') != -1
-        print(res)
+       # print(res)
 
     def test_like(self):
         q = '''
         from table
         filter foo | like "%"'''
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         assert res.index('WHERE foo LIKE "%"') != -1
-        print(res)
+       # print(res)
 
     def test_alias(self):
         q = '''
@@ -425,7 +425,7 @@ class TestSqlGenerator(unittest.TestCase):
         print(q)
         res = prql.to_sql(q)
         assert res.index('FROM `employees` e ') != -1
-        print(res)
+       # print(res)
 
     def test_alias_goes_the_extra_mile(self):
         q = '''
@@ -437,11 +437,11 @@ class TestSqlGenerator(unittest.TestCase):
         '''
         print(q)
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         assert res.index('even_longer_foo.some_value as val') != -1
         assert res.index('even_longer_foo.other_value as other_val') != -1
 
-        print(res)
+       # print(res)
 
     def test_join_alias(self):
         q = '''
@@ -449,18 +449,18 @@ class TestSqlGenerator(unittest.TestCase):
         join s:salaries [emp_no]
         join d:departments [dept_no]
         select [dept_name, gender, salary_avg, salary_sd]'''
-        res = prql.to_sql(q, True)
+        res = prql.to_sql(q)
         print('\n\n\n\n' + res)
         assert res.index('JOIN salaries s ON e.emp_no = s.emp_no') != -1
         assert res.index('JOIN departments d ON e.dept_no = d.dept_no') != -1
 
     def test_join_type_any_side(self):
         q = 'from employees | join salaries [emp_no] side:left'
-        res = prql.to_sql(q, True)
+        res = prql.to_sql(q)
         print('\n\n\n\n' + res)
         assert res.index('LEFT JOIN') != -1
         q = 'from employees | join salaries side:left [emp_no]'
-        res = prql.to_sql(q, True)
+        res = prql.to_sql(q)
         print('\n\n\n\n' + res)
         assert res.index('LEFT JOIN') != -1
 
@@ -470,7 +470,7 @@ class TestSqlGenerator(unittest.TestCase):
         join s:salaries [emp_no]
         join d:departments [dept_no]
         filter e.salary > s.salary'''
-        res = prql.to_sql(q, True)
+        res = prql.to_sql(q)
         print('\n\n\n\n' + res)
         assert res.index('WHERE e.salary>s.salary') != -1
 
@@ -488,8 +488,8 @@ class TestSqlGenerator(unittest.TestCase):
         ]
         join departments [dept_no]
         select [dept_name, gender, salary_avg, salary_sd]'''
-        res = prql.to_sql(q,True)
-        print(res)
+        res = prql.to_sql(q)
+       # print(res)
 
         assert res.index('AVG(salary) as emp_salary') != -1
         assert res.index('GROUP BY emp_no,gender') != -1
@@ -511,5 +511,5 @@ class TestSqlGenerator(unittest.TestCase):
         ]
         join departments [dept_no]
         select [dept_name, title, avg_salary]'''
-        res = prql.to_sql(q,True)
-        print(res)
+        res = prql.to_sql(q)
+       # print(res)

@@ -889,12 +889,14 @@ def ast_to_sql(
                         )
                     )
 
-                join_type = str(join.get_join_type())
+                join_type = join.get_join_type()
                 if join_type is None:
-                    join_type = "JOIN"
+                    join_type_str = "JOIN"
+                else:
+                    join_type_str = str(join.get_join_type())
 
                 join_str += replace_tables(
-                    f"{join_type} {join.name} {join_short} ON {left_side} = {right_side} "
+                    f"{join_type_str} {join.name} {join_short} ON {left_side} = {right_side} "
                 )
 
         if selects:

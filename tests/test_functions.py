@@ -35,7 +35,7 @@ class TestSqlGenerator(unittest.TestCase):
         ]
         """
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         self.assertTrue(res.index("COUNT(*) as cnt") > 0)
         self.run_query(q)
 
@@ -48,7 +48,7 @@ class TestSqlGenerator(unittest.TestCase):
         """
         res = prql.to_sql(q)
         self.assertTrue(res.index('REPLACE(name,"foo","bar") as cleaned') > 0)
-        print(res)
+       # print(res)
         self.run_query(q, 12)
 
     def test_nested_functions(self):
@@ -61,7 +61,7 @@ class TestSqlGenerator(unittest.TestCase):
             triple_nested: ((name | replace "dirty" "clean") | replace "," " ") | trim " "
         ]"""
         res = prql.to_sql(q)
-        print(res)
+       # print(res)
         trimmed = "RTRIM(name) as trimmed"
         simple = 'REPLACE(name,"dirty","clean") as cleaned'
         nest1 = 'LTRIM(RTRIM(name,",")) as nested'

@@ -101,8 +101,8 @@ class TestStdlib(unittest.TestCase):
 
     def test_count(self):
         q = """from table | select [ foo, bar ] | aggregate foo | count"""
-        res = prql.to_sql(q, True)
-        print(res)
+        res = prql.to_sql(q)
+        # print(res)
         self.assertTrue(res.index("COUNT(foo)") != -1)
         self.run_query(q, 1)
         # print(res)
@@ -209,7 +209,7 @@ class TestStdlib(unittest.TestCase):
     def test_trim(self):
         q = "from table | select name  | derive trimmed: name | trim | take 5"
         res = prql.to_sql(q)
-        print(res)
+        # print(res)
         self.assertTrue(res.index("TRIM(name) as trimmed") != -1)
         self.run_query(q, 5)
 
@@ -219,7 +219,7 @@ class TestStdlib(unittest.TestCase):
             derive [ trimmed: name | trim "," ]
         """
         res = prql.to_sql(q)
-        print(res)
+        # print(res)
         self.assertTrue(res.index('TRIM(name,",") as trimmed') != -1)
         self.run_query(q, 12)
 
@@ -229,7 +229,7 @@ class TestStdlib(unittest.TestCase):
             derive [ trimmed: name | trim " ~something_weird~ " ]
         """
         res = prql.to_sql(q)
-        print(res)
+        # print(res)
         self.assertTrue(res.index('TRIM(name," ~something_weird~ ") as trimmed') != -1)
         self.run_query(q, 12)
 
@@ -240,14 +240,14 @@ class TestStdlib(unittest.TestCase):
             derive [ trimmed: trim name " ~something_weird~ " ]
         """
         res = prql.to_sql(q)
-        print(res)
+        # print(res)
         self.assertTrue(res.index('TRIM(name,",") as trimmed') != -1)
         self.run_query(q, 12)
 
     def test_ltrim(self):
         q = "from table | select name  | derive trimmed: name | ltrim | take 5"
         res = prql.to_sql(q)
-        print(res)
+        # print(res)
         self.assertTrue(res.index("LTRIM(name) as trimmed") != -1)
         self.run_query(q, 5)
 
@@ -257,14 +257,14 @@ class TestStdlib(unittest.TestCase):
             derive [ trimmed: name | ltrim "," ]
         """
         res = prql.to_sql(q)
-        print(res)
+        # print(res)
         self.assertTrue(res.index('LTRIM(name,",") as trimmed') != -1)
         self.run_query(q, 12)
 
     def test_rtrim(self):
         q = "from table | select name  | derive trimmed: name | rtrim | take 5"
         res = prql.to_sql(q)
-        print(res)
+        # print(res)
         self.assertTrue(res.index("RTRIM(name) as trimmed") != -1)
         self.run_query(q, 5)
 
@@ -276,7 +276,7 @@ class TestStdlib(unittest.TestCase):
             trimmed2: (name | rtrim ",") | ltrim
         ]"""
         res = prql.to_sql(q)
-        print(res)
+        # print(res)
         self.assertTrue(res.index("RTRIM(name) as trimmed") != -1)
         self.run_query(q, 12)
 
@@ -286,7 +286,7 @@ class TestStdlib(unittest.TestCase):
             derive [ trimmed: name | rtrim "," ]
         """
         res = prql.to_sql(q)
-        print(res)
+        # print(res)
         self.assertTrue(res.index('RTRIM(name,",") as trimmed') != -1)
         self.run_query(q, 12)
 
@@ -299,13 +299,13 @@ class TestStdlib(unittest.TestCase):
         """
         res = prql.to_sql(q, verbose=True)
         self.assertTrue(res.index('REPLACE(name,"foo","bar") as cleaned') > 0)
-        print(res)
+        # print(res)
         self.run_query(q, 12)
 
     def test_substr(self):
         q = """
         from table | select name | derive [ short: name | substr 0 3 ]"""
         res = prql.to_sql(q, verbose=True)
-        print(res)
+        # print(res)
         self.assertTrue(res.index("SUBSTR(name,0,3) as short") > 0)
         self.run_query(q, 12)

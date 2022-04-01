@@ -16,7 +16,7 @@ class TestEmployeeExamples(unittest.TestCase):
     def run_query(self, text, expected=None):
         print(text.replace("\n\n", "\n"))
         print("-" * 40)
-        sql = prql.to_sql(text, True)
+        sql = prql.to_sql(text)
         print(sql)
         rows = TestEmployeeExamples.cur.execute(sql)
         columns = [d[0] for d in rows.description]
@@ -65,7 +65,7 @@ class TestEmployeeExamples(unittest.TestCase):
         order_by_str = "ORDER BY sum_gross_cost "
         limit_str = "LIMIT 20"
 
-        sql = prql.to_sql(text, True)
+        sql = prql.to_sql(text)
         [self.assertTrue(sql.index(f) > 0) for f in agg_funcs]
         self.assertTrue(sql.index(filter_str) > 0)
         self.assertTrue(sql.index(filter_str_2) > 0)
@@ -89,6 +89,6 @@ class TestEmployeeExamples(unittest.TestCase):
         join salary [id]
         select [name, salary]
         """
-        sql = prql.to_sql(text, True)
+        sql = prql.to_sql(text)
         print(sql)
         # self.run_query(text)
