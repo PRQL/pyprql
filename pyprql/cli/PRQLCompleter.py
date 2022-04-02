@@ -7,9 +7,11 @@ from enforce_typing import enforce_types
 from prompt_toolkit.completion import CompleteEvent, Completer, Completion
 from prompt_toolkit.document import Document
 
+from pyprql.lang import prql
 
-def log_to_file(s):
-    with open('output.txt', 'a') as f:
+
+def _debug_log_to_file(s):
+    with open('.prql_cli_debug_output.txt', 'a') as f:
         f.write(datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
         f.write(":" + s)
         f.write('\n')
@@ -51,6 +53,12 @@ class PRQLCompleter(Completer):
         self.prev_word: Optional[str] = None
         self.previous_selection: Optional[List[str]] = None
 
+        self.last_good_table_aliases = {}
+
+    def parse_prql(self, text: str) -> Optional[prql.Root]:
+        ast = prql.parse(text)
+        return ast
+
     def get_completions(
             self, document: Document, complete_event: CompleteEvent
     ) -> Iterable[Completion]:
@@ -70,6 +78,13 @@ class PRQLCompleter(Completer):
             The completion object.
         """
         word_before_cursor = document.get_word_before_cursor(WORD=True)
+        _debug_log_to_file(word_before_cursor)
+
+        table_aliases = self.get_table_aliases(str(document.text))
+        if table_aliases is not None:
+            self.last_good_table_aliases = table_aliases
+            _debug_log_to_file('last_good_table_aliases=' + str(table_aliases))
+
         # We're only interested in everything after the dot
         if '.' in word_before_cursor and not word_before_cursor.endswith('.'):
             word_before_cursor = word_before_cursor.split('.')[-1]
@@ -77,8 +92,6 @@ class PRQLCompleter(Completer):
         # Same with the colon
         if ':' in word_before_cursor and not word_before_cursor.endswith(':'):
             word_before_cursor = word_before_cursor.split(':')[-1]
-
-        log_to_file(word_before_cursor)
 
         completion_operators = ["[", "+", ","]
         possible_matches = {
@@ -101,14 +114,18 @@ class PRQLCompleter(Completer):
             "side:": ["left", "inner", "right", "outer"],
             "order:": ["asc", "desc"],
             "by:": self.column_names,
-
         }
+        aliases = {}
+
+        for alias in self.last_good_table_aliases.keys():
+            aliases[alias] = self.column_map[self.last_good_table_aliases[alias]]
         # print(word_before_cursor)
         for op in completion_operators:
             possible_matches[op] = self.column_names
 
         # This delays the completions until they hit space, or a completion operator
         if word_before_cursor in possible_matches:
+            _debug_log_to_file('possible_matches')
             selection = possible_matches[word_before_cursor]
             selection = [f"{x}" for x in selection]
             self.previous_selection = selection
@@ -128,9 +145,14 @@ class PRQLCompleter(Completer):
             else:
                 for m in selection:
                     yield Completion(m, start_position=-len(word_before_cursor))
-        elif len(word_before_cursor) == 0 or word_before_cursor[-1] == " " or word_before_cursor[-1] == "\t" or word_before_cursor[-1] == "\n":
+        elif len(word_before_cursor) == 0 or word_before_cursor[-1] == " " or word_before_cursor[-1] == "\t" or \
+                word_before_cursor[-1] == "\n":
+            # self.previous_selection = []
+            _debug_log_to_file('null')
             return None
         elif word_before_cursor in builtin_matches:
+            _debug_log_to_file('builtin_matches')
+
             selection = builtin_matches[word_before_cursor]
             self.previous_selection = selection
             for m in selection:
@@ -140,23 +162,36 @@ class PRQLCompleter(Completer):
                 len(word_before_cursor) >= 1
                 and word_before_cursor[-1] in completion_operators
         ):
+            _debug_log_to_file('completion_operators')
+
             selection = possible_matches[word_before_cursor[-1]]
             self.previous_selection = selection
         # If its a period, then we assume the first word was a table
         elif len(word_before_cursor) >= 1 and word_before_cursor[-1] == ".":
+            _debug_log_to_file('period')
+
             table = word_before_cursor[:-1]
+            _debug_log_to_file('table=' + table)
+            _debug_log_to_file('aliases=' + str(self.last_good_table_aliases.keys()))
+
+            if table in self.last_good_table_aliases.keys():
+                table = self.last_good_table_aliases[table]
             if table in self.column_map:
                 selection = self.column_map[table]
                 self.previous_selection = selection
                 for m in selection:
                     yield Completion(str(m), start_position=0)
         elif len(word_before_cursor) >= 1 and word_before_cursor[-1] == ":":
+            _debug_log_to_file('colon')
+
             selection = self.column_map.keys()
             self.previous_selection = selection
             for m in selection:
                 yield Completion(str(m), start_position=0)
         # This goes back to the first if, this is the delayed completion finally completing
         elif self.previous_selection:
+            _debug_log_to_file('previous_selection')
+
             # They have selected something, so just clear it out
             selection = [
                 x for x in self.previous_selection if x.find(word_before_cursor) != -1
@@ -166,8 +201,17 @@ class PRQLCompleter(Completer):
             for m in selection:
                 yield Completion(m, start_position=-len(word_before_cursor))
 
-        # This is supposed to complete keywords, but its tromping all over the other completions
-        # else:
-        #     completer = FuzzyWordCompleter(self.prql_keywords)
-        #     for m in completer.get_completions(document, complete_event):
-        #         yield m
+    @enforce_types
+    def get_table_aliases(self, full_text: str) -> Optional[Dict]:
+        try:
+            ret = {}
+            root = self.parse_prql(full_text)
+            joins = prql.get_operation(root.get_from().pipes.operations, class_type=prql.Join, return_all=True)
+            # print('joins=' +str(joins))
+            for join in joins:
+                if join.alias is not None:
+                    ret[str(join.alias)] = str(join.name)
+            return ret
+        except Exception as e:
+            # print(e)
+            return None

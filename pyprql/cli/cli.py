@@ -240,7 +240,7 @@ class CLI:
             self.sql_mode = True
             self.prompt_text = "SQL> "
             return
-        elif user_input == "show tables" or user_input == "\dt":
+        elif user_input == "show tables" or user_input == "\dt" or user_input == "ls":
             # tables = self.engine.list_tables()
             tables = self.inspector.get_table_names()
             table = Table(show_header=True, header_style="bold sandy_brown")
@@ -250,7 +250,7 @@ class CLI:
             rich.print(table)
             return
         elif user_input.startswith("show columns") or user_input == "\d+":
-            table_name = user_input["show columns ".__len__() :]
+            table_name = user_input["show columns ".__len__():]
             # tables = self.engine.list_tables()
             columns = self.inspector.get_columns(table_name)
             rich.print(columns)
