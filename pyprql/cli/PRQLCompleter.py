@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Prompt_toolkit completion engine for PyPRQL CLI."""
+from datetime import datetime
 from typing import Dict, Iterable, List, Optional
 
 from enforce_typing import enforce_types
@@ -7,16 +8,23 @@ from prompt_toolkit.completion import CompleteEvent, Completer, Completion
 from prompt_toolkit.document import Document
 
 
+def log_to_file(s):
+    with open('output.txt', 'a') as f:
+        f.write(datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+        f.write(":" + s)
+        f.write('\n')
+
+
 class PRQLCompleter(Completer):
     """Prompt_toolkit completion engine for PyPRQL CLI."""
 
     @enforce_types
     def __init__(
-        self,
-        table_names: List[str],
-        column_names: List[str],
-        column_map: Dict[str, List[str]],
-        prql_keywords: List[str],
+            self,
+            table_names: List[str],
+            column_names: List[str],
+            column_map: Dict[str, List[str]],
+            prql_keywords: List[str],
     ) -> None:
         """Initialise a completer instance.
 
@@ -44,7 +52,7 @@ class PRQLCompleter(Completer):
         self.previous_selection: Optional[List[str]] = None
 
     def get_completions(
-        self, document: Document, complete_event: CompleteEvent
+            self, document: Document, complete_event: CompleteEvent
     ) -> Iterable[Completion]:
         """Retrieve completion options.
 
@@ -62,6 +70,16 @@ class PRQLCompleter(Completer):
             The completion object.
         """
         word_before_cursor = document.get_word_before_cursor(WORD=True)
+        # We're only interested in everything after the dot
+        if '.' in word_before_cursor and not word_before_cursor.endswith('.'):
+            word_before_cursor = word_before_cursor.split('.')[-1]
+
+        # Same with the colon
+        if ':' in word_before_cursor and not word_before_cursor.endswith(':'):
+            word_before_cursor = word_before_cursor.split(':')[-1]
+
+        log_to_file(word_before_cursor)
+
         completion_operators = ["[", "+", ",", ":"]
         possible_matches = {
             "from": self.table_names,
@@ -78,11 +96,12 @@ class PRQLCompleter(Completer):
             "filter": self.column_names,
             "exit": [""],
         }
-        matches_that_need_prev_word = {
+        builtin_matches = {
             "show": ["tables", "columns", "connection"],
             "side:": ["left", "inner", "right", "outer"],
             "order:": ["asc", "desc"],
             "by:": self.column_names,
+
         }
         # print(word_before_cursor)
         for op in completion_operators:
@@ -95,29 +114,28 @@ class PRQLCompleter(Completer):
             self.previous_selection = selection
             # This can be reworked to a if not in operator. No pass required.
             if (
-                word_before_cursor == "from"
-                or word_before_cursor == "join"
-                or word_before_cursor == "sort"
-                or word_before_cursor == "select"
-                or word_before_cursor == "columns"
-                or word_before_cursor == "show"
-                or word_before_cursor == ","
-                or word_before_cursor == "["
-                or word_before_cursor == "filter"
+                    word_before_cursor == "from"
+                    or word_before_cursor == "join"
+                    or word_before_cursor == "sort"
+                    or word_before_cursor == "select"
+                    or word_before_cursor == "columns"
+                    or word_before_cursor == "show"
+                    or word_before_cursor == ","
+                    or word_before_cursor == "["
+                    or word_before_cursor == "filter"
             ):
                 pass
             else:
                 for m in selection:
                     yield Completion(m, start_position=-len(word_before_cursor))
-        elif word_before_cursor in matches_that_need_prev_word:
-            selection = matches_that_need_prev_word[word_before_cursor]
-            #            selection = [f"{x}" for x in selection]
+        elif word_before_cursor in builtin_matches:
+            selection = builtin_matches[word_before_cursor]
             for m in selection:
                 yield Completion(m, start_position=0)
         # If its an operator
         elif (
-            len(word_before_cursor) >= 1
-            and word_before_cursor[-1] in completion_operators
+                len(word_before_cursor) >= 1
+                and word_before_cursor[-1] in completion_operators
         ):
             selection = possible_matches[word_before_cursor[-1]]
             self.previous_selection = selection
@@ -128,7 +146,7 @@ class PRQLCompleter(Completer):
                 selection = self.column_map[table]
                 self.previous_selection = selection
                 for m in selection:
-                    yield Completion(m, start_position=0)
+                    yield Completion(str(m), start_position=0)
         # This goes back to the first if, this is the delayed completion finally completing
         elif self.previous_selection:
             selection = [
