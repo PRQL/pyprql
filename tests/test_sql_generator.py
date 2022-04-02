@@ -42,7 +42,7 @@ class TestSqlGenerator(unittest.TestCase):
         self.assertTrue(res.startswith("SELECT foo"))
         self.run_query(q)
 
-    def test_select_sort(self):
+    def test_sort(self):
         q = """
         from table | select foo | sort foo 
         """
@@ -50,7 +50,7 @@ class TestSqlGenerator(unittest.TestCase):
         self.assertTrue(res.startswith("SELECT foo"))
         self.run_query(q)
 
-    def test_select_sort_and_order(self):
+    def test_sort_and_order(self):
         q = """
         from table | select foo | sort foo order:desc 
         """
@@ -59,7 +59,7 @@ class TestSqlGenerator(unittest.TestCase):
         self.assertTrue(res.index("ORDER BY foo DESC ") != -1)
         self.run_query(q)
 
-    def test_select_sort_and_order_2(self):
+    def test_sort_and_order_2(self):
         q = """
         from table | select foo | sort bar order:asc 
         """
@@ -68,7 +68,7 @@ class TestSqlGenerator(unittest.TestCase):
         self.assertTrue(res.index("ORDER BY bar ASC ") != -1)
         self.run_query(q)
 
-    def test_select_sort_on_many(self):
+    def test_sort_on_many(self):
         q = """
         from table | select foo | sort [ foo, bar ] 
         """
@@ -77,7 +77,16 @@ class TestSqlGenerator(unittest.TestCase):
         self.assertTrue(res.index("ORDER BY foo,bar ") != -1)
         self.run_query(q)
 
-    def test_select_sort_on_many_with_direction(self):
+    def test_sort_order_on_either_side(self):
+        q = """
+        from table | select foo | sort order:desc foo order:asc | take 10
+        """
+        res = prql.to_sql(q)
+        print(res)
+        assert res.index("ORDER BY foo DESC") != -1
+
+
+    def test_sort_on_many_with_direction(self):
         q = """
         from table | select foo | sort [ foo, bar ] order:desc 
         """

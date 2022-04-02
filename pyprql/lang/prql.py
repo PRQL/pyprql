@@ -279,13 +279,25 @@ class Descending(_Direction):
 
 @dataclass
 class Sort(_Ast):
-    fields: SortFields
-    direction: Optional[Direction] = None
+    direction1: Optional[Direction] = None
+    fields: SortFields = None
+    direction2: Optional[Direction] = None
+
+    def get_direction(self) -> Optional[Direction]:
+        ret = None
+        if self.direction1 is not None:
+            ret = self.direction1
+        elif self.direction2 is not None:
+            ret = self.direction2
+        return ret
 
     def __str__(self) -> str:
-        return (
-            f'{str(self.fields)} {self.direction if self.direction is not None else ""}'
-        )
+        direction = self.get_direction()
+        ret = f"{str(self.fields)}"
+        if direction is not None:
+            ret = f"{ret} {str(direction)}"
+        return ret
+
 
 
 @dataclass
@@ -809,7 +821,7 @@ def ast_to_sql(
         joins: List[Join] = get_operation(ops.operations, Join, return_all=True)
         agg: Aggregate = get_operation(ops.operations, Aggregate)
         take: Take = get_operation(ops.operations, Take, last_match=True)
-        sort: Sort = get_operation(ops.operations, Sort, last_match=True)
+        sort: Sort = get_operation(ops.operations, Sort)
 
         filters = get_operation(
             ops.operations, Filter, return_all=True, before=Aggregate

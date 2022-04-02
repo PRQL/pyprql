@@ -10,13 +10,6 @@ from prompt_toolkit.document import Document
 from pyprql.lang import prql
 
 
-def _debug_log_to_file(s):
-    with open('.prql_cli_debug_output.txt', 'a') as f:
-        f.write(datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
-        f.write(":" + s)
-        f.write('\n')
-
-
 class PRQLCompleter(Completer):
     """Prompt_toolkit completion engine for PyPRQL CLI."""
 
@@ -55,6 +48,7 @@ class PRQLCompleter(Completer):
 
         self.last_good_table_aliases = {}
 
+    @enforce_types
     def parse_prql(self, text: str) -> Optional[prql.Root]:
         ast = prql.parse(text)
         return ast
@@ -78,10 +72,16 @@ class PRQLCompleter(Completer):
             The completion object.
         """
         word_before_cursor = document.get_word_before_cursor(WORD=True)
-        _debug_log_to_file(word_before_cursor)
+        _debug_log_to_file('wbc:'+word_before_cursor)
+        working_column_names = self.column_names
+        _debug_log_to_file('wcn:'+str(working_column_names))
+        # If we have a from_table, then set the column names to just that table
+        from_table = self.get_from_table(str(document.text))
+        if from_table is not None:
+            working_column_names = self.column_map.get(from_table, [])
 
         table_aliases = self.get_table_aliases(str(document.text))
-        if table_aliases is not None:
+        if table_aliases is not None and table_aliases:
             self.last_good_table_aliases = table_aliases
             _debug_log_to_file('last_good_table_aliases=' + str(table_aliases))
 
@@ -98,30 +98,30 @@ class PRQLCompleter(Completer):
             "from": self.table_names,
             "join": self.table_names,
             "columns": self.table_names,
-            "select": self.column_names,
-            " ": self.column_names,
-            "sort": self.column_names,
-            "sum": self.column_names,
-            "avg": self.column_names,
-            "min": self.column_names,
-            "max": self.column_names,
-            "count": self.column_names,
-            "filter": self.column_names,
+            "select": working_column_names,
+            " ": working_column_names,
+            "sort": working_column_names,
+            "sum": working_column_names,
+            "avg": working_column_names,
+            "min": working_column_names,
+            "max": working_column_names,
+            "count": working_column_names,
+            "filter": working_column_names,
             "exit": [""],
         }
         builtin_matches = {
             "show": ["tables", "columns", "connection"],
             "side:": ["left", "inner", "right", "outer"],
             "order:": ["asc", "desc"],
-            "by:": self.column_names,
+            "by:": working_column_names,
         }
         aliases = {}
 
         for alias in self.last_good_table_aliases.keys():
             aliases[alias] = self.column_map[self.last_good_table_aliases[alias]]
-        # print(word_before_cursor)
+
         for op in completion_operators:
-            possible_matches[op] = self.column_names
+            possible_matches[op] = working_column_names
 
         # This delays the completions until they hit space, or a completion operator
         if word_before_cursor in possible_matches:
@@ -147,7 +147,6 @@ class PRQLCompleter(Completer):
                     yield Completion(m, start_position=-len(word_before_cursor))
         elif len(word_before_cursor) == 0 or word_before_cursor[-1] == " " or word_before_cursor[-1] == "\t" or \
                 word_before_cursor[-1] == "\n":
-            # self.previous_selection = []
             _debug_log_to_file('null')
             return None
         elif word_before_cursor in builtin_matches:
@@ -192,7 +191,6 @@ class PRQLCompleter(Completer):
         elif self.previous_selection:
             _debug_log_to_file('previous_selection')
 
-            # They have selected something, so just clear it out
             selection = [
                 x for x in self.previous_selection if x.find(word_before_cursor) != -1
             ]
@@ -207,11 +205,30 @@ class PRQLCompleter(Completer):
             ret = {}
             root = self.parse_prql(full_text)
             joins = prql.get_operation(root.get_from().pipes.operations, class_type=prql.Join, return_all=True)
-            # print('joins=' +str(joins))
             for join in joins:
                 if join.alias is not None:
                     ret[str(join.alias)] = str(join.name)
+
+            if root.get_from().alias is not None:
+                ret[str(root.get_from().alias)] = str(root.get_from().name)
+
             return ret
         except Exception as e:
             # print(e)
             return None
+
+    @enforce_types
+    def get_from_table(self, full_text: str) -> Optional[str]:
+        try:
+            root = self.parse_prql(full_text)
+            return str(root.get_from())
+        except Exception as e:
+            # print(e)
+            return None
+
+def _debug_log_to_file(s):
+    with open('.prql_cli_debug_output.txt', 'a') as f:
+        f.write(datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+        f.write(":" + s)
+        f.write('\n')
+
