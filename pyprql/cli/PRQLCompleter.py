@@ -80,7 +80,7 @@ class PRQLCompleter(Completer):
 
         log_to_file(word_before_cursor)
 
-        completion_operators = ["[", "+", ",", ":"]
+        completion_operators = ["[", "+", ","]
         possible_matches = {
             "from": self.table_names,
             "join": self.table_names,
@@ -128,8 +128,11 @@ class PRQLCompleter(Completer):
             else:
                 for m in selection:
                     yield Completion(m, start_position=-len(word_before_cursor))
+        elif len(word_before_cursor) == 0 or word_before_cursor[-1] == " " or word_before_cursor[-1] == "\t" or word_before_cursor[-1] == "\n":
+            return None
         elif word_before_cursor in builtin_matches:
             selection = builtin_matches[word_before_cursor]
+            self.previous_selection = selection
             for m in selection:
                 yield Completion(m, start_position=0)
         # If its an operator
@@ -147,8 +150,14 @@ class PRQLCompleter(Completer):
                 self.previous_selection = selection
                 for m in selection:
                     yield Completion(str(m), start_position=0)
+        elif len(word_before_cursor) >= 1 and word_before_cursor[-1] == ":":
+            selection = self.column_map.keys()
+            self.previous_selection = selection
+            for m in selection:
+                yield Completion(str(m), start_position=0)
         # This goes back to the first if, this is the delayed completion finally completing
         elif self.previous_selection:
+            # They have selected something, so just clear it out
             selection = [
                 x for x in self.previous_selection if x.find(word_before_cursor) != -1
             ]

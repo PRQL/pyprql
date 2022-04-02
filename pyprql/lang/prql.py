@@ -714,7 +714,7 @@ def execute_function(
 
 @enforce_types
 def is_empty(a: Any) -> bool:
-    if a is not None and a != "None" and a != "none" and a != "":
+    if a is not None and a:
         return False
     return True
 
