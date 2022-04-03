@@ -78,7 +78,7 @@ class TestEmployeeExamples(unittest.TestCase):
         self.run_query(text)
 
     def test_cte1(self):
-        text = """
+        q = """
         table newest_employees = (
             from employees
             sort tenure
@@ -89,6 +89,17 @@ class TestEmployeeExamples(unittest.TestCase):
         join salary [id]
         select [name, salary]
         """
-        sql = prql.to_sql(text)
+        sql = prql.to_sql(q)
         print(sql)
         # self.run_query(text)
+
+    def test_derive_issue_20(self):
+        q = '''
+        from employees 
+        select [ benefits_cost , salary, title ] 
+        aggregate by:title [ ttl_sal: salary | sum ]  
+        derive [ avg_sal: salary  ] 
+        sort ttl_sal order:desc | take 25'''
+        sql = prql.to_sql(q,True)
+        assert sql.index("avg_sal") > 0
+        print(sql)

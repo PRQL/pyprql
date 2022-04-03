@@ -145,19 +145,6 @@ class Join(_Ast):
         else:
             return None
 
-    #
-    # def __post_init__(self) -> None:
-    #     if isinstance(self.name, JoinType):
-    #         temp = self.join_type
-    #         self.join_type = self.name
-    #         self.name = temp  # type: ignore[assignment]
-    #     if isinstance(self.join_type, Name):
-    #         # Now we need to shift everything , since join_type is now our left_id
-    #         temp = self.left_id
-    #         self.left_id = self.join_type
-    #         self.right_id = temp
-    #         self.join_type = None
-
 
 @dataclass
 class SelectField(_Ast):
@@ -292,13 +279,24 @@ class Descending(_Direction):
 
 @dataclass
 class Sort(_Ast):
-    fields: SortFields
-    direction: Optional[Direction] = None
+    direction1: Optional[Direction] = None
+    fields: Optional[SortFields] = None
+    direction2: Optional[Direction] = None
+
+    def get_direction(self) -> Optional[Direction]:
+        ret = None
+        if self.direction1 is not None:
+            ret = self.direction1
+        elif self.direction2 is not None:
+            ret = self.direction2
+        return ret
 
     def __str__(self) -> str:
-        return (
-            f'{str(self.fields)} {self.direction if self.direction is not None else ""}'
-        )
+        direction = self.get_direction()
+        ret = f"{str(self.fields)}"
+        if direction is not None:
+            ret = f"{ret} {str(direction)}"
+        return ret
 
 
 @dataclass
@@ -727,7 +725,7 @@ def execute_function(
 
 @enforce_types
 def is_empty(a: Any) -> bool:
-    if a is not None and a != "None" and a != "none" and a != "":
+    if a is not None and a:
         return False
     return True
 
@@ -822,7 +820,7 @@ def ast_to_sql(
         joins: List[Join] = get_operation(ops.operations, Join, return_all=True)
         agg: Aggregate = get_operation(ops.operations, Aggregate)
         take: Take = get_operation(ops.operations, Take, last_match=True)
-        sort: Sort = get_operation(ops.operations, Sort, last_match=True)
+        sort: Sort = get_operation(ops.operations, Sort)
 
         filters = get_operation(
             ops.operations, Filter, return_all=True, before=Aggregate

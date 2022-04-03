@@ -6,3 +6,4 @@ __pycache__/
 scratch.py
 .python-version
 .prql-history.txt
+*.db

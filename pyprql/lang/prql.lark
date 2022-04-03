@@ -30,7 +30,7 @@
     filter: ("filter" "[" filter_line ( "," filter_line)* "]") | \
             ("filter" filter_line)
     filter_line: (ESCAPED_STRING|expression)
-    sort: "sort" sort_fields ( "order" ":" direction)?
+    sort: "sort" ["order" ":" direction] sort_fields ["order" ":" direction]
     sort_fields: ("[" name ("," name)* "]" )* \
                  (ESCAPED_STRING|name*)
 
