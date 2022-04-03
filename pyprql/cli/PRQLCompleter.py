@@ -72,9 +72,9 @@ class PRQLCompleter(Completer):
             The completion object.
         """
         word_before_cursor = document.get_word_before_cursor(WORD=True)
-        _debug_log_to_file('wbc:'+word_before_cursor)
+        _debug_log_to_file('wbc:' + word_before_cursor)
         working_column_names = self.column_names
-        _debug_log_to_file('wcn:'+str(working_column_names))
+        _debug_log_to_file('wcn:' + str(working_column_names))
         # If we have a from_table, then set the column names to just that table
         from_table = self.get_from_table(str(document.text))
         if from_table is not None:
@@ -97,6 +97,7 @@ class PRQLCompleter(Completer):
         possible_matches = {
             "from": self.table_names,
             "join": self.table_names,
+            "\d+": self.table_names,
             "columns": self.table_names,
             "select": working_column_names,
             " ": working_column_names,
@@ -123,26 +124,15 @@ class PRQLCompleter(Completer):
         for op in completion_operators:
             possible_matches[op] = working_column_names
 
-        # This delays the completions until they hit space, or a completion operator
+        # This delays the completions until they hit space,
+        # it feels weird when the completion comes up when you're still at the keyword
         if word_before_cursor in possible_matches:
             _debug_log_to_file('possible_matches')
             selection = possible_matches[word_before_cursor]
             selection = [f"{x}" for x in selection]
             self.previous_selection = selection
             # This can be reworked to a if not in operator. No pass required.
-            if (
-                    word_before_cursor == "from"
-                    or word_before_cursor == "join"
-                    or word_before_cursor == "sort"
-                    or word_before_cursor == "select"
-                    or word_before_cursor == "columns"
-                    or word_before_cursor == "show"
-                    or word_before_cursor == ","
-                    or word_before_cursor == "["
-                    or word_before_cursor == "filter"
-            ):
-                pass
-            else:
+            if word_before_cursor not in possible_matches.keys():
                 for m in selection:
                     yield Completion(m, start_position=-len(word_before_cursor))
         elif len(word_before_cursor) == 0 or word_before_cursor[-1] == " " or word_before_cursor[-1] == "\t" or \
@@ -226,9 +216,9 @@ class PRQLCompleter(Completer):
             # print(e)
             return None
 
+
 def _debug_log_to_file(s):
     with open('.prql_cli_debug_output.txt', 'a') as f:
         f.write(datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
         f.write(":" + s)
         f.write('\n')
-
