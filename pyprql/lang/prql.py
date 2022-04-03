@@ -280,7 +280,7 @@ class Descending(_Direction):
 @dataclass
 class Sort(_Ast):
     direction1: Optional[Direction] = None
-    fields: SortFields = None
+    fields: Optional[SortFields] = None
     direction2: Optional[Direction] = None
 
     def get_direction(self) -> Optional[Direction]:
@@ -297,7 +297,6 @@ class Sort(_Ast):
         if direction is not None:
             ret = f"{ret} {str(direction)}"
         return ret
-
 
 
 @dataclass

@@ -253,7 +253,7 @@ class CLI:
             key = "show columns"
             if key not in user_input:
                 key = "\d+"
-            table_name = user_input[key.__len__()+1:]
+            table_name = user_input[key.__len__() + 1 :]
             print(table_name)
             # tables = self.engine.list_tables()
             columns = self.inspector.get_columns(table_name)
