@@ -532,8 +532,11 @@ class TestSqlGenerator(unittest.TestCase):
 
     def test_prql_replace_tables_should_work_on_sort(self):
         q = '''
-        from albums | join tr:tracks [ AlbumId ]| join ar:artists [ ArtistId ] |  select [ albums.Title, tracks.Name , ar
-tists.Name ]  | take 100 | sort artists.Name order:desc'''
+        from albums join tr:tracks [ AlbumId ]
+        join ar:artists [ ArtistId ] 
+        select [ albums.Title, tracks.Name , artists.Name ]  
+        take 100 
+        sort ar.Name order:desc'''
         res = prql.to_sql(q)
         print(res)
         # sort by has the new alias
