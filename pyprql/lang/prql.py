@@ -851,7 +851,7 @@ def ast_to_sql(
             ops.operations, Filter, return_all=True, before=Aggregate
         )
         wheres_from_derives = get_operation(
-            ops.operations, Derive, return_all=True, before=Aggregate
+            ops.operations, Derive, return_all=True
         )
         havings = get_operation(
             ops.operations, Filter, return_all=True, after=Aggregate
@@ -910,27 +910,27 @@ def ast_to_sql(
             for select in selects:
                 select_str += replace_tables(str(select))
 
+        if havings:
+            havings_str = "HAVING "
+            for filter in havings:
+                if filter:
+                    for func in filter.fields:
+                        if func.val is not None:
+                            havings_str += (
+                                    ast_to_sql(
+                                        rule=func.val,
+                                        roots=roots,
+                                        symbol_table=symbol_table,
+                                        replace_tables=replace_tables,
+                                        verbose=verbose)
+                                    + " AND "
+                            )
+            havings_str = havings_str.rstrip(" AND ")
+
         if agg:
 
             if agg.group_by is not None:
                 group_by_str = f"GROUP BY {replace_tables(str(agg.group_by))}"
-
-            if havings is not None and len(havings) > 0:
-                havings_str = "HAVING "
-                for filter in havings:
-                    if filter:
-                        for func in filter.fields:
-                            if func.val is not None:
-                                havings_str += (
-                                        ast_to_sql(
-                                            rule=func.val,
-                                            roots=roots,
-                                            symbol_table=symbol_table,
-                                            replace_tables=replace_tables,
-                                            verbose=verbose)
-                                        + " AND "
-                                )
-                havings_str = havings_str.rstrip(" AND ")
 
             upper = len(agg.aggregate_body.statements)
             i = 0
