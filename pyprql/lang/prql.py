@@ -145,19 +145,6 @@ class Join(_Ast):
         else:
             return None
 
-    #
-    # def __post_init__(self) -> None:
-    #     if isinstance(self.name, JoinType):
-    #         temp = self.join_type
-    #         self.join_type = self.name
-    #         self.name = temp  # type: ignore[assignment]
-    #     if isinstance(self.join_type, Name):
-    #         # Now we need to shift everything , since join_type is now our left_id
-    #         temp = self.left_id
-    #         self.left_id = self.join_type
-    #         self.right_id = temp
-    #         self.join_type = None
-
 
 @dataclass
 class SelectField(_Ast):
