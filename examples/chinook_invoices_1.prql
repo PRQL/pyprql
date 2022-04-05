@@ -1,0 +1,9 @@
+from i:invoices
+join ii:invoice_items [ InvoiceId ]
+join t:tracks [ ii.TrackId=t.TrackId ]
+join a:albums [ albums.AlbumId=t.AlbumId ]
+join ar:artists [ a.ArtistId=ar.ArtistId]
+select [ ii.UnitPrice, i.InvoiceDate  , i.InvoiceId]
+derive [ album: a.Title , track: t.Name , artist: ar.Name, total: i.Total ] 
+sort InvoiceDate
+take 50

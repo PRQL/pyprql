@@ -1,0 +1,9 @@
+from tracks 
+join albums [ AlbumId ]  
+join artists [ albums.ArtistId=artists.ArtistId ]
+join genres [ GenreId ]
+derive [ artist: artists.Name, album: albums.Title, genre: genres.Name ]
+select tracks.Milliseconds 
+aggregate by:albums.Title [ track_count: albums.AlbumId | count ]
+take 20
+sort artists.Name
