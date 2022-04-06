@@ -29,7 +29,7 @@
 
     filter: ("filter" "[" filter_line ( "," filter_line)* "]") | \
             ("filter" filter_line)
-    filter_line: (ESCAPED_STRING|equal_expression)
+    filter_line: (ESCAPED_STRING|expression_eq)
     sort: "sort" ["order" ":" direction] sort_fields ["order" ":" direction]
     sort_fields: ("[" name ("," name)* "]" )* \
                  (ESCAPED_STRING|name*)
@@ -47,9 +47,9 @@
             ( "[" derive_line+ "]" | derive_line ))+
     derive_line: name ":" derive_body (",")?
 
-    derive_body: (ESCAPED_STRING|expression)
+    derive_body: (ESCAPED_STRING|expression_eq)
 
-    equal_expression: expression
+    expression_eq: expression
                 | expression "=" expression
                 | expression "<" expression -> expression_lt
                 | expression ">" expression -> expression_gt
@@ -68,10 +68,10 @@
                   | expression_product "/" expression_parens -> expression_div
 
     ?expression_parens: expression_root
-                      | "(" expression_parens "*" expression ")" -> expression_mul
-                      | "(" expression_parens "/" expression ")" -> expression_div
-                      | "(" expression_parens "+" expression ")" -> expression_add
-                      | "(" expression_parens "-" expression ")" -> expression_sub
+                      | "(" expression_parens "*" expression ")" -> expression_mul_parens
+                      | "(" expression_parens "/" expression ")" -> expression_div_parens
+                      | "(" expression_parens "+" expression ")" -> expression_add_parens
+                      | "(" expression_parens "-" expression ")" -> expression_sub_parens
 
     ?expression_root:  atom
 

@@ -286,7 +286,7 @@ class TestStdlib(unittest.TestCase):
             derive [ trimmed: name | rtrim "," ]
         """
         res = prql.to_sql(q)
-        # print(res)
+        print(res)
         self.assertTrue(res.index('RTRIM(name,",") as trimmed') != -1)
         self.run_query(q, 12)
 

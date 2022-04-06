@@ -367,8 +367,9 @@ class TestSqlGenerator(unittest.TestCase):
         from table
         filter [ foo > 10, bar < 20 ]
         """
-        res = prql.to_sql(q)
-        assert res.index("WHERE foo>10") != -1
+        res = prql.to_sql(q,True)
+        assert res.index("foo>10") != -1
+        assert res.index("bar<20") != -1
 
     # print(res)
 
@@ -405,7 +406,7 @@ class TestSqlGenerator(unittest.TestCase):
                  filter row_count > 200
                  take 20"""
         res = prql.to_sql(q)
-        # print(res)
+        print(res)
         assert res.index("HAVING row_count>200") != -1
 
     # print(res)
@@ -416,7 +417,7 @@ class TestSqlGenerator(unittest.TestCase):
         filter foo | like "bar"'''
         res = prql.to_sql(q)
         # print(res)
-        assert res.index('WHERE foo LIKE "bar"') != -1
+        assert res.index('foo LIKE "bar"') != -1
 
     # print(res)
 
@@ -426,7 +427,7 @@ class TestSqlGenerator(unittest.TestCase):
         filter foo | like "%"'''
         res = prql.to_sql(q,True)
         # print(res)
-        assert res.index('WHERE foo LIKE "%"') != -1
+        assert res.index('foo LIKE "%"') != -1
 
     # print(res)
 

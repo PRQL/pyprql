@@ -78,8 +78,8 @@ class Expression(_Ast, ast_utils.AsList):
 @dataclass
 class BinaryExpression(_Ast):
     left: _Ast
-    right: Optional[_Ast]
-    operator: str
+    right: Optional[_Ast] = None
+    operator: Optional[str] = None  # This will be overridden
 
     def __str__(self) -> str:
         if self.right is not None:
@@ -108,14 +108,35 @@ class ExpressionMul(BinaryExpression):
     operator: str = '*'
 
 
+# Unfortunately we have to recreate the expression based on the parsing when creating the sql.
+# So we need to know if the original had parentheses or not, they will all inherit from this class.
+class ParensExpression(BinaryExpression):
+    pass
+
+
 @dataclass
-class ExpressionDiv(BinaryExpression):
+class ExpressionAddParens(ParensExpression):
+    operator: str = '+'
+
+
+@dataclass
+class ExpressionSubParens(ParensExpression):
+    operator: str = '-'
+
+
+@dataclass
+class ExpressionMulParens(ParensExpression):
+    operator: str = '*'
+
+
+@dataclass
+class ExpressionDivParens(ParensExpression):
     operator: str = '/'
 
 
 @dataclass
-class ExpressionLt(BinaryExpression):
-    operator: str = '<'
+class ExpressionDiv(BinaryExpression):
+    operator: str = '/'
 
 
 @dataclass
@@ -124,7 +145,7 @@ class ExpressionGt(BinaryExpression):
 
 
 @dataclass
-class EqualExpression(BinaryExpression):
+class ExpressionEq(BinaryExpression):
     operator: str = '='
 
 
@@ -252,7 +273,7 @@ class Select(_Ast):
 
 @dataclass
 class DeriveBody(_Ast):
-    val: Union[str, Expression]
+    val: Union[str, _Ast]
 
     def __str__(self) -> str:
         return str(self.val)
@@ -484,10 +505,10 @@ class Root(_Ast):
 @dataclass
 class NameValuePair(_Ast):
     name: str
-    value: str
+    value: _Ast
 
     def __str__(self) -> str:
-        return f"({self.value})"
+        return f"{self.value}"
 
 
 class ToAst(Transformer):
@@ -540,11 +561,8 @@ def to_sql(prql: str, verbose: bool = False) -> str:
         rich.print(ast.get_from())
     if STDLIB_AST is None:
         STDLIB_AST = parse(read_file("stdlib.prql"))
-    # @formatter:off
     return (
-        ast_to_sql(ast.get_from(), [ast, STDLIB_AST], verbose=verbose).
-            replace("   ", " ").
-            replace("  ", " ")
+        ast_to_sql(ast.get_from(), [ast, STDLIB_AST], verbose=verbose).replace("   ", " ").replace("  ", " ")
     )
 
 
@@ -604,7 +622,7 @@ def _generate_alias(s: str, n: int = 1) -> str:
 
 
 @enforce_types
-def replace_all_tables_standalone(
+def replace_all_tables(
         from_long: str, from_short: str, join_long: List[str], join_short: List[str], s: str
 ) -> str:
     s = s.replace(f"{from_long}.", f"{from_short}.")
@@ -619,29 +637,7 @@ def wrap_replace_all_tables(
         from_long: str, from_short: str, join_long: List[str], join_short: List[str]
 ) -> Callable[[str], str]:
     def inner(x: str) -> str:
-        return replace_all_tables_standalone(
-            from_long, from_short, join_long, join_short, x
-        )
-
-    return inner
-
-
-@enforce_types
-def replace_tables_standalone(
-        from_long: str, from_short: str, join_long: str, join_short: str, s: str
-) -> str:
-    s = s.replace(f"{from_long}.", f"{from_short}.")
-    if join_long:
-        s = s.replace(f"{join_long}.", f"{join_short}.")
-    return s
-
-
-@enforce_types
-def wrap_replace_tables(
-        from_long: str, from_short: str, join_long: str, join_short: str
-) -> Callable[[str], str]:
-    def inner(x: str) -> str:
-        return replace_tables_standalone(
+        return replace_all_tables(
             from_long, from_short, join_long, join_short, x
         )
 
@@ -673,50 +669,49 @@ class PRQLException(Exception):
     pass
 
 
+def _replace_variables(ast: _Ast, symbol_table: Dict[str, List[_Ast]]) -> str:
+    if isinstance(ast, Expression):
+        msg = ""
+        exp: Expression = ast
+        for s in exp.statements:
+            msg += str(replace_variables(str(s), symbol_table))
+        return msg
+    elif isinstance(ast, DeriveBody):
+        msg = _replace_variables(ast.val, symbol_table)  # type: ignore [arg-type]
+        return msg
+    elif isinstance(ast, BinaryExpression):
+        msg = ''
+        if ast.left is not None:
+            msg = _replace_variables(ast.left, symbol_table)
+        if ast.right is not None:
+            msg += ast.operator + _replace_variables(ast.right, symbol_table)
+
+        return msg
+    else:
+        key = str(ast)
+        if key in symbol_table:
+            return str(symbol_table[key][0])
+        else:
+            return str(ast)
+
+
 @enforce_types
 def replace_variables(_param: Any, symbol_table: Dict[str, List[_Ast]]) -> str:
-    param: str = str(_param)
-    ic(_param, type(_param))
-    if param in symbol_table:
-        if not symbol_table[param]:
+    param_str: str = str(_param)
+
+    if param_str in symbol_table:
+        if not symbol_table[param_str]:
             return _param
-        if isinstance(symbol_table[param][0], NameValuePair):
-            nvp: NameValuePair = symbol_table[param][0]
-            if isinstance(nvp.value, Expression):
-                msg = ""
-                exp: Expression = nvp.value
-                for s in exp.statements:
-                    msg += str(replace_variables(str(s), symbol_table))
-
-                return msg
-            if isinstance(nvp.value, DeriveBody):
-                # TODO:  Need to update this to replace variables for this new tree
-                # DeriveLine(
-                #     name=Name(name=[Token('NAME', 'gross_cost')]),
-                #     expression=DeriveBody(
-                #         val=ExpressionAdd(
-                #             left=Expression(
-                #                 statements=[
-                #                     Value(
-                #                         value=Name(
-                #                             name=[
-                #                                 Token('NAME',
-                #                                       'gross_salary')
-                #                             ]
-                #                         )
-                #                     )
-                #                 ]
-                #             ),
-                msg = ""
-                # body_exp: Expression = nvp.value.val  # type: ignore[assignment]
-                msg += str(replace_variables(nvp.value.val, symbol_table))
-
-                return msg
-
+        if isinstance(symbol_table[param_str][0], NameValuePair):
+            nvp: NameValuePair = symbol_table[param_str][0]
+            msg = _replace_variables(nvp.value, symbol_table)
+            if msg is None:
+                return str(nvp.value)
             else:
-                return nvp.value
+                return msg
         else:
-            return str(symbol_table[param][0])
+            raise PRQLException(f'Unkown type in symbol table , for {type(symbol_table[param_str][0])} ')
+            # return str(symbol_table[param_str][0])
     else:
         return _param
 
@@ -745,52 +740,52 @@ def execute_function(
                 func_def = defintion
                 break
 
-    try:
-        if func_def:
-            for line in func_def.func_body.fields:
-                if isinstance(line, PipeBody):
-                    line = line.body
-                if isinstance(line, Expression):
-                    exp: Expression = line
-                    if len(exp.statements) != 1:
-                        raise PRQLException(
-                            "Currently only single statement functions that are text based are supported"
-                        )
-                    else:
-                        line = str(exp.statements[0])
-                if type(line) == str:
-                    args = {}
+    # try:
+    if func_def:
+        for line in func_def.func_body.fields:
+            if isinstance(line, PipeBody):
+                line = line.body
+            if isinstance(line, Expression):
+                exp: Expression = line
+                if len(exp.statements) != 1:
+                    raise PRQLException(
+                        "Currently only single statement functions that are text based are supported"
+                    )
+                else:
+                    line = str(exp.statements[0])
+            if type(line) == str:
+                args = {}
 
-                    vals = [
-                        safe_to_sql(
-                            replace_variables(f.parm1, symbol_table),
-                            roots,
-                            symbol_table,
-                        ),
-                        safe_to_sql(
-                            replace_variables(f.parm2, symbol_table),
-                            roots,
-                            symbol_table,
-                        ),
-                        safe_to_sql(
-                            replace_variables(f.parm3, symbol_table),
-                            roots,
-                            symbol_table,
-                        ),
-                    ]
+                vals = [
+                    safe_to_sql(
+                        replace_variables(f.parm1, symbol_table),
+                        roots,
+                        symbol_table,
+                    ),
+                    safe_to_sql(
+                        replace_variables(f.parm2, symbol_table),
+                        roots,
+                        symbol_table,
+                    ),
+                    safe_to_sql(
+                        replace_variables(f.parm3, symbol_table),
+                        roots,
+                        symbol_table,
+                    ),
+                ]
 
-                    if func_def.func_args is not None:
-                        for i in range(0, len(func_def.func_args.fields)):  # type: ignore[arg-type]
-                            n = str(func_def.func_args.fields[i])  # type: ignore[index]
-                            args[n] = vals[i]
-                        msg = line.format(**args)
-                    else:
-                        msg = line
-    except Exception as e:
-        msg = repr(e)
-        if "KeyError" in msg:
-            msg = f"Function {name} had an error executing , full error: {msg}"
-        raise PRQLException(msg)
+                if func_def.func_args is not None:
+                    for i in range(0, len(func_def.func_args.fields)):  # type: ignore[arg-type]
+                        n = str(func_def.func_args.fields[i])  # type: ignore[index]
+                        args[n] = vals[i]
+                    msg = line.format(**args)
+                else:
+                    msg = line
+    # except Exception as e:
+    #     msg = repr(e)
+    #     if "KeyError" in msg:
+    #         msg = f"Function {name} had an error executing , full error: {msg}"
+    #     raise PRQLException(msg)
     return msg
 
 
@@ -851,7 +846,7 @@ def safe_get_alias(join: Union[Join, From], join_long: str) -> str:
 def build_replace_tables(root: Root) -> Callable:
     all_join_longs = []
     all_join_shorts = []
-    _from: From = root.get_from()
+    _from = root.get_from()
     from_long = str(_from.name)
     from_short = safe_get_alias(_from, from_long)
     joins: List[Join] = get_operation(_from.pipes.operations, Join, return_all=True)
@@ -878,17 +873,19 @@ def ast_to_sql(
         replace_tables: Optional[Callable] = None,
         verbose: bool = True,
 ) -> str:
+    # Renaming it here silences the static analysis warnings below for replace_tables being None
+    replace_tables_func: Callable = replace_tables  # type: ignore[assignment]
+
     if isinstance(roots, Root):
         root = roots
     else:
         root = roots[0]
 
-    if not symbol_table:
+    if symbol_table is None:
         symbol_table = build_symbol_table([roots] if isinstance(roots, Root) else roots)
-        # if verbose:
-        #     rich.print(symbol_table)
-    if not replace_tables:
-        replace_tables: Callable = build_replace_tables(root)
+
+    if replace_tables_func is None:
+        replace_tables_func: Callable = build_replace_tables(root)  # type: ignore[no-redef]
 
     if isinstance(rule, Token):
         return str(rule)
@@ -939,8 +936,8 @@ def ast_to_sql(
                 join_long = str(join.name)
                 join_short = safe_get_alias(join, join_long)
 
-                left_id = replace_tables(str(join.left_id))
-                right_id = replace_tables(str(join.right_id))
+                left_id = replace_tables_func(str(join.left_id))
+                right_id = replace_tables_func(str(join.right_id))
 
                 if right_id is None or right_id == "None":
                     right_id = left_id
@@ -955,13 +952,13 @@ def ast_to_sql(
                     )
 
                 if right_id.find(".") == -1:
-                    right_side = replace_tables(
+                    right_side = replace_tables_func(
                         str(join_long + "." + right_id).replace(
                             join_short + "." + join_short + ".", join_short + "."
                         )
                     )
                 else:
-                    right_side = replace_tables(
+                    right_side = replace_tables_func(
                         str(right_id).replace(
                             join_short + "." + join_short + ".", join_short + "."
                         )
@@ -973,13 +970,13 @@ def ast_to_sql(
                 else:
                     join_type_str = str(join.get_join_type())
 
-                join_str += replace_tables(
+                join_str += replace_tables_func(
                     f"{join_type_str} {join.name} {join_short} ON {left_side} = {right_side} "
                 )
 
         if selects:
             for select in selects:
-                select_str += replace_tables(str(select))
+                select_str += replace_tables_func(str(select))
 
         if havings:
             havings_str = "HAVING "
@@ -1001,7 +998,7 @@ def ast_to_sql(
         if agg:
 
             if agg.group_by is not None:
-                group_by_str = f"GROUP BY {replace_tables(str(agg.group_by))}"
+                group_by_str = f"GROUP BY {replace_tables_func(str(agg.group_by))}"
 
             upper = len(agg.aggregate_body.statements)
             i = 0
@@ -1061,7 +1058,7 @@ def ast_to_sql(
                         )
                 i += 1
 
-            agg_str = replace_tables(agg_str)
+            agg_str = replace_tables_func(agg_str)
             agg_str = agg_str.rstrip(",").lstrip(",")
         if take:
             limit_str = str(take)
@@ -1072,7 +1069,7 @@ def ast_to_sql(
                     for function_call in filter.fields:
                         if function_call.val is not None:
                             filter_str += (
-                                    replace_tables(
+                                    replace_tables_func(
                                         ast_to_sql(
                                             function_call.val, roots, symbol_table, replace_tables, verbose
                                         )
@@ -1084,11 +1081,11 @@ def ast_to_sql(
         if wheres_from_derives:
             for d in wheres_from_derives:
                 for line in d.fields:
-                    derives_str += f"{replace_tables(ast_to_sql(line.expression, roots, symbol_table, replace_tables, verbose))} as {line.name} ,"
+                    derives_str += f"{replace_tables_func(ast_to_sql(line.expression, roots, symbol_table, replace_tables, verbose))} as {line.name} ,"
             derives_str = "," + derives_str.rstrip(",")
 
         if sort:
-            order_by_str = f"ORDER BY {replace_tables(str(sort))}"
+            order_by_str = f"ORDER BY {replace_tables_func(str(sort))}"
 
         if not select_str and not agg_str:
             select_str = "*"
@@ -1123,13 +1120,22 @@ def ast_to_sql(
             print("\t" + sql)
         return sql
     elif isinstance(rule, BinaryExpression):
-        left = replace_variables(ast_to_sql(rule.left, roots, symbol_table, replace_tables, verbose), symbol_table)
+        left = replace_variables(
+            ast_to_sql(
+                rule.left, roots, symbol_table, replace_tables, verbose
+            ), symbol_table
+        )
         if rule.right:
             left += rule.operator + replace_variables(
-                ast_to_sql(rule.right, roots, symbol_table, replace_tables, verbose), symbol_table)
-        if verbose:
-            ic(left)
-        return left
+                ast_to_sql(
+                    rule.right, roots, symbol_table, replace_tables, verbose
+                ),
+                symbol_table
+            )
+        if isinstance(rule, ParensExpression):
+            return "(" + left + ")"
+        else:
+            return left
     elif isinstance(rule, Expression):
         expr = rule
         msg = ""

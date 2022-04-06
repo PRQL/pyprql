@@ -14,11 +14,11 @@ class PRQLCompleter(Completer):
 
     @enforce_types
     def __init__(
-        self,
-        table_names: List[str],
-        column_names: List[str],
-        column_map: Dict[str, List[str]],
-        prql_keywords: List[str],
+            self,
+            table_names: List[str],
+            column_names: List[str],
+            column_map: Dict[str, List[str]],
+            prql_keywords: List[str],
     ) -> None:
         """Initialise a completer instance.
 
@@ -53,7 +53,7 @@ class PRQLCompleter(Completer):
         return ast
 
     def get_completions(
-        self, document: Document, complete_event: CompleteEvent
+            self, document: Document, complete_event: CompleteEvent
     ) -> Iterable[Completion]:  # noqa: DAR201
         """Retrieve completion options.
 
@@ -117,8 +117,11 @@ class PRQLCompleter(Completer):
         }
         aliases = {}
 
-        for alias in self.last_good_table_aliases.keys():
-            aliases[alias] = self.column_map[self.last_good_table_aliases[alias]]
+        try:
+            for alias in self.last_good_table_aliases.keys():
+                aliases[alias] = self.column_map[self.last_good_table_aliases[alias]]
+        except KeyError:
+            pass
 
         for op in completion_operators:
             possible_matches[op] = working_column_names
@@ -135,10 +138,10 @@ class PRQLCompleter(Completer):
                 for m in selection:
                     yield Completion(m, start_position=-len(word_before_cursor))
         elif (
-            len(word_before_cursor) == 0
-            or word_before_cursor[-1] == " "
-            or word_before_cursor[-1] == "\t"
-            or word_before_cursor[-1] == "\n"
+                len(word_before_cursor) == 0
+                or word_before_cursor[-1] == " "
+                or word_before_cursor[-1] == "\t"
+                or word_before_cursor[-1] == "\n"
         ):
             # _debug_log_to_file('null')
             return None
@@ -151,8 +154,8 @@ class PRQLCompleter(Completer):
                 yield Completion(m, start_position=0)
         # If its an operator
         elif (
-            len(word_before_cursor) >= 1
-            and word_before_cursor[-1] in completion_operators
+                len(word_before_cursor) >= 1
+                and word_before_cursor[-1] in completion_operators
         ):
             # _debug_log_to_file('completion_operators')
 
@@ -220,7 +223,6 @@ class PRQLCompleter(Completer):
         except Exception as e:  # noqa: F841
             # print(e)
             return None
-
 
 # def _debug_log_to_file(s):
 #     with open('.prql_cli_debug_output.txt', 'a') as f:
