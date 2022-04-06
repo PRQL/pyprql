@@ -76,6 +76,59 @@ class Expression(_Ast, ast_utils.AsList):
 
 
 @dataclass
+class BinaryExpression(_Ast):
+    left: _Ast
+    right: Optional[_Ast]
+    operator: str
+
+    def __str__(self) -> str:
+        if self.right is not None:
+            return f"{self.left} {self.operator} {self.right}"
+        else:
+            return f"{self.left}"
+
+
+@dataclass
+class ExpressionLt(BinaryExpression):
+    operator: str = '<'
+
+
+@dataclass
+class ExpressionAdd(BinaryExpression):
+    operator: str = '+'
+
+
+@dataclass
+class ExpressionSub(BinaryExpression):
+    operator: str = '-'
+
+
+@dataclass
+class ExpressionMul(BinaryExpression):
+    operator: str = '*'
+
+
+@dataclass
+class ExpressionDiv(BinaryExpression):
+    operator: str = '/'
+
+
+@dataclass
+class ExpressionLt(BinaryExpression):
+    operator: str = '<'
+
+
+@dataclass
+class ExpressionGt(BinaryExpression):
+    operator: str = '>'
+
+
+@dataclass
+class EqualExpression(BinaryExpression):
+    operator: str = '='
+
+
+@dataclass
 class _JoinType(_Ast):
     def __str__(self) -> str:
         return "JOIN"
@@ -623,6 +676,7 @@ class PRQLException(Exception):
 @enforce_types
 def replace_variables(_param: Any, symbol_table: Dict[str, List[_Ast]]) -> str:
     param: str = str(_param)
+    ic(_param, type(_param))
     if param in symbol_table:
         if not symbol_table[param]:
             return _param
@@ -636,12 +690,29 @@ def replace_variables(_param: Any, symbol_table: Dict[str, List[_Ast]]) -> str:
 
                 return msg
             if isinstance(nvp.value, DeriveBody):
+                # TODO:  Need to update this to replace variables for this new tree
+                # DeriveLine(
+                #     name=Name(name=[Token('NAME', 'gross_cost')]),
+                #     expression=DeriveBody(
+                #         val=ExpressionAdd(
+                #             left=Expression(
+                #                 statements=[
+                #                     Value(
+                #                         value=Name(
+                #                             name=[
+                #                                 Token('NAME',
+                #                                       'gross_salary')
+                #                             ]
+                #                         )
+                #                     )
+                #                 ]
+                #             ),
                 msg = ""
-                body_exp: Expression = nvp.value.val  # type: ignore[assignment]
-                for s in body_exp.statements:
-                    msg += str(replace_variables(str(s), symbol_table))
+                # body_exp: Expression = nvp.value.val  # type: ignore[assignment]
+                msg += str(replace_variables(nvp.value.val, symbol_table))
 
                 return msg
+
             else:
                 return nvp.value
         else:
@@ -1051,6 +1122,14 @@ def ast_to_sql(
         if verbose:
             print("\t" + sql)
         return sql
+    elif isinstance(rule, BinaryExpression):
+        left = replace_variables(ast_to_sql(rule.left, roots, symbol_table, replace_tables, verbose), symbol_table)
+        if rule.right:
+            left += rule.operator + replace_variables(
+                ast_to_sql(rule.right, roots, symbol_table, replace_tables, verbose), symbol_table)
+        if verbose:
+            ic(left)
+        return left
     elif isinstance(rule, Expression):
         expr = rule
         msg = ""

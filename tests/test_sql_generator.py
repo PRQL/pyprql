@@ -424,7 +424,7 @@ class TestSqlGenerator(unittest.TestCase):
         q = '''
         from table
         filter foo | like "%"'''
-        res = prql.to_sql(q)
+        res = prql.to_sql(q,True)
         # print(res)
         assert res.index('WHERE foo LIKE "%"') != -1
 
@@ -536,7 +536,7 @@ class TestSqlGenerator(unittest.TestCase):
         join ar:artists [ ArtistId ] 
         select [ albums.Title, tracks.Name , artists.Name ]  
         take 100 
-        sort ar.Name order:desc'''
+        sort artists.Name order:desc'''
         res = prql.to_sql(q)
         print(res)
         # sort by has the new alias

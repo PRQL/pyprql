@@ -1,4 +1,4 @@
 # Songs greater than 5 minutes
 from t:tracks
 select t.Composer
-filter (t.Milliseconds * 1000) > (5 * 60)
+filter t.Milliseconds * 1000 > 5 * 60

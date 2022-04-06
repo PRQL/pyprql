@@ -29,7 +29,7 @@
 
     filter: ("filter" "[" filter_line ( "," filter_line)* "]") | \
             ("filter" filter_line)
-    filter_line: (ESCAPED_STRING|expression)
+    filter_line: (ESCAPED_STRING|equal_expression)
     sort: "sort" ["order" ":" direction] sort_fields ["order" ":" direction]
     sort_fields: ("[" name ("," name)* "]" )* \
                  (ESCAPED_STRING|name*)
@@ -48,7 +48,32 @@
     derive_line: name ":" derive_body (",")?
 
     derive_body: (ESCAPED_STRING|expression)
-    expression:  atom | atom operator atom
+
+    equal_expression: expression
+                | expression "=" expression
+                | expression "<" expression -> expression_lt
+                | expression ">" expression -> expression_gt
+                | expression "<=" expression
+                | expression ">=" expression
+                | expression "!=" expression
+                | expression "in" expression
+
+
+    expression: expression_product
+               | expression "+" expression_product -> expression_add
+               | expression "-" expression_product -> expression_sub
+
+    ?expression_product: expression_parens
+                  | expression_product "*" expression_parens -> expression_mul
+                  | expression_product "/" expression_parens -> expression_div
+
+    ?expression_parens: expression_root
+                      | "(" expression_parens "*" expression ")" -> expression_mul
+                      | "(" expression_parens "/" expression ")" -> expression_div
+                      | "(" expression_parens "+" expression ")" -> expression_add
+                      | "(" expression_parens "-" expression ")" -> expression_sub
+
+    ?expression_root:  atom
 
     func_def: "func" NAME [func_args] "=" "("? func_body ")"?
     func_args: ((NAME " ")* NAME)*
@@ -69,7 +94,7 @@
     COMMENT: /#[^\n]*/
 
     operator: (OP_ADD | OP_SUB | OP_MUL | OP_DIV  | OP_EQ | OP_NE  | OP_LT | OP_GE | OP_LE | OP_GT)
-    ?atom:  "(" expression ")" | value | piped_call
+    ?atom:  value | piped_call
 
     OP_ADD: "+"
     OP_SUB: "-"
