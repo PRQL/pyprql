@@ -8,13 +8,17 @@
     alias: NAME ":"
     from: "from" [alias] NAME "|"? pipes
 
-    pipes: ((join | select | derive | filter | sort | take| aggregate) ("|")? )*
+    pipes: ((join | select | derive | filter | sort | take | aggregate) ("|")? )* to?
     join: "join" ["side" ":" join_type] [alias] NAME ["side" ":" join_type] "[" name["=" name] "]"  ["side" ":" join_type]
     join_type: inner_join | left_join | right_join | outer_join
     inner_join: "inner"
     left_join: "left"
     right_join: "right"
     outer_join: "outer"
+
+    to: "to" file_type
+    filetype: csv
+    csv: "csv"
 
     aggregate: "aggregate" ["by" ":" ("[" group_by "]"| group_by)] "["? aggregate_body "]"?
 

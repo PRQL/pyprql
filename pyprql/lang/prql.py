@@ -221,6 +221,33 @@ class Join(_Ast):
 
 
 @dataclass
+class _FileType(_Ast):
+    pass
+
+
+@dataclass
+class Csv(_FileType):
+    def __str__(self) -> Literal["csv"]:
+        return "csv"
+
+
+@dataclass
+class FileType(_FileType):
+    file_type: _FileType
+
+    def __str__(self) -> str:
+        return str(self.file_type)
+
+
+@dataclass
+class To(_Ast):
+    file_type: _FileType
+
+    def get_file_type(self) -> _FileType:
+        return self.file_type
+
+
+@dataclass
 class SelectField(_Ast):
     name: Name
     cast_type: Optional[Name] = None
