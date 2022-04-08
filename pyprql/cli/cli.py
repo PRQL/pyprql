@@ -12,8 +12,10 @@ BOTTOM_TOOLBAR_TXT : str
 """
 import os
 import sys
-from typing import Dict, List, Optional, Tuple
+from pathlib import Path
+from typing import Dict, List, Tuple
 
+import pandas as pd
 import pygments
 import rich
 from enforce_typing import enforce_types
@@ -52,16 +54,22 @@ def clear_screen() -> None:
 class CLI:
     """The command line interface object."""
 
-    def __init__(self, connect_str: Optional[str] = "") -> None:
+    def __init__(self, connect_str: str = "") -> None:
         """Instantiate a CLI object.
 
         Parameters
         ----------
-        connect_str : str, default "chinook"
+        connect_str : str, default ""
             The SQL alchemy connection string.
 
-        Notes
-        -----
+        Note
+        ----
+        If ``connect_str`` is a path to a csv file,
+        then an in-memory sqlite database is created,
+        and the contents of the csv dumped to this database.
+
+        Note
+        ----
             This additionally defines a number of default parameter values,
             generally used to control state of the connection and prompt.
 
@@ -69,18 +77,42 @@ class CLI:
             prompt_test : str, default "PRQL>"
             command : str, default ""
             sql_mode : bool, default False
+
+        Note
+        ----
+        The case where no connection string is provided is coverred by the
+        entry point, where an absence of string is taken to mean
+        "show help".
         """
         self.has_one_blank = False
         self.prompt_text = "PRQL> "
         self.command = ""
         self.sql_mode = False
-        self.connect_str = connect_str
 
-        rich.print(
-            "Connecting to [pale_turquoise1]{}[/pale_turquoise1]".format(connect_str)
-        )
-        self.engine = create_engine(connect_str)
-        self.inspector = inspect(self.engine)
+        file = Path(connect_str)
+        if file.suffix == ".csv":
+            # create an in-memory database
+            # possible performance catch
+            self.connect_str = "sqlite://"
+            self.engine = create_engine(self.connect_str)
+            # read in csv
+            data = pd.read_csv(connect_str, header=0, index_col=None)
+            data.columns = data.columns.str.lower().str.replace(" ", "_")
+            # Dump to sql
+            data.to_sql(
+                "imported", self.engine, if_exists="fail", index=False, method="multi"
+            )
+            # Inspect after dump to get column names correctly
+            self.inspector = inspect(self.engine)
+        else:
+            rich.print(
+                "Connecting to [pale_turquoise1]{}[/pale_turquoise1]".format(
+                    connect_str
+                )
+            )
+            self.connect_str = connect_str
+            self.engine = create_engine(self.connect_str)
+            self.inspector = inspect(self.engine)
 
     @staticmethod
     def print_usage() -> None:
