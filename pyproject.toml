@@ -19,7 +19,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.7.1"
 lark = "^1.1.2"
 icecream = "^2.1.2"
 rich = "^12.0.0"
@@ -29,6 +29,10 @@ prompt-toolkit = "^3.0.28"
 Pygments = "^2.11.2"
 fuzzyfinder = "^2.1.0"
 SQLAlchemy = "^1.4.32"
+pandas = [
+    {version = "~1.3", python = "~3.7.1"},
+    {version = "^1.4", python = "^3.8"}
+]
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.1"
