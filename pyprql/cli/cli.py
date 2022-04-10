@@ -163,31 +163,44 @@ class CLI:
         column_names.sort()
         return column_names, columns
 
-    def execute_sql(self, sql: str) -> None:
+    def execute_sql(self, sql: str, to: str) -> None:
         """Perform an SQL query.
 
-        No value is returned, as ``rich.print`` is used to dumpt the results
-        to the CLI.
+        If to is length 0, then no values are saved,
+        and the result is simply dumped to the screen.
+        If a to parameter is passed,
+        the output is saved to the file and dumped to the screen.
 
         Parameters
         ----------
         sql : str
             The SQL query to be performed.
+        to : str
+            The to clause for file saving.
         """
+        save_info = to.split()
+        delims = {"csv": ","}
         with self.engine.connect() as con:
             rs = con.execute(sql)
-            columns = rs.keys()
+            df = pd.DataFrame.from_records(rs, columns=rs.keys())
+
             table = Table(show_header=True, header_style="bold sandy_brown")
-            for column in columns:
-                table.add_column(column, justify="left")
+            for col in df.columns:
+                table.add_column(str(col), justify="left")
 
             try:
-                for _row in rs:
-                    row = list(_row)
-                    table.add_row(*[str(x) for x in row])
+                for r in df.to_numpy().tolist():
+                    table.add_row(*[str(x) for x in r])
             except ResourceClosedError:
                 rich.print("")
             else:
+                if len(save_info) > 0:
+                    rich.print(
+                        f"Saving results to {save_info[2]} as a {save_info[1]}..."
+                    )
+                    df.to_csv(
+                        save_info[2], sep=delims[save_info[1]], header=True, index=False
+                    )
                 rich.print(table)
 
     def highlight_prql(self, text: str) -> str:
@@ -250,7 +263,7 @@ class CLI:
             rich.print(prql.read_file("../assets/examples.txt", this_files_path))
             return
         elif user_input == "?" or user_input == "help":
-            rich.print("PyPRQL version: {}".format(pyprql_version))
+            rich.print(f"PyPRQL version: {pyprql_version}")
 
             if self.sql_mode:
                 rich.print(
@@ -302,7 +315,7 @@ class CLI:
                     sql += " LIMIT 25"
 
                 self.prompt_text = "SQL> "
-                self.execute_sql(sql)
+                self.execute_sql(sql, "")
 
             else:
                 self.prompt_text = "....>"
@@ -311,11 +324,13 @@ class CLI:
                 self.has_one_blank = False
                 if self.command and self.command.strip().rstrip("") != "":
                     sql = prql.to_sql(self.command)
-                    if "LIMIT" not in sql:
-                        sql += " LIMIT 5"
+                    to = ""
+                    if "TO" in sql:
+                        to = sql[sql.index("TO") :].strip()
+                        sql = sql[: sql.index("TO")].strip()
 
                     print("SQL:\n\t" + self.highlight_sql(sql) + "\nResults:")
-                    self.execute_sql(sql)
+                    self.execute_sql(sql, to=to)
                     self.command = ""
                 self.prompt_text = "PRQL> "
 
