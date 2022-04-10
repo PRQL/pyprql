@@ -179,7 +179,7 @@ class CLI:
             The to clause for file saving.
         """
         save_info = to.split()
-        delims = {"csv": ","}
+        delims = {"csv": ",", "tsv": "\t"}
         with self.engine.connect() as con:
             rs = con.execute(sql)
             df = pd.DataFrame.from_records(rs, columns=rs.keys())

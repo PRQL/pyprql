@@ -17,8 +17,9 @@
     outer_join: "outer"
 
     to: "to" file_type name
-    file_type: csv
+    file_type: csv | tsv
     csv: "csv"
+    tsv: "tsv"
 
     aggregate: "aggregate" ["by" ":" ("[" group_by "]"| group_by)] "["? aggregate_body "]"?
 

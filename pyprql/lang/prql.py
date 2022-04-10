@@ -232,6 +232,12 @@ class Csv(_FileType):
 
 
 @dataclass
+class Tsv(_FileType):
+    def __str__(self) -> Literal["tsv"]:
+        return "tsv"
+
+
+@dataclass
 class FileType(_FileType):
     file_type: _FileType
 
