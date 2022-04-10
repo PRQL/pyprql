@@ -227,13 +227,13 @@ class _FileType(_Ast):
 
 @dataclass
 class Csv(_FileType):
-    def __str__(self) -> Literal["csv"]:
+    def __str__(self) -> Literal["csv"]:  # type: ignore[name-defined]
         return "csv"
 
 
 @dataclass
 class Tsv(_FileType):
-    def __str__(self) -> Literal["tsv"]:
+    def __str__(self) -> Literal["tsv"]:  # type: ignore[name-defined]
         return "tsv"
 
 
