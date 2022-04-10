@@ -52,38 +52,37 @@ def clear_screen() -> None:
 
 
 class CLI:
-    """The command line interface object."""
+    """The command line interface object.
+
+    Parameters
+    ----------
+    connect_str : str
+        The SQL alchemy connection string.
+
+    Note
+    ----
+    If ``connect_str`` is a path to a csv file,
+    then an in-memory sqlite database is created,
+    and the contents of the csv dumped to this database.
+
+    Note
+    ----
+        This additionally defines a number of default parameter values,
+        generally used to control state of the connection and prompt.
+
+        has_one_blank : bool, default False
+        prompt_test : str, default "PRQL>"
+        command : str, default ""
+        sql_mode : bool, default False
+
+    Note
+    ----
+    The case where no connection string is provided is coverred by the
+    entry point, where an absence of string is taken to mean
+    "show help".
+    """
 
     def __init__(self, connect_str: str = "") -> None:
-        """Instantiate a CLI object.
-
-        Parameters
-        ----------
-        connect_str : str, default ""
-            The SQL alchemy connection string.
-
-        Note
-        ----
-        If ``connect_str`` is a path to a csv file,
-        then an in-memory sqlite database is created,
-        and the contents of the csv dumped to this database.
-
-        Note
-        ----
-            This additionally defines a number of default parameter values,
-            generally used to control state of the connection and prompt.
-
-            has_one_blank : bool, default False
-            prompt_test : str, default "PRQL>"
-            command : str, default ""
-            sql_mode : bool, default False
-
-        Note
-        ----
-        The case where no connection string is provided is coverred by the
-        entry point, where an absence of string is taken to mean
-        "show help".
-        """
         self.has_one_blank = False
         self.prompt_text = "PRQL> "
         self.command = ""
