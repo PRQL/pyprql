@@ -10,8 +10,9 @@ on:
   workflow_dispatch:
 
 env:
+  CACHE_NUMBER: 3
   POETRY_VERSION: 1.1.13
-  PSR_VERSION: 7.26.0
+  PSR_VERSION: 7.27.1
 
 # We cache the lint and security job, as there is no poetry install
 jobs:
@@ -20,20 +21,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup Nox
-        uses: excitedleigh/setup-nox@v2.0.0
-      - name: Cache Nox
-        uses: actions/cache@v2
-        env:
-          CACHE_NUMBER: 3
+      - name: Setup Nox and Poetry
+        uses: ./.github/actions/setup-nox
         with:
-          path: .nox
-          key:
-            nox-${{ env.CACHE_NUMBER }}-${{ hashFiles('noxfile.py') }}-${{ hashFiles('poetry.lock') }}
-      - name: Install Poetry
-        uses: snok/install-poetry@v1.3.1
-        with:
-          version: ${{ env.POETRY_VERSION }}
+          cache_number: ${{ env.CACHE_NUMBER }}
+          poetry_version: ${{ env.POETRY_VERSION }}
       - name: Format
         run: nox -s form
       - name: Commit blackened files
@@ -48,22 +40,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup Nox
-        uses: excitedleigh/setup-nox@v2.0.0
-      - name: Cache Nox
-        uses: actions/cache@v2
-        env:
-          CACHE_NUMBER: 3
+      - name: Setup Nox and Poetry
+        uses: ./.github/actions/setup-nox
         with:
-          path: .nox
-          key:
-            nox-${{ env.CACHE_NUMBER }}-${{ hashFiles('noxfile.py') }}-${{ hashFiles('poetry.lock') }}
-      - name: Install Poetry
-        uses: snok/install-poetry@v1.3.1
-        with:
-          version: ${{ env.POETRY_VERSION }}
+          cache_number: ${{ env.CACHE_NUMBER }}
+          poetry_version: ${{ env.POETRY_VERSION }}
       - name: Format
-        run: nox -s lint
+        run: nox -s lint type
 
   security:
     runs-on: ubuntu-latest
@@ -71,20 +54,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup Nox
-        uses: excitedleigh/setup-nox@v2.0.0
-      - name: Cache Nox
-        uses: actions/cache@v2
-        env:
-          CACHE_NUMBER: 3
+      - name: Setup Nox and Poetry
+        uses: ./.github/actions/setup-nox
         with:
-          path: .nox
-          key:
-            nox-${{ env.CACHE_NUMBER }}-${{ hashFiles('noxfile.py') }}-${{ hashFiles('poetry.lock') }}
-      - name: Install Poetry
-        uses: snok/install-poetry@v1.3.1
-        with:
-          version: ${{ env.POETRY_VERSION }}
+          cache_number: ${{ env.CACHE_NUMBER }}
+          poetry_version: ${{ env.POETRY_VERSION }}
       - name: Check for Dependency Vulnerabilities
         run: nox -s security
 
@@ -94,12 +68,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup Nox
-        uses: excitedleigh/setup-nox@v2.0.0
-      - name: Install Poetry
-        uses: snok/install-poetry@v1.3.0
+      - name: Setup Nox and Poetry
+        uses: ./.github/actions/setup-nox
         with:
-          version: ${{ env.POETRY_VERSION }}
+          cache_number: ${{ env.CACHE_NUMBER }}
+          poetry_version: ${{ env.POETRY_VERSION }}
       - name: Test Code and Docs
         run: nox -s tests
 
