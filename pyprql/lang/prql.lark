@@ -16,8 +16,8 @@
     right_join: "right"
     outer_join: "outer"
 
-    to: "to" file_type
-    filetype: csv
+    to: "to" file_type NAME
+    file_type: csv
     csv: "csv"
 
     aggregate: "aggregate" ["by" ":" ("[" group_by "]"| group_by)] "["? aggregate_body "]"?

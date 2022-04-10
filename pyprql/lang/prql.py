@@ -242,6 +242,7 @@ class FileType(_FileType):
 @dataclass
 class To(_Ast):
     file_type: _FileType
+    name: Name
 
     def get_file_type(self) -> _FileType:
         return self.file_type
