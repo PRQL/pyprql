@@ -90,13 +90,16 @@ class CLI:
         self.sql_mode = False
 
         file = Path(connect_str)
-        if file.suffix == ".csv":
+        delims = {".csv": ",", ".tsv": "\t"}
+        if file.suffix in delims.keys():
             # create an in-memory database
             # possible performance catch
             self.connect_str = "sqlite://"
             self.engine = create_engine(self.connect_str)
             # read in csv
-            data = pd.read_csv(connect_str, header=0, index_col=None)
+            data = pd.read_csv(
+                connect_str, sep=delims[file.suffix], header=0, index_col=None
+            )
             data.columns = data.columns.str.lower().str.replace(" ", "_")
             # Dump to sql
             data.to_sql(
