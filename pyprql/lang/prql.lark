@@ -16,7 +16,7 @@
     right_join: "right"
     outer_join: "outer"
 
-    to: "to" file_type NAME
+    to: "to" file_type name
     file_type: csv
     csv: "csv"
 
