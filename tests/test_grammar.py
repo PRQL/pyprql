@@ -94,7 +94,6 @@ class TestSqlGenerator(unittest.TestCase):
         filter t.Milliseconds * (t.TrackId * (32/(47/72)+(1/8))) > 5 * 60.01 + 3.1
         """
         sql = prql.to_sql(q)
-        print(sql)
         assert sql.index("t.Milliseconds*(t.TrackId*(32/(47/72)+(1/8)))") > 0
 
     def test_aggregates_grammar(self):
@@ -134,14 +133,16 @@ class TestSqlGenerator(unittest.TestCase):
         select t.Composer
         """
         with pytest.raises(UnexpectedToken):
-            sql = prql.to_sql(q)
+            _ = prql.to_sql(q)
 
-    @pytest.mark.xfail
-    def test_to_grammar_complex_file(self):
-        q = """
-        from t:tracks
-        select t.Composer
-        to csv ~/a/more/complex/test.csv
-        """
-        sql = prql.to_sql(q)
-        assert sql.index("TO csv ~/a/more/complex/test.csv") == 45
+    def test_to_grammar_complex(self):
+        filenames = ["~/a/more/complex/../test.csv", r"C:\a\more\complex\test.csv"]
+        for file in filenames:
+            with self.subTest():
+                q = f"""
+                from t:tracks
+                select t.Composer
+                to csv {file}
+                """
+                sql = prql.to_sql(q)
+                assert sql.index(f"TO csv {file}") == 45
