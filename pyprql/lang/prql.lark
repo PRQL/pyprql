@@ -16,7 +16,7 @@
     right_join: "right"
     outer_join: "outer"
 
-    to: "to" file_type name
+    to: "to" file_type /[a-zA-Z0-9_:~.\/\\\-\(\) ]+\.[a-zA-Z]+/
     file_type: csv | tsv
     csv: "csv"
     tsv: "tsv"
@@ -115,6 +115,6 @@
     OP_GE: ">="
 
     %import python (NAME, STRING, INTEGER)
-    %import common (WS,INT,SIGNED_INT,NUMBER,SIGNED_NUMBER,FLOAT,SIGNED_FLOAT,ESCAPED_STRING)
+    %import common (WS,INT,SIGNED_INT,NUMBER,SIGNED_NUMBER,FLOAT,SIGNED_FLOAT,ESCAPED_STRING,CNAME)
     %ignore WS
     %ignore COMMENT
