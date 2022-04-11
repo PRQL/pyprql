@@ -8,13 +8,18 @@
     alias: NAME ":"
     from: "from" [alias] NAME "|"? pipes
 
-    pipes: ((join | select | derive | filter | sort | take| aggregate) ("|")? )*
+    pipes: ((join | select | derive | filter | sort | take | aggregate) ("|")? )* to?
     join: "join" ["side" ":" join_type] [alias] NAME ["side" ":" join_type] "[" name["=" name] "]"  ["side" ":" join_type]
     join_type: inner_join | left_join | right_join | outer_join
     inner_join: "inner"
     left_join: "left"
     right_join: "right"
     outer_join: "outer"
+
+    to: "to" file_type /[a-zA-Z0-9_:~.\/\\\-\(\) ]+\.[a-zA-Z]+/
+    file_type: csv | tsv
+    csv: "csv"
+    tsv: "tsv"
 
     aggregate: "aggregate" ["by" ":" ("[" group_by "]"| group_by)] "["? aggregate_body "]"?
 
@@ -110,6 +115,6 @@
     OP_GE: ">="
 
     %import python (NAME, STRING, INTEGER)
-    %import common (WS,INT,SIGNED_INT,NUMBER,SIGNED_NUMBER,FLOAT,SIGNED_FLOAT,ESCAPED_STRING)
+    %import common (WS,INT,SIGNED_INT,NUMBER,SIGNED_NUMBER,FLOAT,SIGNED_FLOAT,ESCAPED_STRING,CNAME)
     %ignore WS
     %ignore COMMENT

@@ -221,6 +221,43 @@ class Join(_Ast):
 
 
 @dataclass
+class _FileType(_Ast):
+    pass
+
+
+@dataclass
+class Csv(_FileType):
+    def __str__(self) -> Literal["csv"]:  # type: ignore[name-defined]
+        return "csv"
+
+
+@dataclass
+class Tsv(_FileType):
+    def __str__(self) -> Literal["tsv"]:  # type: ignore[name-defined]
+        return "tsv"
+
+
+@dataclass
+class FileType(_FileType):
+    file_type: _FileType
+
+    def __str__(self) -> str:
+        return str(self.file_type)
+
+
+@dataclass
+class To(_Ast):
+    file_type: _FileType
+    name: Name
+
+    def __str__(self) -> str:
+        return f"TO {self.file_type} {self.name}"
+
+    def get_file_type(self) -> _FileType:
+        return self.file_type
+
+
+@dataclass
 class SelectField(_Ast):
     name: Name
     cast_type: Optional[Name] = None
@@ -894,7 +931,7 @@ def ast_to_sql(
 
     if isinstance(rule, From):
         # The SQL template is in the form
-        # sql = f"SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {havings_str} {order_by_str} {limit_str}"
+        # sql = f"SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {havings_str} {order_by_str} {limit_str} {to_str}"
         # We will be creating these strings to form the final SQL,
         select_str = ""
         agg_str = ""
@@ -906,6 +943,7 @@ def ast_to_sql(
         havings_str = ""
         order_by_str = ""
         limit_str = ""
+        to_str = ""
         ###
 
         _from = rule
@@ -925,6 +963,7 @@ def ast_to_sql(
             ops.operations, Filter, return_all=True, after=Aggregate
         )
         selects = get_operation(ops.operations, Select, return_all=True)
+        tos = get_operation(ops.operations, To, last_match=True)
 
         from_long = str(_from.name)
         from_short = safe_get_alias(_from, from_long)
@@ -977,6 +1016,11 @@ def ast_to_sql(
         if selects:
             for select in selects:
                 select_str += replace_tables_func(str(select))
+
+        if tos:
+            # Tos is generated with `last_match=True`, so will always be single instance.
+            # Additionally, __str__method is defined for simplicity.
+            to_str += str(tos)
 
         if havings:
             havings_str = "HAVING "
@@ -1120,7 +1164,7 @@ def ast_to_sql(
                 order_by_str,
                 limit_str,
             )
-        sql = f"SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {havings_str} {order_by_str} {limit_str}"
+        sql = f"SELECT {select_str} {agg_str} {derives_str} FROM {from_str} {join_str} WHERE {filter_str} {group_by_str} {havings_str} {order_by_str} {limit_str} {to_str}"
         if verbose:
             print("\t" + sql)
         return sql

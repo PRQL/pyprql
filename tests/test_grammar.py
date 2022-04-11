@@ -3,6 +3,9 @@ import sqlite3
 import unittest
 from pathlib import Path
 
+import pytest
+from lark.exceptions import UnexpectedToken
+
 from pyprql.lang import prql
 
 
@@ -91,7 +94,6 @@ class TestSqlGenerator(unittest.TestCase):
         filter t.Milliseconds * (t.TrackId * (32/(47/72)+(1/8))) > 5 * 60.01 + 3.1
         """
         sql = prql.to_sql(q)
-        print(sql)
         assert sql.index("t.Milliseconds*(t.TrackId*(32/(47/72)+(1/8)))") > 0
 
     def test_aggregates_grammar(self):
@@ -102,7 +104,8 @@ class TestSqlGenerator(unittest.TestCase):
         ]
         """
         sql = prql.to_sql(q)
-        print(sql)
+        assert sql.index("COUNT(t.TrackId) as row_count") == 7
+        assert sql.index("GROUP BY t.Composer") == 70
 
     def test_aggregates_grammar_nested(self):
         q = """
@@ -113,3 +116,33 @@ class TestSqlGenerator(unittest.TestCase):
         """
         sql = prql.to_sql(q)
         assert sql.index("SELECT MAX(COUNT(t.TrackId))") == 0
+
+    def test_to_grammar(self):
+        q = """
+        from t:tracks
+        select t.Composer
+        to csv test.csv
+        """
+        sql = prql.to_sql(q)
+        assert sql.index("TO csv test.csv") == 45
+
+    def test_to_grammar_not_at_end(self):
+        q = """
+        from t:tracks
+        to csv test.csv
+        select t.Composer
+        """
+        with pytest.raises(UnexpectedToken):
+            _ = prql.to_sql(q)
+
+    def test_to_grammar_complex(self):
+        filenames = ["~/a/more/complex/../test.csv", r"C:\a\more\complex\test.csv"]
+        for file in filenames:
+            with self.subTest():
+                q = f"""
+                from t:tracks
+                select t.Composer
+                to csv {file}
+                """
+                sql = prql.to_sql(q)
+                assert sql.index(f"TO csv {file}") == 45

@@ -52,51 +52,53 @@ def clear_screen() -> None:
 
 
 class CLI:
-    """The command line interface object."""
+    """The command line interface object.
+
+    Parameters
+    ----------
+    connect_str : str
+        The SQL alchemy connection string.
+
+    Note
+    ----
+    If ``connect_str`` is a path to a csv file,
+    then an in-memory sqlite database is created,
+    and the contents of the csv dumped to this database.
+
+    Note
+    ----
+        This additionally defines a number of default parameter values,
+        generally used to control state of the connection and prompt.
+
+        has_one_blank : bool, default False
+        prompt_test : str, default "PRQL>"
+        command : str, default ""
+        sql_mode : bool, default False
+
+    Note
+    ----
+    The case where no connection string is provided is coverred by the
+    entry point, where an absence of string is taken to mean
+    "show help".
+    """
 
     def __init__(self, connect_str: str = "") -> None:
-        """Instantiate a CLI object.
-
-        Parameters
-        ----------
-        connect_str : str, default ""
-            The SQL alchemy connection string.
-
-        Note
-        ----
-        If ``connect_str`` is a path to a csv file,
-        then an in-memory sqlite database is created,
-        and the contents of the csv dumped to this database.
-
-        Note
-        ----
-            This additionally defines a number of default parameter values,
-            generally used to control state of the connection and prompt.
-
-            has_one_blank : bool, default False
-            prompt_test : str, default "PRQL>"
-            command : str, default ""
-            sql_mode : bool, default False
-
-        Note
-        ----
-        The case where no connection string is provided is coverred by the
-        entry point, where an absence of string is taken to mean
-        "show help".
-        """
         self.has_one_blank = False
         self.prompt_text = "PRQL> "
         self.command = ""
         self.sql_mode = False
 
         file = Path(connect_str)
-        if file.suffix == ".csv":
+        delims = {".csv": ",", ".tsv": "\t"}
+        if file.suffix in delims.keys():
             # create an in-memory database
             # possible performance catch
             self.connect_str = "sqlite://"
             self.engine = create_engine(self.connect_str)
             # read in csv
-            data = pd.read_csv(connect_str, header=0, index_col=None)
+            data = pd.read_csv(
+                connect_str, sep=delims[file.suffix], header=0, index_col=None
+            )
             data.columns = data.columns.str.lower().str.replace(" ", "_")
             # Dump to sql
             data.to_sql(
@@ -163,31 +165,44 @@ class CLI:
         column_names.sort()
         return column_names, columns
 
-    def execute_sql(self, sql: str) -> None:
+    def execute_sql(self, sql: str, to: str) -> None:
         """Perform an SQL query.
 
-        No value is returned, as ``rich.print`` is used to dumpt the results
-        to the CLI.
+        If to is length 0, then no values are saved,
+        and the result is simply dumped to the screen.
+        If a to parameter is passed,
+        the output is saved to the file and dumped to the screen.
 
         Parameters
         ----------
         sql : str
             The SQL query to be performed.
+        to : str
+            The to clause for file saving.
         """
+        save_info = to.split()
+        delims = {"csv": ",", "tsv": "\t"}
         with self.engine.connect() as con:
             rs = con.execute(sql)
-            columns = rs.keys()
+            df = pd.DataFrame.from_records(rs, columns=rs.keys())
+
             table = Table(show_header=True, header_style="bold sandy_brown")
-            for column in columns:
-                table.add_column(column, justify="left")
+            for col in df.columns:
+                table.add_column(str(col), justify="left")
 
             try:
-                for _row in rs:
-                    row = list(_row)
-                    table.add_row(*[str(x) for x in row])
+                for r in df.to_numpy().tolist():
+                    table.add_row(*[str(x) for x in r])
             except ResourceClosedError:
                 rich.print("")
             else:
+                if len(save_info) > 0:
+                    rich.print(
+                        f"Saving results to {save_info[2]} as a {save_info[1]}..."
+                    )
+                    df.to_csv(
+                        save_info[2], sep=delims[save_info[1]], header=True, index=False
+                    )
                 rich.print(table)
 
     def highlight_prql(self, text: str) -> str:
@@ -250,7 +265,7 @@ class CLI:
             rich.print(prql.read_file("../assets/examples.txt", this_files_path))
             return
         elif user_input == "?" or user_input == "help":
-            rich.print("PyPRQL version: {}".format(pyprql_version))
+            rich.print(f"PyPRQL version: {pyprql_version}")
 
             if self.sql_mode:
                 rich.print(
@@ -302,7 +317,7 @@ class CLI:
                     sql += " LIMIT 25"
 
                 self.prompt_text = "SQL> "
-                self.execute_sql(sql)
+                self.execute_sql(sql, "")
 
             else:
                 self.prompt_text = "....>"
@@ -311,11 +326,13 @@ class CLI:
                 self.has_one_blank = False
                 if self.command and self.command.strip().rstrip("") != "":
                     sql = prql.to_sql(self.command)
-                    if "LIMIT" not in sql:
-                        sql += " LIMIT 5"
+                    to = ""
+                    if "TO" in sql:
+                        to = sql[sql.index("TO") :].strip()
+                        sql = sql[: sql.index("TO")].strip()
 
                     print("SQL:\n\t" + self.highlight_sql(sql) + "\nResults:")
-                    self.execute_sql(sql)
+                    self.execute_sql(sql, to=to)
                     self.command = ""
                 self.prompt_text = "PRQL> "
 
