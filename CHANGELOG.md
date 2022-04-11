@@ -2,6 +2,33 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.0 (2022-04-11)
+### Feature
+* **cli.py:** Support reading from tsvs ([`d2d675b`](https://github.com/qorrect/PyPrql/commit/d2d675b7f398f8b32b27117cff1d2305ee85a811))
+* ***:** Support saving to tsv ([`5a2630f`](https://github.com/qorrect/PyPrql/commit/5a2630f7314b0a2ad04333b745d870f39d083486))
+* **cli.py:** Support cli saving to csv ([`79382c1`](https://github.com/qorrect/PyPrql/commit/79382c1aef6bd0e9c7f1e4686fde84b1e11b5f6d))
+* **prql.py:** Parse to statements ([`2808f26`](https://github.com/qorrect/PyPrql/commit/2808f26fb13b82d3800b6e0e92f3a12733291b9e))
+* **prql.py:** Adds grammar for to ([`3899c89`](https://github.com/qorrect/PyPrql/commit/3899c89fcd6dc735a2fe6a09fd488bfff0a0fb4b))
+* **cli.py:** Import csv ([`c847eb2`](https://github.com/qorrect/PyPrql/commit/c847eb269b0f48889e5b625b97377283a54b1bd1))
+* Adding expression parsing for complex expressions without requiring '()' ([`855ebd0`](https://github.com/qorrect/PyPrql/commit/855ebd0166e06f9d1e288c63b7e529f73e105e61))
+* Adding completion for show columns and \d+ ([`7b7f676`](https://github.com/qorrect/PyPrql/commit/7b7f6768a4519de7ac8fbdc8458b57fe35b8baf7))
+*  Adding code completion on table names for ':', fixes the handling of prev_selection by clearing out on whitespace ([`46f7676`](https://github.com/qorrect/PyPrql/commit/46f7676af190d1e5d008cc9f283628a2a47304f2))
+
+### Fix
+* **prql.lark:** Match file names directly ([`259763b`](https://github.com/qorrect/PyPrql/commit/259763b877f9e4385c60f3a986961b9a533892df))
+* **prql.lark:** Support extensions for to statement ([`82325a6`](https://github.com/qorrect/PyPrql/commit/82325a66c5d5d73e8382011fe2ca681f24914aa6))
+* **prql.parl:** Add filename parameter ([`f567cd6`](https://github.com/qorrect/PyPrql/commit/f567cd6b0a8e2e58488ef392e3d212159ab76f2a))
+* Closes #20, All derives should now be in where clause ([`c736b25`](https://github.com/qorrect/PyPrql/commit/c736b25b97a3fc7b3a2f873df6860139626b38d2))
+* Closes #21, replace_tables now available to all to_sql transformations ([`eb12075`](https://github.com/qorrect/PyPrql/commit/eb1207595af4f86df9496c1c7d441b5ab4f8b566))
+* Final commit for fix11 ([`421fb04`](https://github.com/qorrect/PyPrql/commit/421fb044b687a63547c45562193ad18c4940145e))
+*  Fix11 , use the AST in the completer.  This adds support for table aliases when completing fields. ([`9e79119`](https://github.com/qorrect/PyPrql/commit/9e79119b0fd308ab5928f50e447e4623a9ed18c2))
+* Fixes #10 typing a letter afer period was not auto completing ([`ee8c7f5`](https://github.com/qorrect/PyPrql/commit/ee8c7f57bd84e0b535441b546a96949f57280ecb))
+
+### Documentation
+* **cli.py:** Document connect_str properly ([`95e568d`](https://github.com/qorrect/PyPrql/commit/95e568d6ba4bd581ba276290cc4dd10dff9a87f4))
+* Adding more prql examples ([`2e5149e`](https://github.com/qorrect/PyPrql/commit/2e5149e36d167bb16d82de30676941b7c3f519a4))
+* Adding prql examples ([`8ae2070`](https://github.com/qorrect/PyPrql/commit/8ae2070a6d07c51c5df201de4a73a7435942478f))
+
 ## v0.3.0 (2022-04-01)
 ### Feature
 * **prql.lark:** Add join aliases ([`94a405e`](https://github.com/qorrect/PyPrql/commit/94a405ee44632f378476645c4303e08e91a275ef))
