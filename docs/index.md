@@ -1,5 +1,19 @@
 # Welcome to PyPRQL
 
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+![PyPI - License](https://img.shields.io/pypi/l/pyprql)
+![PyPI](https://img.shields.io/pypi/v/pyprql)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyprql)
+
+[![CI/CD](https://github.com/prql/PyPrql/actions/workflows/cicd.yaml/badge.svg?branch=main)](https://github.com/prql/PyPrql/actions/workflows/cicd.yaml)
+docs
+![Discord](https://img.shields.io/discord/936728116712316989)
+![GitHub contributors](https://img.shields.io/github/contributors/prql/pyprql)
+![GitHub Repo stars](https://img.shields.io/github/stars/prql/pyprql)
+
+[![Codestyle: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+
 The Python implementation of [PRQL][prql].
 
 While you are here,
