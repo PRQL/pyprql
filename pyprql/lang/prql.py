@@ -8,7 +8,7 @@ its initialisation parameters correcpond directly to those
 tokens the parser expects to find.
 
 Those interested in the actual EBNF-based grammar file should see
-`here <https://github.com/qorrect/PyPrql/blob/main/pyprql/lang/prql.lark>`_.
+`here <https://github.com/prql/PyPrql/blob/main/pyprql/lang/prql.lark>`_.
 
 Attributes
 ----------

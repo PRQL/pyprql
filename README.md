@@ -42,7 +42,7 @@ Examples:
 Try it out:
 
 ```
-curl https://github.com/qorrect/PyPrql/blob/main/resources/chinook.db?raw=true -o chinook.db
+curl https://github.com/prql/PyPrql/blob/main/resources/chinook.db?raw=true -o chinook.db
 pyprql "sqlite:///chinook.db"
 
 PRQL> show tables

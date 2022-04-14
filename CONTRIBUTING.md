@@ -117,7 +117,7 @@ Not a necessity,
 but for you terminal warriors out there,
 it just might help!
 
-[issues]: https://github.com/qorrect/pyprql/issues "Issues"
+[issues]: https://github.com/prql/pyprql/issues "Issues"
 [gh]: https://github.com/cli/cli "GH CLI"
 [poetry]: https://python-poetry.org/ "Poetry"
 [poetry_install]: https://python-poetry.org/docs/#installation "Poetry Installation Instructions"
