@@ -54,11 +54,14 @@ def clear_screen() -> None:
 
 @enforce_types
 def clean_column_names(data: pd.DataFrame) -> pd.DataFrame:
-    return data.columns.str.lower() \
-        .str.strip().str.replace('"', "") \
-        .str.replace(" ", "_") \
-        .str.replace("(", "", regex=False) \
+    return (
+        data.columns.str.lower()
+        .str.strip()
+        .str.replace('"', "")
+        .str.replace(" ", "_")
+        .str.replace("(", "", regex=False)
         .str.replace(")", "", regex=False)
+    )
 
 
 class CLI:
@@ -98,7 +101,9 @@ class CLI:
         self.prompt_text = "PRQL> "
         self.command = ""
         self.sql_mode = False
-        BOTTOM_TOOLBAR_TXT += ' Connected to ' + connect_str[connect_str.rfind('/') + 1:] + '.'
+        BOTTOM_TOOLBAR_TXT += (
+            " Connected to " + connect_str[connect_str.rfind("/") + 1 :] + "."
+        )
         file = Path(connect_str)
         delims = {".csv": ",", ".tsv": "\t"}
         if file.suffix in delims.keys():
@@ -310,7 +315,7 @@ class CLI:
             key = "show columns"
             if key not in user_input:
                 key = "\d+"
-            table_name = user_input[key.__len__() + 1:]
+            table_name = user_input[key.__len__() + 1 :]
             print(table_name)
             # tables = self.engine.list_tables()
             columns = self.inspector.get_columns(table_name)
@@ -338,7 +343,7 @@ class CLI:
                     sql = prql.to_sql(self.command)
                     to = ""
                     if "TO" in sql:
-                        to = sql[sql.index("TO"):].strip()
+                        to = sql[sql.index("TO") :].strip()
                         sql = sql[: sql.index("TO")].strip()
 
                     print("SQL:\n\t" + self.highlight_sql(sql) + "\nResults:")
