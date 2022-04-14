@@ -1,1 +1,1 @@
-Tab to complete suggestions (in white). Alt-f to complete history (in grey). Up and down for history. Type help for more.
+Tab to complete suggestions (in white). Alt-f to complete history (in grey).
