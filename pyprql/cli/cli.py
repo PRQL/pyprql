@@ -40,6 +40,7 @@ from pyprql.cli.PRQLStyle import PRQLStyle
 
 bindings = KeyBindings()
 this_files_path = os.path.abspath(os.path.dirname(__file__))
+# We cache this file read here to avoid reading it every time we need it.
 BOTTOM_TOOLBAR_TXT = prql.read_file("../assets/cli_bottom_toolbar.txt", this_files_path)
 
 
@@ -49,6 +50,18 @@ def clear_screen() -> None:
     print(chr(27) + "[2j")
     print("\033c")
     print("\x1bc")
+
+
+@enforce_types
+def clean_column_names(data: pd.DataFrame) -> pd.DataFrame:
+    return (
+        data.columns.str.lower()
+        .str.strip()
+        .str.replace('"', "")
+        .str.replace(" ", "_")
+        .str.replace("(", "", regex=False)
+        .str.replace(")", "", regex=False)
+    )
 
 
 class CLI:
@@ -86,11 +99,14 @@ class CLI:
     """
 
     def __init__(self, connect_str: str = "") -> None:
+        global BOTTOM_TOOLBAR_TXT
         self.has_one_blank = False
         self.prompt_text = "PRQL> "
         self.command = ""
         self.sql_mode = False
-
+        BOTTOM_TOOLBAR_TXT += (
+            " Connected to " + connect_str[connect_str.rfind("/") + 1 :] + "."
+        )
         file = Path(connect_str)
         delims = {".csv": ",", ".tsv": "\t"}
         if file.suffix in delims.keys():
@@ -102,8 +118,7 @@ class CLI:
             data = pd.read_csv(
                 connect_str, sep=delims[file.suffix], header=0, index_col=None
             )
-            data.columns = data.columns.str.lower().str.replace(" ", "_")
-            # Dump to sql
+            data.columns = clean_column_names(data)
             data.to_sql(
                 "imported", self.engine, if_exists="fail", index=False, method="multi"
             )

@@ -1,10 +1,34 @@
 # -*- coding: utf-8 -*-
 import unittest
 
+import pandas as pd
+
+from pyprql.cli.cli import clean_column_names
 from pyprql.lang import prql
 
 
 class TestSQLGeneratorForFactbook(unittest.TestCase):
+
+    def test_clean_columns(self):
+        data = {
+            '"age"': [32, 45],
+            'sex of human': ['M', 'F'],
+            'color_(rgb)': ['W', 'B']
+        }
+        df = pd.DataFrame.from_dict(data)
+        print("\n")
+        print(df)
+        df.columns = clean_column_names(df)
+
+        assert df.columns[0].find('"') == -1
+        assert df.columns[0] == 'age'
+
+        assert df.columns[1].find(' ') == -1
+        assert df.columns[1] == 'sex_of_human'
+
+        assert df.columns[2].find('(') == -1
+        assert df.columns[2].find(')') == -1
+
     def test_get_operations(self):
         text = """
                 from employees

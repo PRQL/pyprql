@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.1 (2022-04-14)
+### Fix
+*  Fixes #27 ([`b666dd0`](https://github.com/qorrect/PyPrql/commit/b666dd03135bb209431575f5d1481e29299576cd))
+
 ## v0.4.0 (2022-04-11)
 ### Feature
 * **cli.py:** Support reading from tsvs ([`d2d675b`](https://github.com/prql/PyPrql/commit/d2d675b7f398f8b32b27117cff1d2305ee85a811))
