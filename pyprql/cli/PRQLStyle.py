@@ -21,9 +21,8 @@ class PRQLStyle(Style):
     Inherits from pygments ``Style``,
     overriding values to create our colour scheme.
     The various style attributes are self-descriptive,
-    and thoroughly documented on the `pygments`_ page.
-
-    .. _pygments: https://pygments.org/docs/styledevelopment/
+    and thoroughly documented on the pygments
+    `website <https://pygments.org/docs/styledevelopment/>`_.
     """
 
     background_color = "#202020"

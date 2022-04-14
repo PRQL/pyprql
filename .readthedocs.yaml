@@ -1,0 +1,20 @@
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
+# Required
+version: 2
+
+# Set the version of Python and other tools you might need
+# Defaults to 3.7 which doesn't support using defaults for typing
+build:
+  os: ubuntu-20.04
+  tools:
+    python: "3.10"
+
+# Build documentation in the docs/ directory with Sphinx
+sphinx:
+  configuration: docs/conf.py
+  fail_on_warning: true
+
+python:
+  install:
+    - requirements: docs/requirements.txt

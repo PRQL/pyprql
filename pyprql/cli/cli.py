@@ -74,19 +74,22 @@ class CLI:
 
     Note
     ----
-    If ``connect_str`` is a path to a csv file,
-    then an in-memory sqlite database is created,
-    and the contents of the csv dumped to this database.
+    This additionally defines a number of default parameter values,
+    generally used to control state of the connection and prompt.
+
+    **has_one_blank** : bool, default False
+
+    **prompt_test** : str, default "PRQL>"
+
+    **command** : str, default ""
+
+    **sql_mode** : bool, default False
 
     Note
     ----
-        This additionally defines a number of default parameter values,
-        generally used to control state of the connection and prompt.
-
-        has_one_blank : bool, default False
-        prompt_test : str, default "PRQL>"
-        command : str, default ""
-        sql_mode : bool, default False
+    If ``connect_str`` is a path to a csv file,
+    then an in-memory sqlite database is created,
+    and the contents of the csv dumped to this database.
 
     Note
     ----
