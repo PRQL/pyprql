@@ -28,4 +28,4 @@ pyprql zillow.csv
 * pyprql can connect to any database that SQLAlchemy supports, execute `pyprql` without arguments for how to install drivers.
 * pyprql also supports CSV files, simply replace the connection string with the file path and it will load the CSV into a temporary SQLite database
 * pyprql can save the results with a ` | to csv ${filename}` transform at the end of the query  
-* pyprql has auto-completion on table names and table aliases with <tab>, as well as history-completion with <alt-f> 
+* pyprql has auto-completion on table names and table aliases with _tab_, as well as history-completion with _alt-f_
