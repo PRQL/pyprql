@@ -15,10 +15,16 @@ __all__: List[str] = ["PRQLLexer"]
 
 
 class PRQLLexer(RegexLexer):
-    """
-    For PRQL.
+    """Provide a custon PRQL Pygments Lexer.
 
-    .. versionadded:: 1
+    Inherits from ``pygments.lexer.RegexLexer``
+
+    Notes
+    -----
+    The properties provided here mirror those defined
+    in the standard RegexLexer. For full documentation,
+    the interested user is directed to the Pygments
+    `website <https://pygments.org/docs/lexerdevelopment/>_.
     """
 
     name = "PRQL"

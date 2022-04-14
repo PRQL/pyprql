@@ -10,7 +10,23 @@ from pyprql.lang import prql
 
 
 class PRQLCompleter(Completer):
-    """Prompt_toolkit completion engine for PyPRQL CLI."""
+    """Prompt_toolkit completion engine for PyPRQL CLI.
+
+    This provides some of the root completion material.
+    Inherits from  prompt_toolkit's ``Completer`` class,
+    and overrides methods to achieve desired functionality.
+
+    Parameters
+    ----------
+    table_names : List[str]
+        List of available tables.
+    column_names : List[str]
+        List of available columns.
+    column_map : Dict[str, List[str]]
+        A column-to-table map.
+    prql_keywords : List[str]
+        list of PRQL keywords.
+    """
 
     @enforce_types
     def __init__(
@@ -20,23 +36,6 @@ class PRQLCompleter(Completer):
         column_map: Dict[str, List[str]],
         prql_keywords: List[str],
     ) -> None:
-        """Initialise a completer instance.
-
-        This provides some of the root completion material.
-        Inherits from  prompt_toolkit's ``Completer`` class,
-        and overrides methods to achieve desired functionality.
-
-        Parameters
-        ----------
-        table_names : List[str]
-            List of available tables.
-        column_names : List[str]
-            List of available columns.
-        column_map : Dict[str, List[str]]
-            A column-to-table map.
-        prql_keywords : List[str]
-            list of PRQL keywords.
-        """
         self.table_names = table_names
         self.column_names = column_names
         self.column_map = column_map
@@ -49,6 +48,18 @@ class PRQLCompleter(Completer):
 
     @enforce_types
     def parse_prql(self, text: str) -> Optional[prql.Root]:
+        """Parse a PRQL string to AST.
+
+        Parameters
+        ----------
+        text : str
+            The PRQL query to parse.
+
+        Returns
+        -------
+        Optional[prql.Root]
+            The parsed AST tree.
+        """
         ast = prql.parse(text)
         return ast
 
@@ -197,6 +208,22 @@ class PRQLCompleter(Completer):
 
     @enforce_types
     def get_table_aliases(self, full_text: str) -> Optional[Dict]:
+        """Retrieve aliases for the used tables.
+        
+        Parse the given PRQL query.
+        Then, iterates through all ``join`` and ``from`` statements
+        to retrieve the aliases of all used tables.
+
+        Parameters
+        ----------
+        full_text : str
+            The PRQL query to parse.
+
+        Returns
+        -------
+        Optional[Dict]
+            All used table aliases.
+        """
         try:
             ret = {}
             root = self.parse_prql(full_text)
@@ -217,6 +244,18 @@ class PRQLCompleter(Completer):
 
     @enforce_types
     def get_from_table(self, full_text: str) -> Optional[str]:
+        """Retrieve the ``from`` statement from a PRQL query.
+
+        Parameters
+        ----------
+        full_text : str
+            The PRQL query to parse.
+
+        Returns
+        -------
+        Optional[str]
+            The ``from`` clause in the given query.
+        """
         try:
             root = self.parse_prql(full_text)
             return str(root.get_from())
