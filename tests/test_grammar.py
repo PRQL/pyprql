@@ -10,11 +10,12 @@ from pyprql.lang import prql
 
 
 class TestSqlGenerator(unittest.TestCase):
-    def setUpClass() -> None:
+    @classmethod
+    def setUpClass(cls) -> None:
         # Use Path for robust construction, but sqlite3 py3.6 requires str
         db_path = str(Path("tests", "../resources/chinook.db"))
-        TestSqlGenerator.con = sqlite3.connect(db_path)
-        TestSqlGenerator.cur = TestSqlGenerator.con.cursor()
+        cls.con = sqlite3.connect(db_path)  # type:ignore[attr-defined]
+        cls.cur = cls.con.cursor()  # type:ignore[attr-defined]
 
     def run_query(self, text, expected=None, verbose=False):
         # print(text.replace('\n\n', '\n'))
@@ -22,8 +23,8 @@ class TestSqlGenerator(unittest.TestCase):
         sql = prql.to_sql(text, verbose)
         # print(sql)
 
-        rows = TestSqlGenerator.cur.execute(sql)
-        columns = [d[0] for d in rows.description]
+        rows = self.cur.execute(sql)
+        _ = [d[0] for d in rows.description]
         # print(f'Columns: {columns}')
         rows = rows.fetchall()
         if expected is not None:

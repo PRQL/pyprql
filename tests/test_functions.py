@@ -7,19 +7,20 @@ from pyprql.lang import prql
 
 
 class TestSqlGenerator(unittest.TestCase):
-    def setUpClass() -> None:
+    @classmethod
+    def setUpClass(cls) -> None:
         # Use Path for robust construction, but sqlite3 py3.6 requires str
         db_path = str(Path("tests", "../resources/employee.db"))
-        TestSqlGenerator.con = sqlite3.connect(db_path)
-        TestSqlGenerator.cur = TestSqlGenerator.con.cursor()
+        cls.con = sqlite3.connect(db_path)  # type:ignore[attr-defined]
+        cls.cur = cls.con.cursor()  # type:ignore[attr-defined]
 
     def run_query(self, text, expected=None):
         # print(text.replace('\n\n', '\n'))
         # print('-' * 40)
         sql = prql.to_sql(text)
         # print(sql)
-        rows = TestSqlGenerator.cur.execute(sql)
-        columns = [d[0] for d in rows.description]
+        rows = self.cur.execute(sql)
+        _ = [d[0] for d in rows.description]
         # print(f'Columns: {columns}')
         rows = rows.fetchall()
         if expected is not None:
@@ -35,7 +36,7 @@ class TestSqlGenerator(unittest.TestCase):
         ]
         """
         res = prql.to_sql(q)
-       # print(res)
+        # print(res)
         self.assertTrue(res.index("COUNT(*) as cnt") > 0)
         self.run_query(q)
 
@@ -48,7 +49,7 @@ class TestSqlGenerator(unittest.TestCase):
         """
         res = prql.to_sql(q)
         self.assertTrue(res.index('REPLACE(name,"foo","bar") as cleaned') > 0)
-       # print(res)
+        # print(res)
         self.run_query(q, 12)
 
     def test_nested_functions(self):
@@ -61,7 +62,7 @@ class TestSqlGenerator(unittest.TestCase):
             triple_nested: ((name | replace "dirty" "clean") | replace "," " ") | trim " "
         ]"""
         res = prql.to_sql(q)
-       # print(res)
+        # print(res)
         trimmed = "RTRIM(name) as trimmed"
         simple = 'REPLACE(name,"dirty","clean") as cleaned'
         nest1 = 'LTRIM(RTRIM(name,",")) as nested'

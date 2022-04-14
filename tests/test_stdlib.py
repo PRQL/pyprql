@@ -8,22 +8,21 @@ import pytest
 from pyprql.lang import prql
 
 
-# ignore type# type: ignore[operator]
-
 class TestStdlib(unittest.TestCase):
-    def setUpClass() -> None:
+    @classmethod
+    def setUpClass(cls) -> None:
         # Use Path for robust construction, but sqlite3 py3.6 requires str
         db_path = str(Path("tests", "../resources/employee.db"))
-        TestStdlib.con = sqlite3.connect(db_path)
-        TestStdlib.cur = TestStdlib.con.cursor()
+        cls.con = sqlite3.connect(db_path)  # type:ignore[attr-defined]
+        cls.cur = cls.con.cursor()  # type:ignore[attr-defined]
 
     def run_query(self, text, expected=None):
         # print(text.replace('\n\n', '\n'))
         # print('-' * 40)
         sql = prql.to_sql(text)
         # print(sql)
-        rows = TestStdlib.cur.execute(sql)
-        columns = [d[0] for d in rows.description]
+        rows = self.cur.execute(sql)
+        _ = [d[0] for d in rows.description]
         # print(f'Columns: {columns}')
         rows = rows.fetchall()
         if expected is not None:

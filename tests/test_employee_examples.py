@@ -7,18 +7,19 @@ from pyprql.lang import prql
 
 
 class TestEmployeeExamples(unittest.TestCase):
-    def setUpClass() -> None:
+    @classmethod
+    def setUpClass(cls) -> None:
         # Use Path for robust construction, but sqlite3 py3.6 requires str
         db_path = str(Path("tests", "../resources/employee.db"))
-        TestEmployeeExamples.con = sqlite3.connect(db_path)
-        TestEmployeeExamples.cur = TestEmployeeExamples.con.cursor()
+        cls.con = sqlite3.connect(db_path)  # type:ignore[attr-defined]
+        cls.cur = cls.con.cursor()  # type:ignore[attr-defined]
 
     def run_query(self, text, expected=None):
         print(text.replace("\n\n", "\n"))
         print("-" * 40)
         sql = prql.to_sql(text)
         print(sql)
-        rows = TestEmployeeExamples.cur.execute(sql)
+        rows = self.cur.execute(sql)
         columns = [d[0] for d in rows.description]
         print(f"Columns: {columns}")
         rows = rows.fetchall()
@@ -65,7 +66,7 @@ class TestEmployeeExamples(unittest.TestCase):
         order_by_str = "ORDER BY sum_gross_cost "
         limit_str = "LIMIT 20"
 
-        sql = prql.to_sql(text,True)
+        sql = prql.to_sql(text, True)
         # [self.assertTrue(sql.index(f) > 0) for f in agg_funcs]
         # self.assertTrue(sql.index(filter_str) > 0)
         # self.assertTrue(sql.index(filter_str_2) > 0)
@@ -94,12 +95,12 @@ class TestEmployeeExamples(unittest.TestCase):
         # self.run_query(text)
 
     def test_derive_issue_20(self):
-        q = '''
-        from employees 
-        select [ benefits_cost , salary, title ] 
-        aggregate by:title [ ttl_sal: salary | sum ]  
-        derive [ avg_sal: salary  ] 
-        sort ttl_sal order:desc | take 25'''
-        sql = prql.to_sql(q,True)
+        q = """
+        from employees
+        select [ benefits_cost , salary, title ]
+        aggregate by:title [ ttl_sal: salary | sum ]
+        derive [ avg_sal: salary  ]
+        sort ttl_sal order:desc | take 25"""
+        sql = prql.to_sql(q, True)
         assert sql.index("avg_sal") > 0
         print(sql)

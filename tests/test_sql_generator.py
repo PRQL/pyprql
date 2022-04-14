@@ -7,11 +7,12 @@ from pyprql.lang import prql
 
 
 class TestSqlGenerator(unittest.TestCase):
-    def setUpClass() -> None:
+    @classmethod
+    def setUpClass(cls) -> None:
         # Use Path for robust construction, but sqlite3 py3.6 requires str
         db_path = str(Path("tests", "../resources/employee.db"))
-        TestSqlGenerator.con = sqlite3.connect(db_path)
-        TestSqlGenerator.cur = TestSqlGenerator.con.cursor()
+        cls.con = sqlite3.connect(db_path)  # type:ignore[attr-defined]
+        cls.cur = cls.con.cursor()  # type:ignore[attr-defined]
 
     def run_query(self, text, expected=None):
         # print(text.replace('\n\n', '\n'))
@@ -19,8 +20,8 @@ class TestSqlGenerator(unittest.TestCase):
         sql = prql.to_sql(text)
         # print(sql)
 
-        rows = TestSqlGenerator.cur.execute(sql)
-        columns = [d[0] for d in rows.description]
+        rows = self.cur.execute(sql)
+        _ = [d[0] for d in rows.description]
         # print(f'Columns: {columns}')
         rows = rows.fetchall()
         if expected is not None:
@@ -44,7 +45,7 @@ class TestSqlGenerator(unittest.TestCase):
 
     def test_sort(self):
         q = """
-        from table | select foo | sort foo 
+        from table | select foo | sort foo
         """
         res = prql.to_sql(q)
         self.assertTrue(res.startswith("SELECT foo"))
@@ -52,7 +53,7 @@ class TestSqlGenerator(unittest.TestCase):
 
     def test_sort_and_order(self):
         q = """
-        from table | select foo | sort foo order:desc 
+        from table | select foo | sort foo order:desc
         """
         res = prql.to_sql(q)
         # print(res)
@@ -61,7 +62,7 @@ class TestSqlGenerator(unittest.TestCase):
 
     def test_sort_and_order_2(self):
         q = """
-        from table | select foo | sort bar order:asc 
+        from table | select foo | sort bar order:asc
         """
         res = prql.to_sql(q)
         # print(res)
@@ -70,7 +71,7 @@ class TestSqlGenerator(unittest.TestCase):
 
     def test_sort_on_many(self):
         q = """
-        from table | select foo | sort [ foo, bar ] 
+        from table | select foo | sort [ foo, bar ]
         """
         res = prql.to_sql(q)
         # print(res)
@@ -85,10 +86,9 @@ class TestSqlGenerator(unittest.TestCase):
         print(res)
         assert res.index("ORDER BY foo DESC") != -1
 
-
     def test_sort_on_many_with_direction(self):
         q = """
-        from table | select foo | sort [ foo, bar ] order:desc 
+        from table | select foo | sort [ foo, bar ] order:desc
         """
         res = prql.to_sql(q)
         # print(res)
@@ -367,7 +367,7 @@ class TestSqlGenerator(unittest.TestCase):
         from table
         filter [ foo > 10, bar < 20 ]
         """
-        res = prql.to_sql(q,True)
+        res = prql.to_sql(q, True)
         assert res.index("foo>10") != -1
         assert res.index("bar<20") != -1
 
@@ -411,7 +411,7 @@ class TestSqlGenerator(unittest.TestCase):
 
     # print(res)
 
-    def test_like(self):
+    def test_like_str(self):
         q = '''
         from table
         filter foo | like "bar"'''
@@ -421,78 +421,78 @@ class TestSqlGenerator(unittest.TestCase):
 
     # print(res)
 
-    def test_like(self):
+    def test_like_symbol(self):
         q = '''
         from table
         filter foo | like "%"'''
-        res = prql.to_sql(q,True)
+        res = prql.to_sql(q, True)
         # print(res)
         assert res.index('foo LIKE "%"') != -1
 
     # print(res)
 
     def test_alias(self):
-        q = '''
+        q = """
         from e:employees
         derive [
             foo: e.foo
         ]
-        '''
+        """
         print(q)
         res = prql.to_sql(q)
-        assert res.index('FROM `employees` e ') != -1
+        assert res.index("FROM `employees` e ") != -1
 
     # print(res)
 
     def test_alias_goes_the_extra_mile(self):
-        q = '''
+        q = """
         from even_longer_foo:foo
         derive [
             val: foo.some_value,
             other_val: even_longer_foo.other_value
         ]
-        '''
+        """
         print(q)
         res = prql.to_sql(q)
         # print(res)
-        assert res.index('even_longer_foo.some_value as val') != -1
-        assert res.index('even_longer_foo.other_value as other_val') != -1
+        assert res.index("even_longer_foo.some_value as val") != -1
+        assert res.index("even_longer_foo.other_value as other_val") != -1
 
     # print(res)
 
     def test_join_alias(self):
-        q = '''
+        q = """
         from e:employees
         join s:salaries [emp_no]
         join d:departments [dept_no]
-        select [dept_name, gender, salary_avg, salary_sd]'''
+        select [dept_name, gender, salary_avg, salary_sd]"""
         res = prql.to_sql(q)
-        print('\n\n\n\n' + res)
-        assert res.index('JOIN salaries s ON e.emp_no = s.emp_no') != -1
-        assert res.index('JOIN departments d ON e.dept_no = d.dept_no') != -1
+        print("\n\n\n\n" + res)
+        assert res.index("JOIN salaries s ON e.emp_no = s.emp_no") != -1
+        assert res.index("JOIN departments d ON e.dept_no = d.dept_no") != -1
 
     def test_join_type_any_side(self):
-        q = 'from employees | join salaries [emp_no] side:left'
+        q = "from employees | join salaries [emp_no] side:left"
         res = prql.to_sql(q)
-        print('\n\n\n\n' + res)
-        assert res.index('LEFT JOIN') != -1
-        q = 'from employees | join salaries side:left [emp_no]'
+        print("\n\n\n\n" + res)
+        assert res.index("LEFT JOIN") != -1
+        q = "from employees | join salaries side:left [emp_no]"
         res = prql.to_sql(q)
-        print('\n\n\n\n' + res)
-        assert res.index('LEFT JOIN') != -1
+        print("\n\n\n\n" + res)
+        assert res.index("LEFT JOIN") != -1
 
     def test_join_alias_with_where(self):
-        q = '''
+        q = """
         from e:employees
         join s:salaries [emp_no]
         join d:departments [dept_no]
-        filter e.salary > s.salary'''
+        filter e.salary > s.salary"""
         res = prql.to_sql(q)
-        print('\n\n\n\n' + res)
-        assert res.index('WHERE e.salary>s.salary') != -1
+        print("\n\n\n\n" + res)
+        assert res.index("WHERE e.salary>s.salary") != -1
 
     def test_prql_employee_md(self):
-        q = '''
+        q = """
         from employees
         join salaries [emp_no]
         aggregate by:[emp_no, gender] [
@@ -504,18 +504,28 @@ class TestSqlGenerator(unittest.TestCase):
           salary_sd: stddev emp_salary
         ]
         join departments [dept_no]
-        select [dept_name, gender, salary_avg, salary_sd]'''
+        select [dept_name, gender, salary_avg, salary_sd]"""
         res = prql.to_sql(q)
         # print(res)
 
-        assert res.index('AVG(salary) as emp_salary') != -1
-        assert res.index('GROUP BY emp_no,gender') != -1
-        assert res.index('FROM `employees` employees_e') != -1
-        assert res.index('JOIN salaries salaries_s ON employees_e.emp_no = salaries_s.emp_no') != -1
-        assert res.index('JOIN departments departments_d ON employees_e.dept_no = departments_d.dept_no') != -1
+        assert res.index("AVG(salary) as emp_salary") != -1
+        assert res.index("GROUP BY emp_no,gender") != -1
+        assert res.index("FROM `employees` employees_e") != -1
+        assert (
+            res.index(
+                "JOIN salaries salaries_s ON employees_e.emp_no = salaries_s.emp_no"
+            )
+            != -1
+        )
+        assert (
+            res.index(
+                "JOIN departments departments_d ON employees_e.dept_no = departments_d.dept_no"
+            )
+            != -1
+        )
 
     def test_prql_employee_md_with_join_alias(self):
-        q = '''
+        q = """
         from salaries
         aggregate by:[emp_no] [
           emp_salary: average salary
@@ -526,19 +536,19 @@ class TestSqlGenerator(unittest.TestCase):
           avg_salary: average emp_salary
         ]
         join departments [dept_no]
-        select [dept_name, title, avg_salary]'''
+        select [dept_name, title, avg_salary]"""
         res = prql.to_sql(q, True)
 
     # print(res)
 
     def test_prql_replace_tables_should_work_on_sort(self):
-        q = '''
+        q = """
         from albums join tr:tracks [ AlbumId ]
-        join ar:artists [ ArtistId ] 
-        select [ albums.Title, tracks.Name , artists.Name ]  
-        take 100 
-        sort artists.Name order:desc'''
+        join ar:artists [ ArtistId ]
+        select [ albums.Title, tracks.Name , artists.Name ]
+        take 100
+        sort artists.Name order:desc"""
         res = prql.to_sql(q)
         print(res)
         # sort by has the new alias
-        assert res.index('ORDER BY ar.Name') != -1
+        assert res.index("ORDER BY ar.Name") != -1
