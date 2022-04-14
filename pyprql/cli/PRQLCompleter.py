@@ -209,7 +209,7 @@ class PRQLCompleter(Completer):
     @enforce_types
     def get_table_aliases(self, full_text: str) -> Optional[Dict]:
         """Retrieve aliases for the used tables.
-        
+
         Parse the given PRQL query.
         Then, iterates through all ``join`` and ``from`` statements
         to retrieve the aliases of all used tables.
