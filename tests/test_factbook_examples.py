@@ -7,18 +7,19 @@ from pyprql.lang import prql
 
 
 class TestSQLGeneratorForFactbook(unittest.TestCase):
-    def setUpClass() -> None:
+    @classmethod
+    def setUpClass(cls) -> None:
         # Use Path for robust construction, but sqlite3 py3.6 requires str
         db_path = str(Path("resources", "factbook.db"))
-        TestSQLGeneratorForFactbook.con = sqlite3.connect(db_path)
-        TestSQLGeneratorForFactbook.cur = TestSQLGeneratorForFactbook.con.cursor()
+        cls.con = sqlite3.connect(db_path)  # type:ignore[attr-defined]
+        cls.cur = cls.con.cursor()  # type:ignore[attr-defined]
 
     def run_query(self, text, expected):
         print(text.replace("\n\n", "\n"))
         print("-" * 40)
         sql = prql.to_sql(text)
         print(sql)
-        rows = TestSQLGeneratorForFactbook.cur.execute(sql)
+        rows = self.cur.execute(sql)
         columns = [d[0] for d in rows.description]
         print(f"Columns: {columns}")
         rows = rows.fetchall()
