@@ -4,8 +4,9 @@ Python implementation of [PRQL](https://github.com/max-sixty/prql).
 
 Documentation of PRQL is at https://github.com/max-sixty/prql
 
-### Installation
-```
+## Installation
+
+```bash
     pip install pyprql
 ```
 
@@ -15,7 +16,7 @@ Usage:
 
 ```bash
     pyprql 'connection_string'
-    pyprql 'postgresql://user:password@localhost:5432/database'    
+    pyprql 'postgresql://user:password@localhost:5432/database'
 ```
 Examples:
 
@@ -25,13 +26,13 @@ Examples:
 Try it out:
 
 ```
-curl https://github.com/qorrect/PyPrql/blob/main/resources/chinook.db?raw=true -o chinook.db 
+curl https://github.com/qorrect/PyPrql/blob/main/resources/chinook.db?raw=true -o chinook.db
 pyprql "sqlite:///chinook.db"
 
-PRQL> show tables 
+PRQL> show tables
 ```
 
-## pyprql.to_sql 
+## pyprql.to_sql
 
 ```elm
 query='''
@@ -87,7 +88,7 @@ LIMIT 20
 
 ```
 
-#### Differences from the spec
+### Differences from the spec
 
 The parser is only able to parse casts in select statements insde of `[ ]`, so
 

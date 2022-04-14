@@ -24,7 +24,7 @@ class PRQLLexer(RegexLexer):
     The properties provided here mirror those defined
     in the standard RegexLexer. For full documentation,
     the interested user is directed to the Pygments
-    `website <https://pygments.org/docs/lexerdevelopment/>_.
+    `website <https://pygments.org/docs/lexerdevelopment/>`_.
     """
 
     name = "PRQL"

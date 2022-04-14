@@ -7,6 +7,9 @@ Thus, for each class,
 its initialisation parameters correcpond directly to those
 tokens the parser expects to find.
 
+Those interested in the actual EBNF-based grammar file should see
+`here <https://github.com/qorrect/PyPrql/blob/main/pyprql/lang/prql.lark>`_.
+
 Attributes
 ----------
 this_module : ModuleType
@@ -142,7 +145,7 @@ class BinaryExpression(_Ast):
     ----------
     left : _Ast
         Statement on the left of the operator.
-     right : Optional[_Ast]
+    right : Optional[_Ast]
         Statement on the right of the operator.
     operator : Optional[str]
         The operation to perform.
@@ -447,7 +450,7 @@ class Join(_Ast):
 
     Note
     ----
-    The multiple ``join_type``s allow for the parameter to occur anywhere
+    The multiple ``join_type`` parameters allow for the parameter to occur anywhere
     and still parse correctly.
 
     Warning
@@ -1268,7 +1271,7 @@ class ValueDef(_Ast):
     ----------
     name : Name
         The name of the value.
-     value_body : From
+    value_body : From
         The query producing the value.
     """
 
@@ -1278,7 +1281,7 @@ class ValueDef(_Ast):
 
 @dataclass
 class ValueDefs(_Ast, ast_utils.AsList):
-    """Multiple ``ValueDef``s.
+    """Multiple ``ValueDef``.
 
     Used to construct the root token.
 
@@ -1293,7 +1296,7 @@ class ValueDefs(_Ast, ast_utils.AsList):
 
 @dataclass
 class FuncDefs(_Ast, ast_utils.AsList):
-    """Multiple ``FuncDefs``.
+    """Multiple ``FuncDef``.
 
     Used to construct the root token.
 
@@ -1763,7 +1766,7 @@ def wrap_replace_all_tables(
     from_long: str, from_short: str, join_long: List[str], join_short: List[str]
 ) -> Callable[[str], str]:
     """Wrap ``replace_all_tables``.
-    
+
     Creates a callable of ``replace_all_tables`` where all parameters are already supplied
     except for ``s``, the string on which the function will operate.
 
