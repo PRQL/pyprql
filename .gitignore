@@ -7,3 +7,4 @@ scratch.py
 .python-version
 .prql-history.txt
 *.db
+Session.vim*
