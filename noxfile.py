@@ -9,6 +9,7 @@ from nox.sessions import Session
 PACKAGE: str = "pyprql"
 LOCATIONS: List[str] = [
     PACKAGE,
+    "tests",
     "noxfile.py",
 ]
 VERSIONS: List[str] = [
@@ -51,7 +52,12 @@ def lint(session: Session) -> None:
     """Lint files with flake8."""
     args = session.posargs or LOCATIONS
     constrained_install(
-        session, "flake8", "flake8-annotations", "flake8-docstrings", "darglint"
+        session,
+        "flake8",
+        "flake8-annotations",
+        "flake8-docstrings",
+        "flake8-pytest-style",
+        "darglint",
     )
     session.run("flake8", *args)
 
