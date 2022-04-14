@@ -105,3 +105,17 @@ def tests(session: Session) -> None:
         "xdoctest",
     )
     session.run("pytest", *args)
+
+
+@nox.session(python="3.10", reuse_venv=False)
+def docs(session: Session) -> None:
+    """Build the documentation."""
+    session.run("poetry", "install", "--no-dev", external=True)
+    constrained_install(
+        session,
+        "sphinx",
+        "sphinx-rtd-theme",
+        "myst-parser",
+        "pytest",
+    )
+    session.run("sphinx-build", "docs", "docs/_build")

@@ -1,0 +1,15 @@
+lark==1.1.2
+icecream==2.1.1
+rich==12.2.0
+enforce-typing==1.0.0.post1
+click==8.1.2
+prompt-toolkit==3.0.2
+Pygments==2.11.2
+fuzzyfinder==2.1.0
+SQLAlchemy==1.4.35
+pandas==1.4.2
+numpy==1.22.3
+sphinx==4.3.2
+sphinx-rtd-theme==1.0.0
+myst-parser==0.17.0
+pytest==7.1.1

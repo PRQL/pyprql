@@ -7,4 +7,6 @@ scratch.py
 .python-version
 .prql-history.txt
 *.db
+.DS_store
+docs/_build
 Session.vim*
