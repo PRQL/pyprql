@@ -6,7 +6,7 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyprql)
 
 [![CI/CD](https://github.com/prql/PyPrql/actions/workflows/cicd.yaml/badge.svg?branch=main)](https://github.com/prql/PyPrql/actions/workflows/cicd.yaml)
-docs
+[![Documentation Status](https://readthedocs.org/projects/pyprql/badge/?version=latest)](https://pyprql.readthedocs.io/en/latest/?badge=latest)
 ![Discord](https://img.shields.io/discord/936728116712316989)
 ![GitHub contributors](https://img.shields.io/github/contributors/prql/pyprql)
 ![GitHub Repo stars](https://img.shields.io/github/stars/prql/pyprql)
