@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Tests on the Factbook database."""
 import unittest
 
 import pandas as pd
@@ -8,7 +9,10 @@ from pyprql.lang import prql
 
 
 class TestSQLGeneratorForFactbook(unittest.TestCase):
+    """A unittest.TestCase."""
+
     def test_clean_columns(self):
+        """Clean column names correctly."""
         data = {
             '"age"': [32, 45],
             "sex of human": ["M", "F"],
@@ -29,6 +33,7 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         assert df.columns[2].find(")") == -1
 
     def test_get_operations(self):
+        """Retrieve operations correctly."""
         text = """
                 from employees
                 filter country = "USA"                           # Each line transforms the previous result.
