@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Tests for statements."""
 import sqlite3
 import unittest
 from pathlib import Path
@@ -7,14 +8,18 @@ from pyprql.lang import prql
 
 
 class TestSqlGenerator(unittest.TestCase):
+    """A unittest.TestCase."""
+
     @classmethod
     def setUpClass(cls) -> None:
+        """Setup tests."""
         # Use Path for robust construction, but sqlite3 py3.6 requires str
         db_path = str(Path("tests", "../resources/employee.db"))
         cls.con = sqlite3.connect(db_path)  # type:ignore[attr-defined]
         cls.cur = cls.con.cursor()  # type:ignore[attr-defined]
 
     def run_query(self, text, expected=None):
+        """Run a query."""
         # print(text.replace('\n\n', '\n'))
         # print('-' * 40)
         sql = prql.to_sql(text)
@@ -27,6 +32,7 @@ class TestSqlGenerator(unittest.TestCase):
             assert len(rows) == expected
 
     def test_select_all(self):
+        """Select all columns."""
         q = """
         func no_params = s"COUNT(*)"
         from table
@@ -41,6 +47,7 @@ class TestSqlGenerator(unittest.TestCase):
         self.run_query(q)
 
     def test_replace_function(self):
+        """Replace strings in a column."""
         q = """
         from table
         select name
@@ -53,6 +60,7 @@ class TestSqlGenerator(unittest.TestCase):
         self.run_query(q, 12)
 
     def test_nested_functions(self):
+        """Evaulate nested functions."""
         q = """from table
         select name
         derive [

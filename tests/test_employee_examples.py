@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Test examples on the Employees database."""
 import sqlite3
 import unittest
 from pathlib import Path
@@ -7,14 +8,18 @@ from pyprql.lang import prql
 
 
 class TestEmployeeExamples(unittest.TestCase):
+    """A unittest.TestCase."""
+
     @classmethod
     def setUpClass(cls) -> None:
+        """Setup the TestCase."""
         # Use Path for robust construction, but sqlite3 py3.6 requires str
         db_path = str(Path("tests", "../resources/employee.db"))
         cls.con = sqlite3.connect(db_path)  # type:ignore[attr-defined]
         cls.cur = cls.con.cursor()  # type:ignore[attr-defined]
 
     def run_query(self, text, expected=None):
+        """Run a query."""
         print(text.replace("\n\n", "\n"))
         print("-" * 40)
         sql = prql.to_sql(text)
@@ -27,6 +32,7 @@ class TestEmployeeExamples(unittest.TestCase):
             assert len(rows) == expected
 
     def test_index(self):
+        """Test the query runs correctly."""
         text = """
         from employees
         filter country = "USA"                           # Each line transforms the previous result.
@@ -79,6 +85,7 @@ class TestEmployeeExamples(unittest.TestCase):
         self.run_query(text)
 
     def test_cte1(self):
+        """Test that CTEs are handled correctly."""
         q = """
         table newest_employees = (
             from employees
@@ -95,6 +102,7 @@ class TestEmployeeExamples(unittest.TestCase):
         # self.run_query(text)
 
     def test_derive_issue_20(self):
+        """Test that derive statements are handled properly."""
         q = """
         from employees
         select [ benefits_cost , salary, title ]
