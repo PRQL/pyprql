@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests on the Factbook database."""
+"""Tests to check parsing utility functions."""
 import unittest
 
 import pandas as pd
