@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Tests using the Factbook example database."""
 import sqlite3
 import unittest
 from pathlib import Path
@@ -7,29 +8,36 @@ from pyprql.lang import prql
 
 
 class TestSQLGeneratorForFactbook(unittest.TestCase):
-    def setUpClass() -> None:
+    """A unittest.TestCase."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        """Setup tests."""
         # Use Path for robust construction, but sqlite3 py3.6 requires str
         db_path = str(Path("resources", "factbook.db"))
-        TestSQLGeneratorForFactbook.con = sqlite3.connect(db_path)
-        TestSQLGeneratorForFactbook.cur = TestSQLGeneratorForFactbook.con.cursor()
+        cls.con = sqlite3.connect(db_path)  # type:ignore[attr-defined]
+        cls.cur = cls.con.cursor()  # type:ignore[attr-defined]
 
     def run_query(self, text, expected):
+        """Run a query."""
         print(text.replace("\n\n", "\n"))
         print("-" * 40)
         sql = prql.to_sql(text)
         print(sql)
-        rows = TestSQLGeneratorForFactbook.cur.execute(sql)
+        rows = self.cur.execute(sql)
         columns = [d[0] for d in rows.description]
         print(f"Columns: {columns}")
         rows = rows.fetchall()
         assert len(rows) == expected
 
     def test_factbook_q1(self):
+        """Take only 1 rows."""
         # SELECT * FROM facts LIMIT 1;
         text = "from facts | take 1"
         self.run_query(text, 1)
 
     def test_factbook_q2(self):
+        """Ignore comments in the query."""
         text = """
         # SELECT name, area_land - area_water as just_land FROM facts LIMIT 2
         from facts | select name | derive [ just_land: area_land - area_water ]  | take 2
@@ -37,6 +45,7 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         self.run_query(text, 2)
 
     def test_factbook_q3(self):
+        """Parse functions correctly."""
         text = """
         #SELECT name
         #FROM facts
@@ -54,6 +63,7 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         self.run_query(text, 1)
 
     def test_factbook_q3b(self):
+        """Parse values correctly."""
         text = """
 
         value min_pop = (
@@ -69,11 +79,13 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         self.run_query(text, 1)
 
     def test_factbook_q4(self):
+        """Join tables."""
         # # SELECT * FROM cities JOIN facts  ON cities.facts_id = facts.id LIMIT 15
         text = "from cities | join facts [facts_id=id] | take 4"
         self.run_query(text, 4)
 
     def test_factbook_q5(self):
+        """Aggregate tables correctly."""
         text = """
         #SELECT cities.name            as city,
         #       facts.name             as country,
@@ -102,6 +114,7 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         self.run_query(text, 5)
 
     def test_factbook_q6(self):
+        """Support operations in derive."""
         text = """
         #SELECT cities.name            as city,
         #       facts.name             as country,

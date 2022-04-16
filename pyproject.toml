@@ -59,6 +59,7 @@ xdoctest = "^0.15.10"
 Sphinx = "~4.3"
 myst-parser = "^0.17.0"
 sphinx-rtd-theme = "^1.0.0"
+flake8-pytest-style = "^1.6.0"
 
 [tool.poetry.scripts]
 pyprql = "pyprql.cli.__init__:main"
