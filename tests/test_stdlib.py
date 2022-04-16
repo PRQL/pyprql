@@ -331,7 +331,7 @@ class TestStdlib(unittest.TestCase):
         derive cleaned: name | replace "foo" "bar"
 
         """
-        res = prql.to_sql(q, verbose=True)
+        res = prql.to_sql(q)
         self.assertTrue(res.index('REPLACE(name,"foo","bar") as cleaned') > 0)
         # print(res)
         self.run_query(q, 12)
@@ -340,7 +340,7 @@ class TestStdlib(unittest.TestCase):
         """Find substrings correctly."""
         q = """
         from table | select name | derive [ short: name | substr 0 3 ]"""
-        res = prql.to_sql(q, verbose=True)
+        res = prql.to_sql(q)
         # print(res)
         self.assertTrue(res.index("SUBSTR(name,0,3) as short") > 0)
         self.run_query(q, 12)
