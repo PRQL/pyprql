@@ -18,6 +18,8 @@ Python implementation of [PRQL][prql].
 
 Documentation of PRQL is lives [here][prql_docs].
 
+This project is maintained by [@qorrect](https://github.com/qorrect/) and [@rbpatt2019](https://github.com/rbpatt2019)
+
 ## Installation
 
 ```bash
@@ -44,10 +46,10 @@ pyprql zillow.csv
 
 ### The pyprql tool
 
-* pyprql can connect to any database that SQLAlchemy supports, execute `pyprql` without arguments for how to install drivers.
-* pyprql also supports CSV files, simply replace the connection string with the file path and it will load the CSV into a temporary SQLite database
+* pyprql can connect to any database that SQLAlchemy supports, execute `pyprql` without arguments for docs on how to install drivers.
+* pyprql can connect to CSV files,  replace the connection string with the file path and it will load the CSV into a temporary SQLite database.
 * pyprql can save the results with a ` | to csv ${filename}` transform at the end of the query
-* pyprql has auto-completion on table names and table aliases with _tab_, as well as history-completion with _alt-f_
+* pyprql has auto-completion on table names and table aliases with _tab_, and history-completion with _alt-f_
 
 [prql]: https://github.com/prql/prql
 [prql_docs]: https://lang.prql.builders/introduction.html
