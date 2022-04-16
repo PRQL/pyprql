@@ -1,7 +1,7 @@
 lark==1.1.2
 icecream==2.1.1
 rich==12.2.0
-enforce-typing==1.0.0.post1
+enforce-typing==git+https://github.com/qorrect/python-enforce-typing@master#egg=enforce-typing
 click==8.1.2
 prompt-toolkit==3.0.2
 Pygments==2.11.2
