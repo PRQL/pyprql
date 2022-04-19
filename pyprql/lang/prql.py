@@ -22,13 +22,15 @@ GLOBAL_PARSER : Optional[Lark]
     Cache used for long running processes.
 GLOBAL_TRANSFORMER : Optional[Transformer]
     Cache used for long running processes.
+T : TypeVar
+    A type bar with ``bound=_Ast``
 """
 import os
 import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from types import ModuleType
-from typing import Any, Callable, Dict, List, Optional, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type, TypeVar, Union, overload
 
 if sys.version_info < (3, 8):
     from typing_extensions import Literal
@@ -37,7 +39,6 @@ else:
 
 import lark
 import rich
-from enforce_typing import enforce_types
 from icecream import ic
 from lark import Lark, Token, Transformer, ast_utils
 
@@ -55,6 +56,11 @@ class _Ast(ast_utils.Ast):
     """An ``ast_utils.Ast`` object."""
 
     pass
+
+
+# Represent any type that is derived from _Ast
+# Used when input and output need same type.
+T = TypeVar("T", bound=_Ast)
 
 
 @dataclass
@@ -1383,20 +1389,21 @@ class Root(_Ast):
         """
         return self.with_def
 
-    @enforce_types
-    def assign_field(self, clazz: Type, values: List[Any]) -> Optional[Type]:
+    T = TypeVar("T", bound=_Ast)
+
+    def assign_field(self, clazz: Type[T], values: List[Any]) -> Optional[T]:
         """Initialise a field, by first checking if a token if present among inputs.
 
         Parameters
         ----------
-        clazz : Type
+        clazz : Type[T]
             The type of token to search for.
         values : List[Any]
             All inputs to the class.
 
         Returns
         -------
-        Optional[Type]
+        Optional[T]
             The first instance of type ``clazz`` among ``values``.
         """
         for v in values:
@@ -1512,7 +1519,6 @@ class ToAst(Transformer):
 
 
 # TODO: perhaps a bit more natural to handle this with pathlib.Path?
-@enforce_types
 def read_file(filename: str, path: str = script_path) -> str:
     """Read a file and return its contents.
 
@@ -1534,7 +1540,6 @@ def read_file(filename: str, path: str = script_path) -> str:
     return x
 
 
-@enforce_types
 def parse(_text: str, verbose: bool = False) -> Root:
     """Parse a PRQL string to SQL, and return the Root.
 
@@ -1568,7 +1573,6 @@ def parse(_text: str, verbose: bool = False) -> Root:
     return GLOBAL_TRANSFORMER.transform(tree)
 
 
-@enforce_types
 def to_sql(prql: str, verbose: bool = False) -> str:
     """Convert a query to SQL.
 
@@ -1602,7 +1606,6 @@ def to_sql(prql: str, verbose: bool = False) -> str:
     )
 
 
-@enforce_types
 def pretty_print(root: Root) -> None:
     """Print pretty things.
 
@@ -1617,15 +1620,71 @@ def pretty_print(root: Root) -> None:
     rich.print(root)
 
 
-@enforce_types
+# Most basic call - returns first instance.
+@overload
 def get_operation(
+    *,
     ops: List[_Ast],
-    class_type: Type[_Ast],
-    last_match: bool = False,
-    return_all: bool = False,
-    before: Type = None,
-    after: Type = None,
-) -> Union[List, _Ast]:
+    class_type: Type[T],
+) -> T:
+    ...
+
+
+# Most basic call - returns all instances.
+@overload
+def get_operation(
+    *,
+    ops: List[_Ast],
+    class_type: Type[T],
+    return_all: Literal[True],
+) -> List[T]:
+    ...
+
+
+# Return last instance.
+@overload
+def get_operation(
+    *,
+    ops: List[_Ast],
+    class_type: Type[T],
+    last_match: Literal[True],
+) -> T:
+    ...
+
+
+# Return all instances before a specified type.
+@overload
+def get_operation(
+    *,
+    ops: List[_Ast],
+    class_type: Type[T],
+    return_all: Literal[True],
+    before: Type[_Ast],
+) -> List[T]:
+    ...
+
+
+# Return all instances after a specified type.
+@overload
+def get_operation(
+    *,
+    ops: List[_Ast],
+    class_type: Type[T],
+    return_all: Literal[True],
+    after: Type[_Ast],
+) -> List[T]:
+    ...
+
+
+def get_operation(
+    *,
+    ops: List[_Ast],
+    class_type: Type[T],
+    return_all: Optional[bool] = None,
+    last_match: Optional[bool] = None,
+    before: Optional[Type[_Ast]] = None,
+    after: Optional[Type[_Ast]] = None,
+) -> Union[List[T], T]:
     """Return operations of a specific type.
 
     Given a list of operations,
@@ -1633,21 +1692,28 @@ def get_operation(
     The remaining boolean parameters allow control over number returned
     and where amongst the list they occur.
 
+    In order to specify the whether the return value is a singleton or a list,
+    we must abuse some overloaded signatures.
+    In order to achieve this,
+    the signature requires kwargs only.
+
     Note
     ----
-    The operations are designed to be the same as are valid as a pipe,
-    namely Join, Select, Derive, Filter, Sort, Take, Aggregate, and To.
+    ``T`` is a TypeVar with ``bound=_Ast``.
+    This allows us to specify that the returned list or item must be of the type specified
+    while simultaneously allowing it to be any element of the grammar.
 
     Parameters
     ----------
     ops : List[_Ast]
         A list of operations.
-    class_type : Type[_Ast]
+    class_type : Type[T]
         The operation type to return.
-    last_match : bool
-        Return the last occurence of the operation.
+        See ``Note`` on ``T``.
     return_all : bool
         Return all occurences of the operation.
+    last_match : bool
+        Return the last occurence of the operation.
     before : Type
         Return only those occurences before an operation of this type.
     after : Type
@@ -1655,10 +1721,9 @@ def get_operation(
 
     Returns
     -------
-    Union[List, _Ast]
-        Depending on the boolean values,
-        either a list of all matching operations,
-        or a singleton operation.
+    Union[List[T], T]
+        If ``return_all``, then ``List[T]``.
+        If not ``return_all``, then ``T``.
 
     Raises
     ------
@@ -1667,6 +1732,10 @@ def get_operation(
         or if either ``after`` or ``before`` is specified without ``return_all``.
     """
     ops_list = ops
+    if return_all is None:
+        return_all = False
+    if last_match is None:
+        last_match = False
     ret = []
     is_before = True
     is_after = False
@@ -1702,7 +1771,6 @@ def get_operation(
     return ret
 
 
-@enforce_types
 def _generate_alias(s: str, n: int = 1) -> str:
     """Generate an alias for a given string.
 
@@ -1725,7 +1793,6 @@ def _generate_alias(s: str, n: int = 1) -> str:
     return s + "_" + s[0:n]
 
 
-@enforce_types
 def replace_all_tables(
     from_long: str, from_short: str, join_long: List[str], join_short: List[str], s: str
 ) -> str:
@@ -1761,7 +1828,6 @@ def replace_all_tables(
 
 
 # TODO: I've left the auto generated docstring, as I'm not sure what the function is used for.
-@enforce_types
 def wrap_replace_all_tables(
     from_long: str, from_short: str, join_long: List[str], join_short: List[str]
 ) -> Callable[[str], str]:
@@ -1793,7 +1859,6 @@ def wrap_replace_all_tables(
     return inner
 
 
-@enforce_types
 def build_symbol_table(roots: List[Root]) -> Dict[str, List[_Ast]]:
     """Build a symbol table from the ``Root`` instance.
 
@@ -1820,7 +1885,7 @@ def build_symbol_table(roots: List[Root]) -> Dict[str, List[_Ast]]:
             table[str(n.name)].append(n)
         if root.get_from().pipes:
             derives = get_operation(
-                root.get_from().pipes.operations, Derive, return_all=True
+                ops=root.get_from().pipes.operations, class_type=Derive, return_all=True
             )
             for d in derives:
                 for line in d.fields:
@@ -1877,7 +1942,6 @@ def _replace_variables(ast: _Ast, symbol_table: Dict[str, List[_Ast]]) -> str:
             return str(ast)
 
 
-@enforce_types
 def replace_variables(_param: Any, symbol_table: Dict[str, List[_Ast]]) -> str:
     """Parses a symbol_table to expand all references to a variable.
 
@@ -1919,7 +1983,6 @@ def replace_variables(_param: Any, symbol_table: Dict[str, List[_Ast]]) -> str:
         return _param
 
 
-@enforce_types
 def execute_function(
     f: FuncCall,
     roots: Union[Root, List],
@@ -2013,7 +2076,6 @@ def execute_function(
     return msg
 
 
-@enforce_types
 def is_empty(a: Any) -> bool:
     """Check if an object is empty.
 
@@ -2035,7 +2097,6 @@ def is_empty(a: Any) -> bool:
     return True
 
 
-@enforce_types
 def get_function_parm_count(f: Union[FuncCall, FuncDef]) -> int:
     """Return the number of parameters in a function.
 
@@ -2063,7 +2124,6 @@ def get_function_parm_count(f: Union[FuncCall, FuncDef]) -> int:
     return parm_count
 
 
-@enforce_types
 def safe_to_sql(
     rule: Any,
     roots: Union[Root, List],
@@ -2101,7 +2161,6 @@ def safe_to_sql(
         return None
 
 
-@enforce_types
 def safe_get_alias(join: Union[Join, From], join_long: str) -> str:
     """Safely create an alias for a table.
 
@@ -2150,10 +2209,18 @@ def build_replace_tables(root: Root) -> Callable[[str], str]:
     """
     all_join_longs = []
     all_join_shorts = []
+    from_long = ""
+    from_short = ""
     _from = root.get_from()
-    from_long = str(_from.name)
-    from_short = safe_get_alias(_from, from_long)
-    joins: List[Join] = get_operation(_from.pipes.operations, Join, return_all=True)
+    joins: List[Join] = []
+
+    if _from is not None:
+        from_long = str(_from.name)
+        from_short = safe_get_alias(_from, from_long)
+        if _from.pipes is not None:
+            joins = get_operation(
+                ops=_from.pipes.operations, class_type=Join, return_all=True
+            )
 
     for join in joins:
         if join:
@@ -2169,7 +2236,6 @@ def build_replace_tables(root: Root) -> Callable[[str], str]:
     return replace_tables
 
 
-@enforce_types
 def ast_to_sql(
     rule: Union[_Ast, Token],
     roots: Union[Root, List],
@@ -2242,20 +2308,24 @@ def ast_to_sql(
         from_long = ""
         from_short = ""
         ops = _from.pipes
-        joins: List[Join] = get_operation(ops.operations, Join, return_all=True)
-        agg: Aggregate = get_operation(ops.operations, Aggregate)
-        take: Take = get_operation(ops.operations, Take, last_match=True)
-        sort: Sort = get_operation(ops.operations, Sort)
+        joins: List[Join] = get_operation(
+            ops=ops.operations, class_type=Join, return_all=True
+        )
+        agg: Aggregate = get_operation(ops=ops.operations, class_type=Aggregate)
+        take: Take = get_operation(ops=ops.operations, class_type=Take, last_match=True)
+        sort: Sort = get_operation(ops=ops.operations, class_type=Sort)
 
         filters = get_operation(
-            ops.operations, Filter, return_all=True, before=Aggregate
+            ops=ops.operations, class_type=Filter, return_all=True, before=Aggregate
         )
-        wheres_from_derives = get_operation(ops.operations, Derive, return_all=True)
+        wheres_from_derives = get_operation(
+            ops=ops.operations, class_type=Derive, return_all=True
+        )
         havings = get_operation(
-            ops.operations, Filter, return_all=True, after=Aggregate
+            ops=ops.operations, class_type=Filter, return_all=True, after=Aggregate
         )
-        selects = get_operation(ops.operations, Select, return_all=True)
-        tos = get_operation(ops.operations, To, last_match=True)
+        selects = get_operation(ops=ops.operations, class_type=Select, return_all=True)
+        tos = get_operation(ops=ops.operations, class_type=To, last_match=True)
 
         from_long = str(_from.name)
         from_short = safe_get_alias(_from, from_long)
@@ -2316,9 +2386,9 @@ def ast_to_sql(
 
         if havings:
             havings_str = "HAVING "
-            for filter in havings:
-                if filter:
-                    for func in filter.fields:
+            for f in havings:
+                if f is not None:
+                    for func in f.fields:
                         if func.val is not None:
                             havings_str += (
                                 ast_to_sql(

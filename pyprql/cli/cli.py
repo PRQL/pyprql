@@ -18,7 +18,6 @@ from typing import Dict, List, Tuple
 import pandas as pd
 import pygments
 import rich
-from enforce_typing import enforce_types
 from prompt_toolkit import prompt
 from prompt_toolkit.application import get_app
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -52,7 +51,6 @@ def clear_screen() -> None:
     print("\x1bc")
 
 
-@enforce_types
 def clean_column_names(data: pd.DataFrame) -> pd.DataFrame:
     return (
         data.columns.str.lower()
@@ -259,7 +257,6 @@ class CLI:
         highlighted = pygments.highlight(text, SqlLexer(), Formatter())
         return highlighted
 
-    @enforce_types
     def handle_input(self, _user_input: str) -> None:
         """Process user input.
 

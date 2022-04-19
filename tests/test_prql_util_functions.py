@@ -59,13 +59,13 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
 
         # First get all derives
         all_filters = prql.get_operation(
-            ast.get_from().pipes.operations, prql.Filter, return_all=True
+            ops=ast.get_from().pipes.operations, class_type=prql.Filter, return_all=True
         )
         self.assertTrue(len(all_filters) == 3)
 
         wheres = prql.get_operation(
-            ast.get_from().pipes.operations,
-            prql.Filter,
+            ops=ast.get_from().pipes.operations,
+            class_type=prql.Filter,
             return_all=True,
             before=prql.Aggregate,
         )
@@ -73,8 +73,8 @@ class TestSQLGeneratorForFactbook(unittest.TestCase):
         self.assertTrue(len(wheres) == 2)
 
         havings = prql.get_operation(
-            ast.get_from().pipes.operations,
-            prql.Filter,
+            ops=ast.get_from().pipes.operations,
+            class_type=prql.Filter,
             return_all=True,
             after=prql.Aggregate,
         )
