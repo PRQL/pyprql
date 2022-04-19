@@ -37,7 +37,6 @@ else:
 
 import lark
 import rich
-from enforce_typing import enforce_types
 from icecream import ic
 from lark import Lark, Token, Transformer, ast_utils
 
@@ -1383,7 +1382,6 @@ class Root(_Ast):
         """
         return self.with_def
 
-    @enforce_types
     def assign_field(self, clazz: Type, values: List[Any]) -> Optional[Type]:
         """Initialise a field, by first checking if a token if present among inputs.
 
@@ -1512,7 +1510,6 @@ class ToAst(Transformer):
 
 
 # TODO: perhaps a bit more natural to handle this with pathlib.Path?
-@enforce_types
 def read_file(filename: str, path: str = script_path) -> str:
     """Read a file and return its contents.
 
@@ -1534,7 +1531,6 @@ def read_file(filename: str, path: str = script_path) -> str:
     return x
 
 
-@enforce_types
 def parse(_text: str, verbose: bool = False) -> Root:
     """Parse a PRQL string to SQL, and return the Root.
 
@@ -1568,7 +1564,6 @@ def parse(_text: str, verbose: bool = False) -> Root:
     return GLOBAL_TRANSFORMER.transform(tree)
 
 
-@enforce_types
 def to_sql(prql: str, verbose: bool = False) -> str:
     """Convert a query to SQL.
 
@@ -1602,7 +1597,6 @@ def to_sql(prql: str, verbose: bool = False) -> str:
     )
 
 
-@enforce_types
 def pretty_print(root: Root) -> None:
     """Print pretty things.
 
@@ -1617,7 +1611,6 @@ def pretty_print(root: Root) -> None:
     rich.print(root)
 
 
-@enforce_types
 def get_operation(
     ops: List[_Ast],
     class_type: Type[_Ast],
@@ -1702,7 +1695,6 @@ def get_operation(
     return ret
 
 
-@enforce_types
 def _generate_alias(s: str, n: int = 1) -> str:
     """Generate an alias for a given string.
 
@@ -1725,7 +1717,6 @@ def _generate_alias(s: str, n: int = 1) -> str:
     return s + "_" + s[0:n]
 
 
-@enforce_types
 def replace_all_tables(
     from_long: str, from_short: str, join_long: List[str], join_short: List[str], s: str
 ) -> str:
@@ -1761,7 +1752,6 @@ def replace_all_tables(
 
 
 # TODO: I've left the auto generated docstring, as I'm not sure what the function is used for.
-@enforce_types
 def wrap_replace_all_tables(
     from_long: str, from_short: str, join_long: List[str], join_short: List[str]
 ) -> Callable[[str], str]:
@@ -1793,7 +1783,6 @@ def wrap_replace_all_tables(
     return inner
 
 
-@enforce_types
 def build_symbol_table(roots: List[Root]) -> Dict[str, List[_Ast]]:
     """Build a symbol table from the ``Root`` instance.
 
@@ -1877,7 +1866,6 @@ def _replace_variables(ast: _Ast, symbol_table: Dict[str, List[_Ast]]) -> str:
             return str(ast)
 
 
-@enforce_types
 def replace_variables(_param: Any, symbol_table: Dict[str, List[_Ast]]) -> str:
     """Parses a symbol_table to expand all references to a variable.
 
@@ -1919,7 +1907,6 @@ def replace_variables(_param: Any, symbol_table: Dict[str, List[_Ast]]) -> str:
         return _param
 
 
-@enforce_types
 def execute_function(
     f: FuncCall,
     roots: Union[Root, List],
@@ -2013,7 +2000,6 @@ def execute_function(
     return msg
 
 
-@enforce_types
 def is_empty(a: Any) -> bool:
     """Check if an object is empty.
 
@@ -2035,7 +2021,6 @@ def is_empty(a: Any) -> bool:
     return True
 
 
-@enforce_types
 def get_function_parm_count(f: Union[FuncCall, FuncDef]) -> int:
     """Return the number of parameters in a function.
 
@@ -2063,7 +2048,6 @@ def get_function_parm_count(f: Union[FuncCall, FuncDef]) -> int:
     return parm_count
 
 
-@enforce_types
 def safe_to_sql(
     rule: Any,
     roots: Union[Root, List],
@@ -2101,7 +2085,6 @@ def safe_to_sql(
         return None
 
 
-@enforce_types
 def safe_get_alias(join: Union[Join, From], join_long: str) -> str:
     """Safely create an alias for a table.
 
@@ -2169,7 +2152,6 @@ def build_replace_tables(root: Root) -> Callable[[str], str]:
     return replace_tables
 
 
-@enforce_types
 def ast_to_sql(
     rule: Union[_Ast, Token],
     roots: Union[Root, List],

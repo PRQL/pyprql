@@ -2,7 +2,6 @@
 """Prompt_toolkit completion engine for PyPRQL CLI."""
 from typing import Dict, Iterable, List, Optional
 
-from enforce_typing import enforce_types
 from prompt_toolkit.completion import CompleteEvent, Completer, Completion
 from prompt_toolkit.document import Document
 
@@ -28,7 +27,6 @@ class PRQLCompleter(Completer):
         list of PRQL keywords.
     """
 
-    @enforce_types
     def __init__(
         self,
         table_names: List[str],
@@ -46,7 +44,6 @@ class PRQLCompleter(Completer):
 
         self.last_good_table_aliases: Dict[str, str] = {}
 
-    @enforce_types
     def parse_prql(self, text: str) -> Optional[prql.Root]:
         """Parse a PRQL string to AST.
 
@@ -206,7 +203,6 @@ class PRQLCompleter(Completer):
             for m in selection:
                 yield Completion(m, start_position=-len(word_before_cursor))
 
-    @enforce_types
     def get_table_aliases(self, full_text: str) -> Optional[Dict]:
         """Retrieve aliases for the used tables.
 
@@ -242,7 +238,6 @@ class PRQLCompleter(Completer):
             # print(e)
             return None
 
-    @enforce_types
     def get_from_table(self, full_text: str) -> Optional[str]:
         """Retrieve the ``from`` statement from a PRQL query.
 
