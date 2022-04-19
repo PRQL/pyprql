@@ -224,7 +224,9 @@ class PRQLCompleter(Completer):
             ret = {}
             root = self.parse_prql(full_text)
             joins = prql.get_operation(
-                root.get_from().pipes.operations, class_type=prql.Join, return_all=True
+                ops=root.get_from().pipes.operations,
+                class_type=prql.Join,
+                return_all=True,
             )
             for join in joins:
                 if join.alias is not None:
