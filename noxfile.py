@@ -104,10 +104,12 @@ def tests(session: Session) -> None:
     session.run("poetry", "install", "--no-dev", external=True)
     constrained_install(  # These are required for tests. Don't clutter w/ all dependencies!
         session,
+        "coverage",
         "pytest",
         "pytest-clarity",
         "pytest-sugar",
         "pytest-xdist",
+        "pytest-cov",
         "xdoctest",
     )
     session.run("pytest", *args)

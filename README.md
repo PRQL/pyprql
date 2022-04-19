@@ -14,9 +14,7 @@
 [![Codestyle: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
-Python implementation of [PRQL][prql].
-
-Documentation of PRQL is lives [here][prql_docs].
+Python implementation of [PRQL][prql].  Documentation of PRQL is [here][prql_docs].
 
 This project is maintained by [@qorrect](https://github.com/qorrect/) and [@rbpatt2019](https://github.com/rbpatt2019)
 

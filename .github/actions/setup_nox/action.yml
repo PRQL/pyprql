@@ -34,7 +34,7 @@ runs:
       with:
         path: .nox
         key:
-          nox-${{inputs.cache }}-${{ hashFiles('noxfile.py') }}-${{ hashFiles('poetry.lock') }}
+          nox-${{inputs.cache_number }}-${{ hashFiles('noxfile.py') }}-${{ hashFiles('poetry.lock') }}
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:

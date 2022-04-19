@@ -2,6 +2,22 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.2 (2022-04-16)
+### Fix
+*  Fixes enforce typing breaking on subscripted generics by forking and providing a flag to ignore this non-error. ([`cb19cbc`](https://github.com/prql/PyPrql/commit/cb19cbc81275b291856818fd5689881007d5ee3c))
+
+### Documentation
+* **index.md:** Add docs badge to docs ([`3029853`](https://github.com/prql/PyPrql/commit/3029853a76dfc0952e2e2904e6ffede3019c3726))
+* **README.md:** Add ReadTheDocs ([`4d5404c`](https://github.com/prql/PyPrql/commit/4d5404c6c5a34375bcb8a8472f9d18265024f471))
+* **docs:** Add tests to the sphinx build ([`049ff35`](https://github.com/prql/PyPrql/commit/049ff353e37b180201228c45411713ef73f78761))
+* **tests:** Document tests ([`950e55d`](https://github.com/prql/PyPrql/commit/950e55dbaef0579b7e72664d51de0cea50b7ef6b))
+* **README.md:** Add badges ([`c176d65`](https://github.com/prql/PyPrql/commit/c176d65e22f091f8ac6db7a03a2a0745a7f37139))
+* ***:** Correct urls ([`0622add`](https://github.com/prql/PyPrql/commit/0622add58fdb0dcf271102ac69f4a6dc71eb2ff5))
+* **README.md:** Get those badges ([`2547540`](https://github.com/prql/PyPrql/commit/2547540aee2108b6c326e219e1a21bed35ca2a8d))
+* **LICENSE:** Add license ([`7119bec`](https://github.com/prql/PyPrql/commit/7119bec4a80a1f4b11c4134bf034d5dcf8dbca41))
+* **docs:** Add Sphinx support ([`f966f34`](https://github.com/prql/PyPrql/commit/f966f349d6c81f31f8abd87f929addb4b73d2e81))
+* ***:** Provide docstrings throughout ([`c1b7b6d`](https://github.com/prql/PyPrql/commit/c1b7b6dc18db481f8c678cf09811afa3a25d9988))
+
 ## v0.4.1 (2022-04-14)
 ### Fix
 *  Fixes #27 ([`b666dd0`](https://github.com/qorrect/PyPrql/commit/b666dd03135bb209431575f5d1481e29299576cd))
