@@ -37,7 +37,6 @@ numpy = [
     {version = "~1.21", python = "~3.7.1"},
     {version = "^1.22.3", python = "^3.8"}
 ]
-pytest-xdist = "^2.5.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.1"
@@ -60,6 +59,8 @@ Sphinx = "~4.3"
 myst-parser = "^0.17.0"
 sphinx-rtd-theme = "^1.0.0"
 flake8-pytest-style = "^1.6.0"
+coverage = "^6.3.2"
+pytest-cov = "^3.0.0"
 
 [tool.poetry.scripts]
 pyprql = "pyprql.cli.__init__:main"
@@ -82,7 +83,17 @@ addopts = """
 -vv
 --xdoctest
 -n auto
+--cov=pyprql
+--cov-report=term
+--cov-report=xml
 """
+
+[tool.coverage.run]
+branch = true
+source = ["pyprql"]
+
+[tool.coverage.report]
+show_missing = true
 
 [tool.isort]
 profile = "black"

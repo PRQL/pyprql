@@ -10,3 +10,5 @@ scratch.py
 .DS_store
 docs/_build
 Session.vim*
+coverage.xml
+.coverage

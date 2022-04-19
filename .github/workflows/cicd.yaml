@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  CACHE_NUMBER: 3
+  CACHE_NUMBER: 4
   POETRY_VERSION: 1.1.13
   PSR_VERSION: 7.27.1
 
@@ -75,6 +75,12 @@ jobs:
           poetry_version: ${{ env.POETRY_VERSION }}
       - name: Test Code and Docs
         run: nox -s tests
+      - name: Upload to CodeCov
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: true
+          verbose: true
 
   release:
     runs-on: ubuntu-latest
