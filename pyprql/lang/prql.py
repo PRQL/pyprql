@@ -1092,31 +1092,16 @@ class Take(_Ast):
 
 # TODO: clarify filter documentation
 @dataclass
-class Filter(_Ast, ast_utils.AsList):
-    """The ``filter`` statement.
-
-    Parameters
-    ----------
-    fields : List[str]
-        The fields to filter by.
-    name : str
-    """
-
-    fields: List[str]
-    name: str = "filter"
-
-
-# TODO: clarify filter documentation
-@dataclass
 class FilterLine(_Ast):
     """The ``FilterLine`` token.
 
     Parameters
     ----------
-    val : Any
+    val : _Ast
+        Usually a BinaryExpression, SSTRING
     """
 
-    val: Any = None
+    val: Optional[_Ast] = None
 
     def __str__(self) -> str:
         """Return a string representation.
@@ -1127,6 +1112,21 @@ class FilterLine(_Ast):
             The string representation of the take statement.
         """
         return str(self.val)
+
+
+@dataclass
+class Filter(_Ast, ast_utils.AsList):
+    """The ``filter`` statement.
+
+    Parameters
+    ----------
+    fields : List[FilterLine]
+        The fields to filter by.
+    name : str
+    """
+
+    fields: List[FilterLine]
+    name: str = "filter"
 
 
 @dataclass
