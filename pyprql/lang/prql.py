@@ -624,12 +624,15 @@ class SelectField(_Ast):
 
     Parameters
     ----------
+    alias : Optional[Alias]
+        The alias for the column in the select.
     name : Name
         The column to be selected.
     cast_type : Optional[Name]
         Whether the column should be cast as a new name.
     """
 
+    alias: Optional[Alias]
     name: Name
     cast_type: Optional[Name] = None
 
@@ -641,9 +644,15 @@ class SelectField(_Ast):
         str
             The SelectFiled representation.
         """
+        result = str(self.name)
+
         if self.cast_type is not None:
-            return f"CAST({self.name} as {self.cast_type})"
-        return str(self.name)
+            result = f"CAST({result} as {self.cast_type})"
+
+        if self.alias is not None:
+            result += f" as {self.alias}"
+
+        return result
 
 
 @dataclass()

@@ -470,7 +470,8 @@ class TestSqlGenerator(unittest.TestCase):
         q = """
         from even_longer_foo:foo
         derive [
-            val: foo.some_value,
+            val: foo.some_value
+        select [
             other_val: even_longer_foo.other_value
         ]
         """
