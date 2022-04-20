@@ -1,0 +1,4 @@
+    jinja_macro: /\{\{.*?(?<!\\)\}(?<!\\)\}/
+
+    // Add ref and source type of macros support for relations
+    %extend relation:  jinja_macro
