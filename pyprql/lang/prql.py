@@ -1567,7 +1567,7 @@ def read_file(filename: str, path: str = script_path) -> str:
     return x
 
 
-def parse(_text: str, verbose: bool = False) -> Root:
+def parse(_text: str, verbose: bool = False, dbt: bool = False) -> Root:
     """Parse a PRQL string to SQL, and return the Root.
 
     Parameters
@@ -1586,8 +1586,13 @@ def parse(_text: str, verbose: bool = False) -> Root:
     global GLOBAL_TRANSFORMER
     text = _text + "\n"
     if GLOBAL_PARSER is None:
+        grammar = read_file("prql.lark")
+        # TODO: change to dbt check
+        if dbt:
+            grammar += read_file("dbt.lark")
+
         GLOBAL_PARSER = Lark(
-            read_file("prql.lark"),
+            grammar,
             start="root",
             parser="lalr",
             transformer=ToAst(),
@@ -1600,7 +1605,7 @@ def parse(_text: str, verbose: bool = False) -> Root:
     return GLOBAL_TRANSFORMER.transform(tree)
 
 
-def to_sql(prql: str, verbose: bool = False) -> str:
+def to_sql(prql: str, verbose: bool = False, dbt: bool = False) -> str:
     """Convert a query to SQL.
 
     First,
@@ -1621,7 +1626,7 @@ def to_sql(prql: str, verbose: bool = False) -> str:
         The raw SQL.
     """
     global STDLIB_AST
-    ast = parse(prql, verbose)
+    ast = parse(prql, verbose, dbt)
     if verbose:
         rich.print(ast.get_from())
     if STDLIB_AST is None:
