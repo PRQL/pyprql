@@ -47,7 +47,7 @@
     select_fields: ("[" select_field ("," select_field)*  "]" )* \
                    (name*)
 
-    select_field: name ( "|" "as" name )?
+    select_field: [alias] name ( "|" "as" name )?
     derive: ("derive" \
             ( "[" derive_line+ "]" | derive_line ))+
     derive_line: name ":" derive_body (",")?
