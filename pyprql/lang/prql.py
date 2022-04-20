@@ -114,6 +114,24 @@ class Name(_Ast, ast_utils.AsList):
 
 
 @dataclass
+class JinjaMacro(_Ast):
+    macro: str
+
+    def __str__(self) -> str:
+        return str(self.macro)
+
+
+@dataclass
+class Relation(_Ast):
+    relation: Union[str, JinjaMacro]
+
+    def __str__(self) -> str:
+        if isinstance(self.relation, JinjaMacro):
+            return str(self.relation)
+        return "`" + self.relation + "`"
+
+
+@dataclass
 class Expression(_Ast, ast_utils.AsList):
     """A Lark expression.
 
@@ -1799,7 +1817,11 @@ def _generate_alias(s: str, n: int = 1) -> str:
     str
         The aliased string.
     """
-    return s + "_" + s[0:n]
+    alias = s + "_" + s[0:n]
+
+    for c in "}{][)(,\"' ":
+        alias = alias.replace(c, "")
+    return alias
 
 
 def replace_all_tables(
