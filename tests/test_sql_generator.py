@@ -470,8 +470,24 @@ class TestSqlGenerator(unittest.TestCase):
         q = """
         from even_longer_foo:foo
         derive [
-            val: foo.some_value
+            val: foo.some_value,
+            other_val: even_longer_foo.other_value
+        ]
+        """
+        print(q)
+        res = prql.to_sql(q)
+        # print(res)
+        assert res.index("even_longer_foo.some_value as val") != -1
+        assert res.index("even_longer_foo.other_value as other_val") != -1
+
+    # print(res)
+
+    def test_select_alias(self):
+        """Alias, even when given ridiculous aliases."""
+        q = """
+        from even_longer_foo:foo
         select [
+            val: foo.some_value,
             other_val: even_longer_foo.other_value
         ]
         """
