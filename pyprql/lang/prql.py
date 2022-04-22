@@ -1576,6 +1576,8 @@ def parse(_text: str, verbose: bool = False, dbt: bool = False) -> Root:
         The query string to parse.
     verbose : bool
         Whether or not to print verbose information.
+    dbt : bool
+        Whether or not to enable dbt-style parsing.
 
     Returns
     -------
@@ -1619,6 +1621,8 @@ def to_sql(prql: str, verbose: bool = False, dbt: bool = False) -> str:
         The PRQL query to parse
     verbose : bool
         Whether or not to print verbose information.
+    dbt : bool
+        Whether or not to enable dbt-style parsing.
 
     Returns
     -------
