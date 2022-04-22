@@ -2370,7 +2370,7 @@ def ast_to_sql(
         from_long = str(_from.name)
         from_short = safe_get_alias(_from, from_long)
 
-        from_str = f"`{from_long}`" + " " + from_short
+        from_str = from_long + " " + from_short
 
         for join in joins:
             if join:
