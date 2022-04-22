@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 import pandas as pd
+import prql_python as prql
 import pygments
 import rich
 from prompt_toolkit import prompt
@@ -31,16 +32,37 @@ from rich.table import Table
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.exc import ResourceClosedError
 
-import pyprql.lang.prql as prql
 from pyprql import __version__ as pyprql_version
 from pyprql.cli.PRQLCompleter import PRQLCompleter
 from pyprql.cli.PRQLLexer import PRQLLexer
 from pyprql.cli.PRQLStyle import PRQLStyle
 
-bindings = KeyBindings()
 this_files_path = os.path.abspath(os.path.dirname(__file__))
-# We cache this file read here to avoid reading it every time we need it.
-BOTTOM_TOOLBAR_TXT = prql.read_file("../assets/cli_bottom_toolbar.txt", this_files_path)
+
+
+def read_file(filename: str, path: str = this_files_path) -> str:
+    """Read a file and return its contents.
+
+    Parameters
+    ----------
+    filename : str
+        The file to read.
+    path : str
+        Default : the run path of the script.
+        The root folder.
+
+    Returns
+    -------
+    str
+        The contents of the file.
+    """
+    with open(path + os.sep + filename, "r") as f:
+        x = f.read()
+    return x
+
+
+bindings = KeyBindings()
+BOTTOM_TOOLBAR_TXT = read_file("../assets/cli_bottom_toolbar.txt")
 
 
 @bindings.add("c-l")
@@ -54,11 +76,11 @@ def clear_screen() -> None:
 def clean_column_names(data: pd.DataFrame) -> pd.DataFrame:
     return (
         data.columns.str.lower()
-        .str.strip()
-        .str.replace('"', "")
-        .str.replace(" ", "_")
-        .str.replace("(", "", regex=False)
-        .str.replace(")", "", regex=False)
+            .str.strip()
+            .str.replace('"', "")
+            .str.replace(" ", "_")
+            .str.replace("(", "", regex=False)
+            .str.replace(")", "", regex=False)
     )
 
 
@@ -103,7 +125,7 @@ class CLI:
         self.command = ""
         self.sql_mode = False
         BOTTOM_TOOLBAR_TXT += (
-            " Connected to " + connect_str[connect_str.rfind("/") + 1 :] + "."
+                " Connected to " + connect_str[connect_str.rfind("/") + 1:] + "."
         )
         file = Path(connect_str)
         delims = {".csv": ",", ".tsv": "\t"}
@@ -135,7 +157,7 @@ class CLI:
     @staticmethod
     def print_usage() -> None:
         """Prints the usage information for the CLI."""
-        print(prql.read_file("../assets/cli_usage.txt", this_files_path))
+        print(read_file("../assets/cli_usage.txt"))
 
     def bottom_toolbar(self) -> List[Tuple[str, str]]:
         """Create bottom toolbar for prql prompt.
@@ -277,19 +299,19 @@ class CLI:
             sys.exit(0)
         elif user_input == "examples":
             # That would likely increase maintainability
-            rich.print(prql.read_file("../assets/examples.txt", this_files_path))
+            rich.print(read_file("../assets/examples.txt"))
             return
         elif user_input == "?" or user_input == "help":
             rich.print(f"PyPRQL version: {pyprql_version}")
 
             if self.sql_mode:
                 rich.print(
-                    prql.read_file("../assets/sql_mode_help.txt", this_files_path)
+                    read_file("../assets/sql_mode_help.txt")
                 )
 
             else:
                 rich.print(
-                    prql.read_file("../assets/prql_mode_help.txt", this_files_path)
+                    read_file("../assets/prql_mode_help.txt")
                 )
                 self.prompt_text = "PRQL> "
 
@@ -315,7 +337,7 @@ class CLI:
             key = "show columns"
             if key not in user_input:
                 key = "\d+"
-            table_name = user_input[key.__len__() + 1 :]
+            table_name = user_input[key.__len__() + 1:]
             print(table_name)
             # tables = self.engine.list_tables()
             columns = self.inspector.get_columns(table_name)
@@ -328,7 +350,7 @@ class CLI:
 
                 self.has_one_blank = False
                 sql = self.command
-                if "SELECT" in sql and "LIMIT" not in sql:
+                if "LIMIT" not in sql:
                     sql += " LIMIT 25"
 
                 self.prompt_text = "SQL> "
@@ -343,7 +365,7 @@ class CLI:
                     sql = prql.to_sql(self.command)
                     to = ""
                     if "TO" in sql:
-                        to = sql[sql.index("TO") :].strip()
+                        to = sql[sql.index("TO"):].strip()
                         sql = sql[: sql.index("TO")].strip()
 
                     print("SQL:\n\t" + self.highlight_sql(sql) + "\nResults:")

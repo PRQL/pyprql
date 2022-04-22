@@ -5,7 +5,7 @@ from typing import Dict, Iterable, List, Optional
 from prompt_toolkit.completion import CompleteEvent, Completer, Completion
 from prompt_toolkit.document import Document
 
-from pyprql.lang import prql
+import prql_python as prql
 
 
 class PRQLCompleter(Completer):
@@ -44,22 +44,6 @@ class PRQLCompleter(Completer):
 
         self.last_good_table_aliases: Dict[str, str] = {}
 
-    def parse_prql(self, text: str) -> Optional[prql.Root]:
-        """Parse a PRQL string to AST.
-
-        Parameters
-        ----------
-        text : str
-            The PRQL query to parse.
-
-        Returns
-        -------
-        Optional[prql.Root]
-            The parsed AST tree.
-        """
-        ast = prql.parse(text)
-        return ast
-
     def get_completions(
         self, document: Document, complete_event: CompleteEvent
     ) -> Iterable[Completion]:  # noqa: DAR201
@@ -83,13 +67,13 @@ class PRQLCompleter(Completer):
         working_column_names = self.column_names
         # _debug_log_to_file('wcn:' + str(working_column_names))
         # If we have a from_table, then set the column names to just that table
-        from_table = self.get_from_table(str(document.text))
-        if from_table is not None:
-            working_column_names = self.column_map.get(from_table, [])
-
-        table_aliases = self.get_table_aliases(str(document.text))
-        if table_aliases is not None and table_aliases:
-            self.last_good_table_aliases = table_aliases
+        # from_table = self.get_from_table(str(document.text))
+        # if from_table is not None:
+        #     working_column_names = self.column_map.get(from_table, [])
+        #
+        # table_aliases = self.get_table_aliases(str(document.text))
+        # if table_aliases is not None and table_aliases:
+        #     self.last_good_table_aliases = table_aliases
             # _debug_log_to_file('last_good_table_aliases=' + str(table_aliases))
 
         # We're only interested in everything after the dot
@@ -104,7 +88,7 @@ class PRQLCompleter(Completer):
         possible_matches = {
             "from": self.table_names,
             "join": self.table_names,
-            "\d+": self.table_names,
+            "\\d+": self.table_names,
             "columns": self.table_names,
             "select": working_column_names,
             " ": working_column_names,
@@ -203,66 +187,3 @@ class PRQLCompleter(Completer):
             for m in selection:
                 yield Completion(m, start_position=-len(word_before_cursor))
 
-    def get_table_aliases(self, full_text: str) -> Optional[Dict]:
-        """Retrieve aliases for the used tables.
-
-        Parse the given PRQL query.
-        Then, iterates through all ``join`` and ``from`` statements
-        to retrieve the aliases of all used tables.
-
-        Parameters
-        ----------
-        full_text : str
-            The PRQL query to parse.
-
-        Returns
-        -------
-        Optional[Dict]
-            All used table aliases.
-        """
-        try:
-            ret = {}
-            root = self.parse_prql(full_text)
-            joins = prql.get_operation(
-                ops=root.get_from().pipes.operations,
-                class_type=prql.Join,
-                return_all=True,
-            )
-            for join in joins:
-                if join.alias is not None:
-                    ret[str(join.alias)] = str(join.name)
-
-            if root.get_from().alias is not None:
-                ret[str(root.get_from().alias)] = str(root.get_from().name)
-
-            return ret
-        except Exception as e:  # noqa: F841
-            # print(e)
-            return None
-
-    def get_from_table(self, full_text: str) -> Optional[str]:
-        """Retrieve the ``from`` statement from a PRQL query.
-
-        Parameters
-        ----------
-        full_text : str
-            The PRQL query to parse.
-
-        Returns
-        -------
-        Optional[str]
-            The ``from`` clause in the given query.
-        """
-        try:
-            root = self.parse_prql(full_text)
-            return str(root.get_from())
-        except Exception as e:  # noqa: F841
-            # print(e)
-            return None
-
-
-# def _debug_log_to_file(s):
-#     with open('.prql_cli_debug_output.txt', 'a') as f:
-#         f.write(datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
-#         f.write(":" + s)
-#         f.write('\n')
