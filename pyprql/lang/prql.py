@@ -498,9 +498,9 @@ class Join(_Ast):
         The type of join to perform.
     """
 
-    join_type: Optional[_JoinType] = None
-    alias: Optional[Alias] = None
-    name: Optional[Name] = None
+    join_type: Optional[_JoinType]
+    alias: Optional[Alias]
+    name: Relation
     join_type_2: Optional[_JoinType] = None
     left_id: Optional[Name] = None
     right_id: Optional[Name] = None
@@ -1190,8 +1190,8 @@ class From(_Ast):
         All operations, other than from, in the query.
     """
 
-    alias: Optional[Alias] = None
-    name: Optional[Name] = None
+    alias: Optional[Alias]
+    name: Relation
     pipes: Optional[Pipes] = None
 
 
