@@ -21,6 +21,7 @@ def main(params: Optional[List[str]] = None) -> None:
     params : Optional[List[str]], default None
         The parameters passed to the CLI.
     """
+
     if params is None:
         params = sys.argv
     try:

@@ -333,10 +333,10 @@ class CLI:
                 table.add_row(table_name)
             rich.print(table)
             return
-        elif user_input.startswith("show columns") or user_input.startswith("\d+"):
+        elif user_input.startswith("show columns") or user_input.startswith("\\d+"):
             key = "show columns"
             if key not in user_input:
-                key = "\d+"
+                key = "\\d+"
             table_name = user_input[key.__len__() + 1:]
             print(table_name)
             # tables = self.engine.list_tables()
