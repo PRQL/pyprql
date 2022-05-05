@@ -3,7 +3,7 @@
 import os
 import sys
 
-import sphinx_rtd_theme
+import sphinx_rtd_theme  # noqa: F401
 
 sys.path.insert(0, os.path.abspath("../"))
 sys.path.insert(0, os.path.abspath("../pyprql/"))
@@ -30,3 +30,6 @@ source_suffix = {
     ".md": "markdown",
 }
 myst_heading_anchors = 2
+myst_enable_extensions = [
+    "html_admonition",
+]
