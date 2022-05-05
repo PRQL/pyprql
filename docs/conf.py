@@ -30,3 +30,6 @@ source_suffix = {
     ".md": "markdown",
 }
 myst_heading_anchors = 2
+myst_enable_extensions = [
+    "html_admonition",
+]
