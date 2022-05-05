@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import prql_python as prql
 
 

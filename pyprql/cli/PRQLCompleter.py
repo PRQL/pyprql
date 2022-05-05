@@ -5,8 +5,6 @@ from typing import Dict, Iterable, List, Optional
 from prompt_toolkit.completion import CompleteEvent, Completer, Completion
 from prompt_toolkit.document import Document
 
-import prql_python as prql
-
 
 class PRQLCompleter(Completer):
     """Prompt_toolkit completion engine for PyPRQL CLI.
@@ -74,7 +72,7 @@ class PRQLCompleter(Completer):
         # table_aliases = self.get_table_aliases(str(document.text))
         # if table_aliases is not None and table_aliases:
         #     self.last_good_table_aliases = table_aliases
-            # _debug_log_to_file('last_good_table_aliases=' + str(table_aliases))
+        # _debug_log_to_file('last_good_table_aliases=' + str(table_aliases))
 
         # We're only interested in everything after the dot
         if "." in word_before_cursor and not word_before_cursor.endswith("."):
@@ -186,4 +184,3 @@ class PRQLCompleter(Completer):
 
             for m in selection:
                 yield Completion(m, start_position=-len(word_before_cursor))
-
