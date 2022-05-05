@@ -1,0 +1,52 @@
+name: Setup Python Semantic Release
+description: 'Prepare Python Semantic Release'
+
+inputs:
+  gh_token:
+    description: "Github token for validating uploads."
+    required: True
+  pypi_token:
+    description: "PyPI token for validating uploads."
+    required: True
+  cache_number:
+    description: "A manually specified cache number. Useful for triggering new caches."
+    required: True
+    default: 0
+  poetry_version:
+    description: "Which poetry version to use."
+    required: True
+    default: 1.1.13
+  psr_version:
+    description: "Which python semantic release version to use."
+    required: True
+    default: 7.28.1
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Pyton
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Cache Pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.pip
+        key:
+          pip${{ inputs.cache_number }}-PT${{ inputs.poetry_version }}-PRS${{ inputs.psr_version }}
+    - name: Get Dependencies
+      shell: bash
+      run: |
+        pip install poetry==${{ inputs.poetry_version }} python-semantic-release==${{ inputs.psr_version }}
+    - name: Configure git
+      shell: bash
+      run: |
+        git config --global user.name 'rbpatt2019'
+        git config --global user.email 'rbpatt2019@users.noreply.github.com'
+    - name: Python Semantic Release
+      shell: bash
+      env:
+        REPOSITORY_USERNAME: __token__
+        REPOSITORY_PASSWORD: ${{ inputs.pypi_token }}
+      run: |
+        semantic-release -v DEBUG publish
