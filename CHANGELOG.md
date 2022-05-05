@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.3 (2022-05-05)
+### Fix
+* ***:** Merge 42 ([`6cca7e2`](https://github.com/prql/PyPrql/commit/6cca7e21747f785172ce37e51875c7317765a3f1))
+
+### Documentation
+* **docs:** Correct file links ([`6eb1910`](https://github.com/prql/PyPrql/commit/6eb19103c0b4cf6bf524c8378608c8e3cba55e0e))
+* **README.md:** Add CodeCov coverage ([`93f1009`](https://github.com/prql/PyPrql/commit/93f1009ec9d7bf8e6992da5b935d5df0e4ddf006))
+
 ## v0.4.2 (2022-04-16)
 ### Fix
 *  Fixes enforce typing breaking on subscripted generics by forking and providing a flag to ignore this non-error. ([`cb19cbc`](https://github.com/prql/PyPrql/commit/cb19cbc81275b291856818fd5689881007d5ee3c))
