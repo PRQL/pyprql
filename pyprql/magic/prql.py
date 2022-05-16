@@ -6,6 +6,7 @@ from IPython import InteractiveShell
 from IPython.core.magic import cell_magic, line_magic, magics_class, needs_local_scope
 from prql_python import to_sql
 from sql.magic import SqlMagic
+from traitlets import Bool
 
 
 @magics_class
@@ -26,6 +27,13 @@ class PRQLMagic(SqlMagic):
         Since instantiation is handled by IPython,
         the user should never need to create this clas manually.
     """
+
+    displaycon = Bool(False, config=True, help="Show connection string after execute")
+    autopandas = Bool(
+        True,
+        config=True,
+        help="Return Pandas DataFrames instead of regular result sets",
+    )
 
     def __init__(self, shell: InteractiveShell):
         super().__init__(shell)
