@@ -36,8 +36,8 @@ numpy = [
     {version = "^1.22.3", python = "^3.8"}
 ]
 prql-python = "^0"
-ipython-sql = "^0.4.0"
 ipython = "7.33.0"
+ipython-sql = "^0.4.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.1"

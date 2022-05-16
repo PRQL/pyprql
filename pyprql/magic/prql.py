@@ -36,14 +36,6 @@ class PRQLMagic(SqlMagic):
     def prql(self, line: str = "", cell: str = "", local_ns: Dict = {}) -> Any:
         """Create the PRQL magic.
 
-        If used as a line magic,
-        then the line is assumed to be PRQL and parsed to SQL.
-        If used as a cell magic,
-        then the line is passed untouched,
-        but the cell contents are parsed to SQL.
-        Then,
-        the parameters are passed to ``sql.SqlMagic.execute``.
-
         Parameters
         ----------
         line : str
@@ -60,10 +52,8 @@ class PRQLMagic(SqlMagic):
             this could be one of several items,
             such as a ``sqlalchemy`` connection or a ``pandas`` dataframe.
         """
-        if line != "":
-            # Assume line magic doesn't take arguments
-            line = to_sql(line)
+        # Assume line will only take arguments
+        # So cell will always need to be parsed
         if cell != "":
-            # If a cell magic, always convert to prql
             cell = to_sql(cell)
         super().execute(line=line, cell=cell, local_ns=local_ns)
