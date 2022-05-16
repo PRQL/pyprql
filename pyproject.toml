@@ -38,6 +38,7 @@ numpy = [
 prql-python = "^0"
 ipython = "7.33.0"
 ipython-sql = "^0.4.0"
+duckdb-engine = "^0.1.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.1"
