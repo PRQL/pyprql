@@ -38,7 +38,7 @@ def constrained_install(session: Session, *args: str, **kwargs: Any) -> None:
     os.remove("requirements.txt")
 
 
-@nox.session(python="3.8")
+@nox.session(python="3.10")
 def form(session: Session) -> None:
     """Format code with isort and black."""
     args = session.posargs or LOCATIONS

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """A magic class for parsing PRQL in IPython or Jupyter."""
-from typing import Any, Dict
+from typing import Dict
 
 from IPython import InteractiveShell
 from IPython.core.magic import cell_magic, line_magic, magics_class, needs_local_scope
@@ -44,13 +44,13 @@ class PRQLMagic(SqlMagic):
     )
     autoview = Bool(True, config=True, help="Display results")
 
-    def __init__(self, shell: InteractiveShell):
+    def __init__(self, shell: InteractiveShell) -> None:
         super().__init__(shell)
 
     @needs_local_scope
     @line_magic
     @cell_magic
-    def prql(self, line: str = "", cell: str = "", local_ns: Dict = {}) -> Any:
+    def prql(self, line: str = "", cell: str = "", local_ns: Dict = {}) -> None:
         """Create the PRQL magic.
 
         To handle parsing to PRQL,
@@ -69,13 +69,6 @@ class PRQLMagic(SqlMagic):
             The magic's cell contents.
         local_ns : Dict
             The variables local to the running IPython shell.
-
-        Returns
-        -------
-        Any
-            Depending on the arguments passed,
-            this could be one of several items,
-            such as a ``sqlalchemy`` connection or a ``pandas`` dataframe.
         """
         # If cell is occupied, it must be parsed to SQL
         if cell != "":
