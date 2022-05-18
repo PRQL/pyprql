@@ -1,4 +1,4 @@
-# The Command Line Interface
+# Command Line Interface
 
 In addition to providing the main entrypoint,
 documented below,

@@ -16,7 +16,7 @@ class PRQLMagic(SqlMagic):
     This is a thin wrapper around ``sql.SqlMagic``,
     the class that provides the ``%%sql`` magic.
     For full documentation on usage and features,
-    please see their docs_.
+    please see their `docs <https://github.com/catherinedevlin/ipython-sql>`_.
 
     We override their defaults in two cases:
 
@@ -27,8 +27,6 @@ class PRQLMagic(SqlMagic):
     to working around some quirky behaviour,
     we also provide an ``autoview`` option to indicate
     whether results should be printed to the window.
-
-    .. _docs: https://github.com/catherinedevlin/ipython-sql
 
     Parameters
     ----------
@@ -56,14 +54,12 @@ class PRQLMagic(SqlMagic):
         """Create the PRQL magic.
 
         To handle parsing to PRQL,
-        there is one limitation relative to the original_ ``%%sql`` magic.
-        Namely,
+        there is one limitation relative to the `original <https://github.com/catherinedevlin/ipython-sql>`_
+        ``%%sql`` magic. Namely,
         line magics can only be used to pass connection strings and arguments.
         To figure out whether the ``line`` argument contained PRQL or not
         required heavy parsing followed by recosntruction of the input to pass
         on to the ``%sql`` magic we are wrapping.
-
-        .. _original: https://github.com/catherinedevlin/ipython-sql
 
         Parameters
         ----------

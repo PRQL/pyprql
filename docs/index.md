@@ -23,6 +23,7 @@ we'd kindly ask you to abide by our [code of conduct](./coc.md).
 If you'd like to learn more about the project,
 please see the [README](./readme.md).
 For information about the source code,
+including the CLI and IPython/Jupyter Magic,
 please see the [documentation](./pyprql.md).
 If testing is your passion,
 take a peek at [testing](./tests.md).
