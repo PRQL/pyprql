@@ -71,12 +71,12 @@ class PRQLMagic(SqlMagic):
             The variables local to the running IPython shell.
         """
         # If cell is occupied, it must be parsed to SQL
-        if cell != "":
+        if cell:
             cell = to_sql(cell)
 
         # If cell is occupied and line is empty,
         # we artificially populate line to ensure a return value.
-        if cell != "" and line == "":
+        if cell and not line:
             line = "_ <<"
 
         super().execute(line=line, cell=cell, local_ns=local_ns)
