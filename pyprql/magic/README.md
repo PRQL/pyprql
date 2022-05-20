@@ -4,7 +4,7 @@ Work with pandas and PRQL in an IPython terminal or Jupyter notebook.
 
 ## Implementation
 
-This is a this wrapper around the fantastic
+This is a thin wrapper around the fantastic
 [IPython-sql][ipysql] magic.
 Roughly speaking,
 all we do is parse PRQL to SQL and pass that through to `ipython-sql`.
@@ -26,7 +26,7 @@ If you haven't installed PyPRQL,
 that's as simple as:
 
 ```shell
-pip install PyPRQL
+pip install pyprql
 ```
 
 ### Set Up
@@ -70,13 +70,25 @@ This adds a table named `data` to the in-memory `DuckDB` instance.
 If you connect to an existing SQL database,
 then all the tables normally there will be accessible.
 
-### Usage
+One thing we don't support that `IPython-SQL` does is passing PRQL directly to a line magic.
+That is to say,
+the following will **not** work:
 
-:::{Important}
+```python
+In [4]: %prql from data | select freq
+
+```
+
+This mainly to work around some parsing challenges,
+and it may be added as a feature in a future release.
+
+:::{Warning}
 This is one area where we differe from `IPython-sql`.
-We only support parasing PRQL as a cell magic,
-not as a line magic.
+PRQL queries can only be made from a cell magic.
 :::
+
+
+### Usage
 
 Now,
 let's do a query!

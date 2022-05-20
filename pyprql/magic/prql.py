@@ -24,7 +24,7 @@ class PRQLMagic(SqlMagic):
     1. displaycon is set to ``False``.
 
     Additionally,
-    to working around some quirky behaviour,
+    to work around some quirky behaviour,
     we also provide an ``autoview`` option to indicate
     whether results should be printed to the window.
 
