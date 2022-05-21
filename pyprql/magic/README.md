@@ -70,7 +70,7 @@ This adds a table named `data` to the in-memory `DuckDB` instance.
 If you connect to an existing SQL database,
 then all the tables normally there will be accessible.
 
-One thing we don't support that `IPython-SQL` does is passing PRQL directly to a line magic.
+One thing we don't support that `IPython-SQL` does is passing a PRQL query directly to a line magic.
 That is to say,
 the following will **not** work:
 
@@ -83,7 +83,7 @@ This mainly to work around some parsing challenges,
 and it may be added as a feature in a future release.
 
 :::{Warning}
-This is one area where we differe from `IPython-sql`.
+This is one area where we differ from `IPython-sql`.
 PRQL queries can only be made from a cell magic.
 :::
 
