@@ -2,6 +2,21 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.0 (2022-05-21)
+### Feature
+* **pyproject.toml:** Add duckdb-engine ([`e21d4b9`](https://github.com/prql/PyPrql/commit/e21d4b9364c69ccedbbe6482fcb455ba6f10f979))
+* **magic/prql.py:** Rough working functionality ([`df4a218`](https://github.com/prql/PyPrql/commit/df4a218ab0a7460fd3e5bf4e10fef9777a810a7d))
+* **pyprql/magic:** Adds ipython magic ([`2401f01`](https://github.com/prql/PyPrql/commit/2401f0190b136b6ddb77c48159c4064b3edbe377))
+
+### Fix
+* **magic/prql.py:** Fix printing of results ([`a53e172`](https://github.com/prql/PyPrql/commit/a53e172962fa9db31db879f486b436732d07c854))
+* **magic/prql.py:** Change default configurations ([`f3a5274`](https://github.com/prql/PyPrql/commit/f3a5274e5e72ce750bf60b7ea21d97b862a3fe45))
+
+### Documentation
+* **magic/README.md:** Correct typos ([`d555db0`](https://github.com/prql/PyPrql/commit/d555db037c00cbcc76b57b2d820235ef540810c9))
+* **magic:** Expand line vs cell explanation ([`1e0da72`](https://github.com/prql/PyPrql/commit/1e0da72056c3e447c4e60385c5423da8f8695849))
+* ***:** Document magic ([`2f51f92`](https://github.com/prql/PyPrql/commit/2f51f9252be0e11a8d714f3906b0f920dd93da76))
+
 ## v0.4.3 (2022-05-05)
 ### Fix
 * ***:** Merge 42 ([`6cca7e2`](https://github.com/prql/PyPrql/commit/6cca7e21747f785172ce37e51875c7317765a3f1))
