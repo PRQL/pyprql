@@ -46,6 +46,7 @@ runs:
     - name: Python Semantic Release
       shell: bash
       env:
+        GH_TOKEN: ${{ inputs.gh_token }}
         REPOSITORY_USERNAME: __token__
         REPOSITORY_PASSWORD: ${{ inputs.pypi_token }}
       run: |
