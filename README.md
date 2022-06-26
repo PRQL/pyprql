@@ -16,7 +16,9 @@
 [![Codestyle: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
-Python bindings to [PRQL][prql].  Documentation of PRQL is [here][prql_docs].
+Python bindings to [PRQL][prql].  
+
+For docs, Check out the [PyPRQL Docs](https://pyprql.readthedocs.io/), and the [PRQL Book][prql_docs].
 
 This project is maintained by [@qorrect](https://github.com/qorrect/) and [@rbpatt2019](https://github.com/rbpatt2019)
 
@@ -48,8 +50,8 @@ pyprql zillow.csv
 
 * pyprql can connect to any database that SQLAlchemy supports, execute `pyprql` without arguments for docs on how to install drivers.
 * pyprql can connect to CSV files,  replace the connection string with the file path and it will load the CSV into a temporary SQLite database.
-* pyprql can save the results with a ` | to csv ${filename}` transform at the end of the query
+* pyprql can save the results with a `| to csv ${filename}` transform at the end of the query
 * pyprql has auto-completion on table names and table aliases with _tab_, and history-completion with _alt-f_
 
 [prql]: https://github.com/prql/prql
-[prql_docs]: https://lang.prql.builders/introduction.html
+[prql_docs]: https://prql-lang.org/reference
