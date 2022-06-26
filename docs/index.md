@@ -38,10 +38,11 @@ please see our guide for [contributors](./contributing.md)
 :hidden:
 :maxdepth: 3
 
-coc
 readme
 pyprql
+magic_readme
 tests
 changelog
 contributing
+coc
 ```

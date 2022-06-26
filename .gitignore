@@ -12,3 +12,4 @@ docs/_build
 Session.vim*
 coverage.xml
 .coverage
+.ipynb_checkpoints
