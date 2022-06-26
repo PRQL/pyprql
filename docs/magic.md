@@ -9,7 +9,6 @@ while documentation on the magic class implementation [lives here](./magic_imple
 :hidden:
 :maxdepth: 3
 
-magic_readme
 magic_init
 magic_implement
 ```

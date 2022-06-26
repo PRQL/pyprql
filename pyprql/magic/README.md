@@ -31,107 +31,126 @@ pip install pyprql
 
 ### Set Up
 
-Open up either an `IPython` terminal or `Jupyter` notebook.
-First,
-we need to load the extension and connect to a database.
+Open up either an `IPython` terminal or `Jupyter` notebook. First, we need to
+load the extension and connect to a database.
 
 ```python
 In [1]: %load_ext pyprql.magic
 
-In [2]: %prql duckdb:///:memory:
-
 ```
 
-When connecting to a database,
-pass the connection string as an argument to the line magic `%prql`.
-The connection string needs to be in [SQLAlchemy format][conn_str],
-so any connection supported by `SQLAlchemy` is supported by the magic.
-Additional connection parameters can be passed as a dictionary using the `--connection_arguments`
-flag to the the `%prql` line magic.
-We ship with the necessary extensions to use [DuckDB][duckdb]
-as the backend,
-and here connect to an in-memory database.
+#### Connecting a database
 
-However,
-in-memory databases start off empty!
-So,
-we need to add some data.
-This is where [pandas][pandas]
-comes into play.
-We can easily add a dataframe to the `DuckDB` database like so:
+We have two options for connecting a database
+
+1. Create an in-memory DB. This is the easiest way to get started.
+
+   ```
+   In [2]: %prql duckdb:///:memory:
+   ```
+
+   However, in-memory databases start off empty! So, we need to add some data.
+   We have a two options:
+
+   - We can easily add a [pandas][pandas] dataframe to the `DuckDB` database
+     like so:
+
+     ```python
+     In [3]: %prql --persist df
+     ```
+
+     where `df` is a pandas dataframe. This adds a table named `df` to the
+     in-memory `DuckDB` instance.
+
+   - Or download a CSV and query it directly, with DuckDB:
+
+     ```python
+     !wget https://github.com/graphql-compose/graphql-compose-examples/blob/master/examples/northwind/data/csv/products.csv
+     ```
+
+     ...and then `from products.csv` will work.
+
+2. Connect to an existing database
+
+   When connecting to a database, pass the connection string as an argument to the
+   line magic `%prql`. The connection string needs to be in [SQLAlchemy
+   format][conn_str], so any connection supported by `SQLAlchemy` is supported by
+   the magic. Additional connection parameters can be passed as a dictionary using
+   the `--connection_arguments` flag to the the `%prql` line magic. We ship with
+   the necessary extensions to use [DuckDB][duckdb] as the backend, and here
+   connect to an in-memory database.
+
+### Querying
+
+Now, let's do a query! By default, `PRQLMagic` always returns the results as
+dataframe, and always prints the results. The results of the previous query are
+accessible in the `_` variable.
+
+These examples are based on the `products.csv` example above.
 
 ```python
-In [3]: %prql --persist data
 
+
+In [4]: %%prql
+   ...: from p = products.csv
+   ...: filter supplierID == 1
+
+Done.
+Returning data to local variable _
+   productID    productName  supplierID  categoryID      quantityPerUnit  unitPrice  unitsInStock  unitsOnOrder  reorderLevel  discontinued
+0          1           Chai           1           1   10 boxes x 20 bags       18.0            39             0            10             0
+1          2          Chang           1           1   24 - 12 oz bottles       19.0            17            40            25             0
+2          3  Aniseed Syrup           1           2  12 - 550 ml bottles       10.0            13            70            25             0
 ```
 
-where data is a pandas dataframe we have already loaded.
-This adds a table named `data` to the in-memory `DuckDB` instance.
-If you connect to an existing SQL database,
-then all the tables normally there will be accessible.
+```python
+In [5]: %%prql
+   ...: from p = products.csv
+   ...: group categoryID (
+   ...:   aggregate [average unitPrice]
+   ...: )
 
-One thing we don't support that `IPython-SQL` does is passing a PRQL query directly to a line magic.
-That is to say,
-the following will **not** work:
+Done.
+Returning data to local variable _
+   categoryID  avg("unitPrice")
+0           1         37.979167
+1           2         23.062500
+2           7         32.370000
+3           6         54.006667
+4           8         20.682500
+5           4         28.730000
+6           3         25.160000
+7           5         20.250000
+```
+
+We can capture the results into a different variable like so:
+
+```
+In [6]: %%prql results <<
+   ...: from p = products.csv
+   ...: aggregate [min unitsInStock, max unitsInStock]
+
+Done.
+Returning data to local variable results
+   min("unitsInStock")  max("unitsInStock")
+0                    0                  125
+```
+
+Now, the output of the query is saved to `results`.
+
+:::{Note}
+
+Unlike `IPython-SQL`, we currently only support queries in a cell magic (i.e.
+`%%prql`), and not a line magic (i.e. `%prql`). So the following will **not**
+work:
 
 ```python
 In [4]: %prql from data | select freq
-
 ```
 
 This mainly to work around some parsing challenges,
 and it may be added as a feature in a future release.
-
-:::{Warning}
-This is one area where we differ from `IPython-sql`.
-PRQL queries can only be made from a cell magic.
 :::
-
-
-### Usage
-
-Now,
-let's do a query!
-By default,
-`PRQLMagic` always returns the results as dataframe,
-and always prints the results.
-The results of the previous query are accessible in the `_` variable.
-
-```python
-In [4]: %%prql
-from data
-filter freq > 100
-select [ food_name ]
-
-Done.
-Returning data to local variable _
-       food_name
-0        Abalone
-1  Savoy cabbage
-2           Kiwi
-3       Angelica
-```
-
-If you want to,
-you can capture the results into a different variable like so:
-
-```python
-In [5]: %%prql results <<
-from data
-filter freq > 100
-select [ food_name ]
-
-Done.
-Returning data to local variable results
-       food_name
-0        Abalone
-1  Savoy cabbage
-2           Kiwi
-3       Angelica
-```
-
-Now,
-the output of the query is saved to `results`.
 
 ## Configuration
 
@@ -141,7 +160,7 @@ should you need to change settings,
 a list of settings is available using the `%config` line magic.
 
 ```python
-In [6]: %config PRQLMagic
+In [7]: %config PRQLMagic
 PRQLMagic(SqlMagic) options
 -------------------------
 PRQLMagic.autocommit=<Bool>
