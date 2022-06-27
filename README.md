@@ -16,11 +16,11 @@
 [![Codestyle: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
-Python bindings to [PRQL][prql].  
+Python TUI for CSV files and database connections.  See [prql-python](https://pypi.org/project/prql-python/) for just bindings.  
 
 For docs, Check out the [PyPRQL Docs](https://pyprql.readthedocs.io/), and the [PRQL Book][prql_docs].
 
-This project is maintained by [@qorrect](https://github.com/qorrect/) and [@rbpatt2019](https://github.com/rbpatt2019)
+This project is maintained by [@charlie-sanders](https://github.com/charlie-sanders/) and [@rbpatt2019](https://github.com/rbpatt2019)
 
 ## Installation
 
@@ -30,20 +30,18 @@ pip install pyprql
 
 ### Try it out
 
-#### Database
-
-```bash
-curl https://github.com/qorrect/PyPrql/blob/main/resources/chinook.db?raw=true -o chinook.db
-pyprql "sqlite:///chinook.db"
-
-PRQL> show tables
-```
-
 #### CSV file
 
 ```bash
 curl https://people.sc.fsu.edu/~jburkardt/data/csv/zillow.csv
 pyprql zillow.csv
+```
+
+#### Database
+
+```bash
+pyprql "sqlite:///your_database.db"
+PRQL> show tables
 ```
 
 ### The pyprql tool
