@@ -34,7 +34,7 @@ pip install pyprql
 Open up either an `IPython` terminal or `Jupyter` notebook. First, we need to
 load the extension and connect to a database.
 
-```python
+```
 In [1]: %load_ext pyprql.magic
 
 ```
@@ -55,7 +55,7 @@ We have two options for connecting a database
    - We can easily add a [pandas][pandas] dataframe to the `DuckDB` database
      like so:
 
-     ```python
+     ```
      In [3]: %prql --persist df
      ```
 
@@ -64,7 +64,7 @@ We have two options for connecting a database
 
    - Or download a CSV and query it directly, with DuckDB:
 
-     ```python
+     ```
      !wget https://github.com/graphql-compose/graphql-compose-examples/blob/master/examples/northwind/data/csv/products.csv
      ```
 
@@ -88,7 +88,7 @@ accessible in the `_` variable.
 
 These examples are based on the `products.csv` example above.
 
-```python
+```
 
 
 In [4]: %%prql
@@ -103,7 +103,7 @@ Returning data to local variable _
 2          3  Aniseed Syrup           1           2  12 - 550 ml bottles       10.0            13            70            25             0
 ```
 
-```python
+```
 In [5]: %%prql
    ...: from p = products.csv
    ...: group categoryID (
@@ -144,7 +144,7 @@ Unlike `IPython-SQL`, we currently only support queries in a cell magic (i.e.
 `%%prql`), and not a line magic (i.e. `%prql`). So the following will **not**
 work:
 
-```python
+```
 In [4]: %prql from data | select freq
 ```
 
@@ -159,7 +159,7 @@ however,
 should you need to change settings,
 a list of settings is available using the `%config` line magic.
 
-```python
+```
 In [7]: %config PRQLMagic
 PRQLMagic(SqlMagic) options
 -------------------------
@@ -205,7 +205,7 @@ PRQLMagic.style=<Unicode>
 If you want to change any of these,
 you can do that with the `%config` line magic as well.
 
-```python
+```
 In [7]: %config PRQLMagic.autoview = False
 ```
 
