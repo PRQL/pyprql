@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.3 (2022-06-27)
+### Fix
+* Update docs ([#56](https://github.com/prql/PyPrql/issues/56)) ([`524079f`](https://github.com/prql/PyPrql/commit/524079fd4e8c227b6b09985a0df33b2a705be85f))
+
 ## v0.5.2 (2022-06-27)
 ### Fix
 *  Fixes docs ([#55](https://github.com/prql/PyPrql/issues/55)) ([`20ba9d0`](https://github.com/prql/PyPrql/commit/20ba9d086ca4c86840383e446b5aae5154a904fa))
