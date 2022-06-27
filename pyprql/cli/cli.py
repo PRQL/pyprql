@@ -360,6 +360,7 @@ class CLI:
             if not user_input:
                 self.has_one_blank = False
                 if self.command and self.command.strip().rstrip("") != "":
+
                     cleaned = self.clean_input(self.command)
                     print(f"PRQL:\t{self.highlight_prql(cleaned)}")
                     sql = prql.to_sql(cleaned)
