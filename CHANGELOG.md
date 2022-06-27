@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.2 (2022-06-27)
+### Fix
+*  Fixes docs ([#55](https://github.com/prql/PyPrql/issues/55)) ([`20ba9d0`](https://github.com/prql/PyPrql/commit/20ba9d086ca4c86840383e446b5aae5154a904fa))
+
 ## v0.5.1 (2022-06-27)
 ### Fix
 * Fixes multiline input ([#53](https://github.com/prql/PyPrql/issues/53)) ([`a5dced5`](https://github.com/prql/PyPrql/commit/a5dced5634d9c96783b2bd8950c674d4d8ee27a1))
