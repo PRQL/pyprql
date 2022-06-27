@@ -11,6 +11,7 @@ BOTTOM_TOOLBAR_TXT : str
     The text for the help bar of the CLI.
 """
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
@@ -76,11 +77,11 @@ def clear_screen() -> None:
 def clean_column_names(data: pd.DataFrame) -> pd.DataFrame:
     return (
         data.columns.str.lower()
-        .str.strip()
-        .str.replace('"', "")
-        .str.replace(" ", "_")
-        .str.replace("(", "", regex=False)
-        .str.replace(")", "", regex=False)
+            .str.strip()
+            .str.replace('"', "")
+            .str.replace(" ", "_")
+            .str.replace("(", "", regex=False)
+            .str.replace(")", "", regex=False)
     )
 
 
@@ -125,7 +126,7 @@ class CLI:
         self.command = ""
         self.sql_mode = False
         BOTTOM_TOOLBAR_TXT += (
-            " Connected to " + connect_str[connect_str.rfind("/") + 1 :] + "."
+                " Connected to " + connect_str[connect_str.rfind("/") + 1:] + "."
         )
         file = Path(connect_str)
         delims = {".csv": ",", ".tsv": "\t"}
@@ -333,14 +334,15 @@ class CLI:
             key = "show columns"
             if key not in user_input:
                 key = "\\d+"
-            table_name = user_input[key.__len__() + 1 :]
+            table_name = user_input[key.__len__() + 1:]
             print(table_name)
             # tables = self.engine.list_tables()
             columns = self.inspector.get_columns(table_name)
             rich.print(columns)
             return
 
-        self.command += user_input + " "
+        self.command += user_input + "|"
+        # print(f'Self.command is now {self.command}')
         if self.sql_mode:
             if not user_input:
 
@@ -358,10 +360,12 @@ class CLI:
             if not user_input:
                 self.has_one_blank = False
                 if self.command and self.command.strip().rstrip("") != "":
-                    sql = prql.to_sql(self.command)
+                    cleaned = self.clean_input(self.command)
+                    print(f'PRQL:\t{self.highlight_prql(cleaned)}')
+                    sql = prql.to_sql(cleaned)
                     to = ""
                     if "TO" in sql:
-                        to = sql[sql.index("TO") :].strip()
+                        to = sql[sql.index("TO"):].strip()
                         sql = sql[: sql.index("TO")].strip()
 
                     print("SQL:\n\t" + self.highlight_sql(sql) + "\nResults:")
@@ -418,3 +422,6 @@ class CLI:
                 self.command = ""
                 self.prompt_text = "PRQL> "
                 self.has_one_blank = False
+
+    def clean_input(self, command):
+        return re.sub(r'\|+', r'|', command.rstrip('|'))
