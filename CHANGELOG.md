@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.1 (2022-06-27)
+### Fix
+* Fixes multiline input ([#53](https://github.com/prql/PyPrql/issues/53)) ([`a5dced5`](https://github.com/prql/PyPrql/commit/a5dced5634d9c96783b2bd8950c674d4d8ee27a1))
+*  Fixes #48, multiline input (lint) ([#52](https://github.com/prql/PyPrql/issues/52)) ([`46201d8`](https://github.com/prql/PyPrql/commit/46201d8c5a6d01b104447ec0f18432148fecdf87))
+*  Fixes #48, multiline input ([`fcf7a89`](https://github.com/prql/PyPrql/commit/fcf7a89053a97756528814c0f9627703c3840845))
+
 ## v0.5.0 (2022-05-21)
 ### Feature
 * **pyproject.toml:** Add duckdb-engine ([`e21d4b9`](https://github.com/prql/PyPrql/commit/e21d4b9364c69ccedbbe6482fcb455ba6f10f979))
