@@ -9,8 +9,8 @@ sys.path.insert(0, os.path.abspath("../"))
 sys.path.insert(0, os.path.abspath("../pyprql/"))
 
 project = "PyPRQL"
-author = "Charlie Sando"
-copyright = "2022, Charlie Sando"
+author = "PRQL Crew"
+copyright = "2022"
 version = "0.4.1"
 extensions = [
     "sphinx_rtd_theme",
