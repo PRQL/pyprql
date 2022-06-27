@@ -424,5 +424,5 @@ class CLI:
                 self.prompt_text = "PRQL> "
                 self.has_one_blank = False
 
-    def clean_input(self, command):
+    def clean_input(self, command: str) -> str:
         return re.sub(r'\|+', r'|', command.rstrip('|'))
