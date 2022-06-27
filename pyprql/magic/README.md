@@ -64,7 +64,7 @@ We have two options for connecting a database
    - Or download a CSV and query it directly, with DuckDB:
 
      ```
-     !wget https://github.com/graphql-compose/graphql-compose-examples/blob/master/examples/northwind/data/csv/products.csv
+     !wget https://raw.githubusercontent.com/graphql-compose/graphql-compose-examples/master/examples/northwind/data/csv/products.csv
      ```
 
      ...and then `from products.csv` will work.
