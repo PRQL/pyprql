@@ -16,7 +16,11 @@
 [![Codestyle: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
-Python TUI for CSV files and database connections.  See [prql-python](https://pypi.org/project/prql-python/) for just bindings.  
+PyPRQL contains these tools:
+
+- pyprql.pandas - Pandas integration for PRQL
+- pyprql.magic - IPython magic for connecting to databases using `%%prql`
+- pyprql.cli - TUI for databases using PRQL 
 
 For docs, Check out the [PyPRQL Docs](https://pyprql.readthedocs.io/), and the [PRQL Book][prql_docs].
 
@@ -28,7 +32,19 @@ This project is maintained by [@charlie-sanders](https://github.com/charlie-sand
 pip install pyprql
 ```
 
-### Try it out
+
+### Try out the Pandas integration
+
+```python
+import pandas as pd 
+import pyprql.pandas
+df = (...)
+results_df = df.prql.query('from df | select [age,name,occupation] | filter age > 21')
+
+```
+
+
+### Try out the TUI
 
 #### CSV file
 
