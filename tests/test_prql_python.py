@@ -54,13 +54,13 @@ def test_df_big_prql_query():
         from df
         filter start_date > @2021-01-01
         derive [
-          gross_salary = salary + tax,
+          gross_salary = salary + tax ?? 0,
           gross_cost = gross_salary + benefits_cost,
         ]
         filter gross_cost > 0
         group [title, country] (
           aggregate [
-            average gross_salary,
+            avg_gross_salary = average gross_salary,
             sum_gross_cost = sum gross_cost,
             cnt = count
           ]
@@ -92,12 +92,12 @@ def test_df_big_prql_query():
 
     assert row1["country"] == "Slovenia"
     assert row1["cnt"] == 1  # the other slovenia was hired in 2020
-    assert row1["avg((salary + tax))"] == 132
+    assert row1["avg_gross_salary"] == 132
     assert row1["sum_gross_cost"] == 182
     assert row1["id"] == "wizard_Slovenia"
 
     assert row2["country"] == "USA"
     assert row2["cnt"] == 2
-    assert row2["avg((salary + tax))"] == 111
+    assert row2["avg_gross_salary"] == 111
     assert row2["sum_gross_cost"] == 252
     assert row2["id"] == "developer_USA"
