@@ -16,7 +16,11 @@
 [![Codestyle: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
-Python TUI for CSV files and database connections.  See [prql-python](https://pypi.org/project/prql-python/) for just bindings.  
+PyPRQL contains these tools:
+
+- pyprql.pandas - Pandas integration for PRQL
+- pyprql.magic - IPython magic for connecting to databases using `%%prql`
+- pyprql.cli - TUI for databases using PRQL 
 
 For docs, Check out the [PyPRQL Docs](https://pyprql.readthedocs.io/), and the [PRQL Book][prql_docs].
 
@@ -28,28 +32,50 @@ This project is maintained by [@charlie-sanders](https://github.com/charlie-sand
 pip install pyprql
 ```
 
-### Try it out
 
-#### CSV file
+### Try out the Pandas integration
+
+```python
+import  pandas as pd 
+import pyprql.pandas
+df = (...)
+results_df = df.prql.query('from df | select [age,name,occupation] | filter age > 21')
+
+```
+
+### Try out the Jupyter Magic 
+
+
+```
+In [1]: %load_ext pyprql.magic
+In [2]: %prql postgresql://user:password@localhost:5432/database
+In [3]: %%prql
+   ...: from p
+   ...: group categoryID (
+   ...:   aggregate [average unitPrice]
+   ...: )
+In [4]: %%prql results <<
+   ...: from p = products.csv
+   ...: aggregate [min unitsInStock, max unitsInStock]
+   
+```
+
+### Try out the TUI
+
+With a CSV file:
 
 ```bash
 curl https://people.sc.fsu.edu/~jburkardt/data/csv/zillow.csv
 pyprql zillow.csv
 ```
 
-#### Database
+With a Database:
 
 ```bash
-pyprql "sqlite:///your_database.db"
+pyprql 'postgresql://user:password@localhost:5432/database'
 PRQL> show tables
 ```
 
-### The pyprql tool
-
-* pyprql can connect to any database that SQLAlchemy supports, execute `pyprql` without arguments for docs on how to install drivers.
-* pyprql can connect to CSV files,  replace the connection string with the file path and it will load the CSV into a temporary SQLite database.
-* pyprql can save the results with a `| to csv ${filename}` transform at the end of the query
-* pyprql has auto-completion on table names and table aliases with _tab_, and history-completion with _alt-f_
 
 [prql]: https://github.com/prql/prql
 [prql_docs]: https://prql-lang.org/reference

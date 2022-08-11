@@ -35,7 +35,7 @@ numpy = [
     {version = "~1.21", python = "~3.7.1"},
     {version = "^1.22.3", python = "^3.8"}
 ]
-prql-python = "^0"
+prql-python = "^0.2.6"
 ipython = [
     {version = "~7.33.0", python = "~3.7.1"},
     {version = "^8.0", python = "^3.8"}
