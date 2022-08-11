@@ -36,8 +36,9 @@ pip install pyprql
 ### Try out the Pandas integration
 
 ```python
-import pandas as pd 
-import pyprql.pandas
+import pandas as pd
+import pyprql.pandas_magic
+
 df = (...)
 results_df = df.prql.query('from df | select [age,name,occupation] | filter age > 21')
 
@@ -55,7 +56,7 @@ In [3]: %%prql
    ...:   aggregate [average unitPrice]
    ...: )
 In [4]: %%prql results <<
-   ...: from p = products.csv
+   ...: from p 
    ...: aggregate [min unitsInStock, max unitsInStock]
    
 ```
