@@ -2,7 +2,7 @@
 """Unit tests for prql_python compatibility."""
 import prql_python as prql
 import pandas as pd
-import pyprql.pandas.prql
+import pyprql.pandas
 
 
 def test_pyql_python():
