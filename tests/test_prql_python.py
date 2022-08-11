@@ -19,20 +19,6 @@ def test_df_accessor():
     assert (res.iloc[1]['latitude'] == 3)
 
 
-def test_df_duckdb_supports_ctes():
-    df = pd.DataFrame({"role": ["admin", "user", "user"], "age": [30, 40, 45],
-                       "join_date": [pd.Timestamp("2020-01-01"), pd.Timestamp("2020-01-02"),
-                                     pd.Timestamp("2020-01-03")]})
-    res = df.prql.query('''
-        from df
-        group role (
-          sort join_date  # taken from above
-          take 1
-        )
-        ''')
-    # print(res)
-    assert (len(res.index) == 2)
-
 
 def test_df_supports_grouped_aggs():
     rows = {
