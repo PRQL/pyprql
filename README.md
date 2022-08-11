@@ -36,7 +36,7 @@ pip install pyprql
 ### Try out the Pandas integration
 
 ```python
-import  pandas as pd 
+import pandas as pd 
 import pyprql.pandas
 df = (...)
 results_df = df.prql.query('from df | select [age,name,occupation] | filter age > 21')
