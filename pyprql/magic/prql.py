@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """A magic class for parsing PRQL in IPython or Jupyter."""
+import logging
 from typing import Dict
 
 from IPython import InteractiveShell
@@ -88,4 +89,6 @@ class PRQLMagic(SqlMagic):
             if "<<" in line:
                 print(local_ns[line.split()[0]])
             else:
+                logging.error(local_ns["_"])
+                print(type(local_ns["_"]))
                 print(local_ns["_"])
