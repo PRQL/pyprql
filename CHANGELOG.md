@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.6 (2022-08-24)
+### Fix
+*  Updating release process ([#73](https://github.com/prql/PyPrql/issues/73)) ([`adb90ea`](https://github.com/prql/PyPrql/commit/adb90ead8170d6ff1f91d0957b7cd331c3f4ca70))
+
 ## v0.6.0 (2022-08-24)
 
 
