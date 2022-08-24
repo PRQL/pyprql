@@ -9,4 +9,4 @@ df = pd.DataFrame({})
 results_df = df.prql.query('from df | select [age,name,occupation] | filter age > 21')
 
 """
-import pyprql.pandas_magic.prql  # noqa: F401
+import pyprql.pandas_accessor.prql  # noqa: F401

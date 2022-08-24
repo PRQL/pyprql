@@ -3,7 +3,7 @@
 import pandas as pd
 import prql_python as prql
 
-import pyprql.pandas_magic
+import pyprql.pandas_accessor
 
 
 def test_pyql_python():

@@ -18,7 +18,7 @@
 
 PyPRQL contains these tools:
 
-- pyprql.pandas - Pandas integration for PRQL
+- pyprql.pandas_accessor - Pandas integration for PRQL
 - pyprql.magic - IPython magic for connecting to databases using `%%prql`
 - pyprql.cli - TUI for databases using PRQL 
 
@@ -37,7 +37,7 @@ pip install pyprql
 
 ```python
 import pandas as pd
-import pyprql.pandas_magic
+import pyprql.pandas_accessor
 
 df = (...)
 results_df = df.prql.query('from df | select [age,name,occupation] | filter age > 21')
