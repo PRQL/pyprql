@@ -21,4 +21,10 @@ class PrqlAccessor:
         self._obj = pandas_obj
 
     def query(self, prql_query: str) -> pd.DataFrame:
-        return duckdb.query(prql.to_sql(prql_query)).to_df()
+        prepended_query = f"from df \n {prql_query}"
+        sql_query = prql.to_sql(prepended_query)
+        return duckdb.query_df(
+            self._obj,
+            virtual_table_name="df",
+            sql_query=sql_query,
+        ).fetch_df()

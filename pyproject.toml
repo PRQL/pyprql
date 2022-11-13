@@ -87,12 +87,7 @@ build_command = "poetry build"
 
 [tool.pytest.ini_options]
 addopts = """
--vv
 --xdoctest
--n auto
---cov=pyprql
---cov-report=term
---cov-report=xml
 """
 
 [tool.coverage.run]

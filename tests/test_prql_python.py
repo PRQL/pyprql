@@ -1,9 +1,11 @@
-# -*- coding: utf-8 -*-
-"""Unit tests for prql_python compatibility."""
 import pandas as pd
 import prql_python as prql
+import pytest
 
-import pyprql.pandas_accessor
+
+@pytest.fixture(autouse=True)
+def import_accessor():
+    import pyprql.pandas_accessor
 
 
 def test_pyql_python():
@@ -14,7 +16,7 @@ def test_pyql_python():
 
 def test_df_accessor():
     df = pd.DataFrame({"latitude": [1, 2, 3], "longitude": [1, 2, 3]})
-    res = df.prql.query("from df | select [ latitude, longitude] | filter latitude > 1")
+    res = df.prql.query("select [latitude, longitude] | filter latitude > 1")
     assert len(res.index) == 2
     assert res.iloc[0]["latitude"] == 2
     assert res.iloc[1]["latitude"] == 3
@@ -29,7 +31,6 @@ def test_df_supports_grouped_aggs():
     df = pd.DataFrame(rows)
     res = df.prql.query(
         """
-        from df
         group [country] (
           aggregate [
             avg_sal = average salary,
@@ -51,7 +52,6 @@ def test_df_supports_grouped_aggs():
 
 def test_df_big_prql_query():
     q = """
-        from df
         filter start_date > @2021-01-01
         derive [
           gross_salary = salary + tax ?? 0,
