@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The python command line interface of PRQL.
 
 Attributes

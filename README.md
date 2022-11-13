@@ -20,7 +20,7 @@ PyPRQL contains these tools:
 
 - pyprql.pandas_accessor - Pandas integration for PRQL
 - pyprql.magic - IPython magic for connecting to databases using `%%prql`
-- pyprql.cli - TUI for databases using PRQL 
+- pyprql.cli - TUI for databases using PRQL
 
 For docs, Check out the [PyPRQL Docs](https://pyprql.readthedocs.io/), and the [PRQL Book][prql_docs].
 
@@ -31,7 +31,6 @@ This project is maintained by [@charlie-sanders](https://github.com/charlie-sand
 ```bash
 pip install pyprql
 ```
-
 
 ### Try out the Pandas integration
 
@@ -44,10 +43,9 @@ results_df = df.prql.query('from df | select [age,name,occupation] | filter age 
 
 ```
 
-### Try out the Jupyter Magic 
+### Try out the Jupyter Magic
 
-
-```
+```python
 In [1]: %load_ext pyprql.magic
 In [2]: %prql postgresql://user:password@localhost:5432/database
 In [3]: %%prql
@@ -56,9 +54,9 @@ In [3]: %%prql
    ...:   aggregate [average unitPrice]
    ...: )
 In [4]: %%prql results <<
-   ...: from p 
+   ...: from p
    ...: aggregate [min unitsInStock, max unitsInStock]
-   
+
 ```
 
 ### Try out the TUI
@@ -77,6 +75,4 @@ pyprql 'postgresql://user:password@localhost:5432/database'
 PRQL> show tables
 ```
 
-
-[prql]: https://github.com/prql/prql
 [prql_docs]: https://prql-lang.org/reference
