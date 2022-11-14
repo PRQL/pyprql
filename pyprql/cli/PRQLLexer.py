@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """A Pygments RegexLexer for the PyPRQL CLI.
 
 Attributes

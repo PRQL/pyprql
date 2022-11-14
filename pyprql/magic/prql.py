@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """A magic class for parsing PRQL in IPython or Jupyter."""
 from typing import Dict
 

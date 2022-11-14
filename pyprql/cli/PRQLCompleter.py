@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Prompt_toolkit completion engine for PyPRQL CLI."""
 from typing import Dict, Iterable, List, Optional
 

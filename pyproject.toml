@@ -1,98 +1,92 @@
 [tool.poetry]
-name = "pyprql"
-version = "0.5.6"
-description = "Python TUI database client that supports prql"
 authors = ["qorrect <charlie.fats@gmail.com>", "rbpatt2019 <rb.patterson.cross@gmail.com>"]
+classifiers = [
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Typing :: Typed",
+]
+description = "Python TUI database client that supports prql"
+homepage = ""
 license = "Apache-2.0"
+name = "pyprql"
 readme = "README.md"
 repository = "https://github.com/prql/PyPrql"
-homepage = ""
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "License :: OSI Approved :: Apache Software License",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Typing :: Typed",
-]
+version = "0.5.6"
 
 [tool.poetry.dependencies]
-python = "^3.7.1"
-icecream = "^2.1.2"
-rich = "^12.0.0"
-click = "^8.0.4"
-prompt-toolkit = "^3.0.28"
 Pygments = "^2.11.2"
-fuzzyfinder = "^2.1.0"
 SQLAlchemy = "^1.4.32"
-pandas = [
-    {version = "~1.3", python = "~3.7.1"},
-    {version = "^1.4", python = "^3.8"}
-]
-numpy = [
-    {version = "~1.21", python = "~3.7.1"},
-    {version = "^1.22.3", python = "^3.8"}
-]
-prql-python = "^0.2.6"
+click = "^8.0.4"
+duckdb-engine = "^0.1.8"
+fuzzyfinder = "^2.1.0"
+icecream = "^2.1.2"
 ipython = [
-    {version = "~7.33.0", python = "~3.7.1"},
-    {version = "^8.0", python = "^3.8"}
+  {version = "~7.33.0", python = "~3.7.1"},
+  {version = "^8.0", python = "^3.8"},
 ]
 ipython-sql = "^0.4.0"
-duckdb-engine = "^0.1.8"
-traitlets = "^5.2.0"
+numpy = [
+  {version = "~1.21", python = "~3.7.1"},
+  {version = "^1.22.3", python = "^3.8"},
+]
+pandas = [
+  {version = "~1.3", python = "~3.7.1"},
+  {version = "^1.4", python = "^3.8"},
+]
+prompt-toolkit = "^3.0.28"
+prql-python = "^0.2.6"
 pytest = "^7.1.2"
+python = "^3.7.1"
+rich = "^12.0.0"
+traitlets = "^5.2.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.0.1"
-nox = "^2022.1.7"
-pre-commit = "^2.17.0"
+Sphinx = "~4.3"
+black = "^22.1.0"
 commitizen = "^2.21.2"
+coverage = "^6.3.2"
+darglint = "^1.8.1"
 flake8 = "^4.0.1"
 flake8-annotations = "^2.7.0"
 flake8-docstrings = "^1.6.0"
-darglint = "^1.8.1"
-mypy = "^0.931"
-isort = "^5.10.1"
-black = "^22.1.0"
-safety = "^2"
-pytest-xdist = "^2.5.0"
-pytest-clarity = "^1.0.1"
-pytest-sugar = "^0.9.4"
-xdoctest = "^0.15.10"
-Sphinx = "~4.3"
-myst-parser = "^0.17.0"
-sphinx-rtd-theme = "^1.0.0"
 flake8-pytest-style = "^1.6.0"
-coverage = "^6.3.2"
+isort = "^5.10.1"
+mypy = "^0.982"
+myst-parser = "^0.17.0"
+nox = "^2022.1.7"
+pre-commit = "^2.17.0"
+pytest = "^7.0.1"
+pytest-clarity = "^1.0.1"
 pytest-cov = "^3.0.0"
+pytest-sugar = "^0.9.4"
+pytest-xdist = "^2.5.0"
+safety = "^2"
+sphinx-rtd-theme = "^1.0.0"
+xdoctest = "^0.15.10"
 
 [tool.poetry.scripts]
 pyprql = "pyprql.cli.__init__:main"
 
 [tool.semantic_release]
 branch = "main"
-version_variable = [
-    "pyprql/__init__.py:__version__"
-]
-version_toml = [
-    "pyproject.toml:tool.poetry.version"
-]
+build_command = "poetry build"
 changelog_file = "CHANGELOG.md"
 upload_to_pypi = true
 upload_to_release = true
-build_command = "poetry build"
+version_toml = [
+  "pyproject.toml:tool.poetry.version",
+]
+version_variable = [
+  "pyprql/__init__.py:__version__",
+]
 
 [tool.pytest.ini_options]
 addopts = """
--vv
 --xdoctest
--n auto
---cov=pyprql
---cov-report=term
---cov-report=xml
 """
 
 [tool.coverage.run]
@@ -103,10 +97,13 @@ source = ["pyprql"]
 show_missing = true
 
 [tool.isort]
+float_to_top = false
 profile = "black"
 skip_gitignore = true
-float_to_top = false
+
+[tool.mypy]
+files = "pyprql"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]

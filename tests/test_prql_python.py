@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Unit tests for prql_python compatibility."""
 import pandas as pd
 import prql_python as prql

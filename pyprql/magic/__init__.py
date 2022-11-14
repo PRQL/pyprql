@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """IPython/Jupyter magic for PyPRQL.
 
 Examples

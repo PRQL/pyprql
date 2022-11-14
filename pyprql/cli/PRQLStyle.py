@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Pygments Style object for PyPRQL CLI."""
 from pygments.style import Style
 from pygments.token import (
