@@ -67,7 +67,6 @@ pytest-xdist = "^2.5.0"
 safety = "^2"
 sphinx-rtd-theme = "^1.0.0"
 xdoctest = "^0.15.10"
-xdoctest = "^0.15.10"
 
 [tool.poetry.scripts]
 pyprql = "pyprql.cli.__init__:main"
