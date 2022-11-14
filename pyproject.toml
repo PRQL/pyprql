@@ -55,7 +55,7 @@ flake8-annotations = "^2.7.0"
 flake8-docstrings = "^1.6.0"
 flake8-pytest-style = "^1.6.0"
 isort = "^5.10.1"
-mypy = "^0.931"
+mypy = "^0.982"
 myst-parser = "^0.17.0"
 nox = "^2022.1.7"
 pre-commit = "^2.17.0"
@@ -64,7 +64,7 @@ pytest-clarity = "^1.0.1"
 pytest-cov = "^3.0.0"
 pytest-sugar = "^0.9.4"
 pytest-xdist = "^2.5.0"
-safety = "^1.10.3"
+safety = "^2"
 sphinx-rtd-theme = "^1.0.0"
 xdoctest = "^0.15.10"
 
@@ -100,6 +100,9 @@ show_missing = true
 float_to_top = false
 profile = "black"
 skip_gitignore = true
+
+[tool.mypy]
+files = "pyprql"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
