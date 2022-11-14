@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Pandas Dataframe accessor for PRQL.
 
 Examples

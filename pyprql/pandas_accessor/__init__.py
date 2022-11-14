@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Init file for pyprql.pandas.
 
 Examples
