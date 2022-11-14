@@ -90,6 +90,7 @@ def security(session: Session) -> None:
         "--ignore=44717",
         "--ignore=44716",
         "--ignore=44715",
+        "--ignore=51457",
         "--file=requirements.txt",
         "--full-report",
     )
