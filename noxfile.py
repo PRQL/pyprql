@@ -23,6 +23,7 @@ nox.options.reuse_existing_virtualenvs = True
 @nox.session(python=VERSIONS)
 def type(session: Session) -> None:
     """Type check files with mypy."""
+    session.run_always("poetry", "install", external=True)
     args = session.posargs or LOCATIONS
     # TODO: move these to configs
     session.run("mypy", "--ignore-missing-imports", "--show-error-codes", *args)
@@ -31,6 +32,9 @@ def type(session: Session) -> None:
 @nox.session(python="3.10")
 def security(session: Session) -> None:
     """Check security safety."""
+    session.run_always("poetry", "install", external=True)
+    # the ignored flags are only relevant in python 3.7,
+    # where numpy <1.22 is required
     session.run(
         "safety",
         "check",
@@ -46,6 +50,7 @@ def security(session: Session) -> None:
 @nox.session(python=VERSIONS)
 def tests(session: Session) -> None:
     """Run the test suite with pytest."""
+    session.run_always("poetry", "install", external=True)
     args = session.posargs or []
     session.run("pytest", *args)
 
@@ -53,4 +58,5 @@ def tests(session: Session) -> None:
 @nox.session(python="3.10")
 def docs(session: Session) -> None:
     """Build the documentation."""
+    session.run_always("poetry", "install", external=True)
     session.run("sphinx-build", "docs", "docs/_build")
