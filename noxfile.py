@@ -33,14 +33,10 @@ def type(session: Session) -> None:
 def security(session: Session) -> None:
     """Check security safety."""
     session.run_always("poetry", "install", external=True)
-    # the ignored flags are only relevant in python 3.7,
-    # where numpy <1.22 is required
     session.run(
         "safety",
         "check",
-        "--ignore=44717",
-        "--ignore=44716",
-        "--ignore=44715",
+        "--ignore=51668",
         "--ignore=51457",
         "--full-report",
     )
