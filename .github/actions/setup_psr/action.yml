@@ -1,3 +1,5 @@
+# TODO: can probably integrate this into the cicd — it's only called from one place
+
 name: Setup Python Semantic Release
 description: "Prepare Python Semantic Release"
 
@@ -16,10 +18,6 @@ inputs:
     description: "Which poetry version to use."
     required: True
     default: 1.3.0
-  psr_version:
-    description: "Which python semantic release version to use."
-    required: True
-    default: 7.28.1
 
 runs:
   using: composite
@@ -32,11 +30,12 @@ runs:
       uses: actions/cache@v2
       with:
         path: ~/.pip
-        key: pip${{ inputs.cache_number }}-PT${{ inputs.poetry_version }}-PRS${{ inputs.psr_version }}
+        key: pip${{ inputs.cache_number }}-PT${{ inputs.poetry_version }}
     - name: Get Dependencies
       shell: bash
       run: |
-        pip install poetry==${{ inputs.poetry_version }} python-semantic-release==${{ inputs.psr_version }}
+        pip install poetry==${{ inputs.poetry_version }}
+        poetry install
     - name: Configure git
       shell: bash
       run: |
@@ -49,4 +48,4 @@ runs:
         REPOSITORY_USERNAME: __token__
         REPOSITORY_PASSWORD: ${{ inputs.pypi_token }}
       run: |
-        semantic-release -v DEBUG publish
+        poetry run semantic-release -v DEBUG publish
