@@ -3,44 +3,35 @@ authors = ["qorrect <charlie.fats@gmail.com>", "rbpatt2019 <rb.patterson.cross@g
 classifiers = [
   "License :: OSI Approved :: Apache Software License",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.7",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Typing :: Typed",
 ]
 description = "Python TUI database client that supports prql"
-homepage = ""
+homepage = "prql-lang.org"
 license = "Apache-2.0"
 name = "pyprql"
 readme = "README.md"
 repository = "https://github.com/prql/PyPrql"
-version = "0.5.6"
+version = "0.5.7"
 
 [tool.poetry.dependencies]
+python = "^3.8"
+
 Pygments = "^2.11.2"
 SQLAlchemy = "^1.4.32"
 click = "^8.0.4"
 duckdb-engine = "^0.1.8"
 fuzzyfinder = "^2.1.0"
 icecream = "^2.1.2"
-ipython = [
-  {version = "~7.33.0", python = "~3.7.1"},
-  {version = "^8.0", python = "^3.8"},
-]
+ipython = "^8.0"
 ipython-sql = "^0.4.0"
-numpy = [
-  {version = "~1.21", python = "~3.7.1"},
-  {version = "^1.22.3", python = "^3.8"},
-]
-pandas = [
-  {version = "~1.3", python = "~3.7.1"},
-  {version = "^1.4", python = "^3.8"},
-]
+numpy = "^1.22.3"
+pandas = "^1.4"
 prompt-toolkit = "^3.0.28"
-prql-python = "^0.2.6"
+prql-python = "^0.3"
 pytest = "^7.1.2"
-python = "^3.7.1"
 rich = "^12.0.0"
 traitlets = "^5.2.0"
 
@@ -106,4 +97,4 @@ files = "pyprql"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1.3.0"]
