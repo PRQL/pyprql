@@ -13,3 +13,4 @@ Session.vim*
 coverage.xml
 .coverage
 .ipynb_checkpoints
+dist
