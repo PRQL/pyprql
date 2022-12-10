@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  POETRY_VERSION: 1.1.13
+  POETRY_VERSION: 3.0
   PSR_VERSION: 7.28.1
   CACHE_NUMBER: 5
 
