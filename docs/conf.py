@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Sphinx configuration."""
 import os
 import sys

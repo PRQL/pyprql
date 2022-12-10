@@ -56,7 +56,7 @@ def read_file(filename: str, path: str = this_files_path) -> str:
     str
         The contents of the file.
     """
-    with open(path + os.sep + filename, "r") as f:
+    with open(path + os.sep + filename) as f:
         x = f.read()
     return x
 
@@ -320,7 +320,7 @@ class CLI:
             self.sql_mode = True
             self.prompt_text = "SQL> "
             return
-        elif user_input == "show tables" or user_input == "\dt" or user_input == "ls":
+        elif user_input == "show tables" or user_input == r"\dt" or user_input == "ls":
             # tables = self.engine.list_tables()
             tables = self.inspector.get_table_names()
             table = Table(show_header=True, header_style="bold sandy_brown")
