@@ -9,7 +9,7 @@ classifiers = [
   "Typing :: Typed",
 ]
 description = "Python TUI database client that supports prql"
-homepage = "prql-lang.org"
+homepage = "https://prql-lang.org"
 license = "Apache-2.0"
 name = "pyprql"
 readme = "README.md"
