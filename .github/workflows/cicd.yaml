@@ -51,8 +51,7 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-    # FIXME: readd back
-    # if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     needs: [test, security]
     steps:
       - name: Checkout
