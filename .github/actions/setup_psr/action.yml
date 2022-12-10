@@ -29,7 +29,7 @@ runs:
       with:
         python-version: 3.9
     - name: Cache Pip
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.pip
         key: pip${{ inputs.cache_number }}-PT${{ inputs.poetry_version }}-PRS${{ inputs.psr_version }}
