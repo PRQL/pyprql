@@ -17,6 +17,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "myst_parser",
 ]
+exclude_patterns = ["archive/**"]
 
 napoleon_google_docstrings = False
 napoleon_numpy_docstrings = True

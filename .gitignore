@@ -15,3 +15,5 @@ coverage.xml
 .ipynb_checkpoints
 dist
 .dmypy.json
+*.ipynb
+*.csv
