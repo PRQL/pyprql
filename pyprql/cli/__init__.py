@@ -7,10 +7,9 @@ from pyprql.cli.cli import CLI
 
 warnings.warn(
     """
-Currently the  is unfortunately deprecated, since the original creators are no
-longer actively maintaning it. It was a valiant effort, and of the first things that
-was built on top of PRQL. But it's a big project that requires work to keep it
-current.
+Currently the PyPRQL CLI is unfortunately deprecated, since the original creators are no
+longer actively maintaning it. It was a valiant effort, and of the first things that was
+built on top of PRQL. But it's a big project that requires work to keep it current.
 
 If anyone would be interested in taking it over, please feel free to start contributing.
 """,
