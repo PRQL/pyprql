@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.9 (2022-12-10)
+### Fix
+* Release 0.5.9 ([#92](https://github.com/prql/PyPrql/issues/92)) ([`7a031f7`](https://github.com/prql/PyPrql/commit/7a031f78c1bed6e4396e53e71d6cde6d584a1924))
+
 ## v0.5.8 (2022-12-10)
 
 
