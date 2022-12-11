@@ -1,5 +1,9 @@
 [tool.poetry]
-authors = ["qorrect <charlie.fats@gmail.com>", "rbpatt2019 <rb.patterson.cross@gmail.com>"]
+authors = [
+  "Charlie Sanders <charlie.fats@gmail.com>",
+  "rbpatt2019 <rb.patterson.cross@gmail.com>",
+  "PRQL Team",
+]
 classifiers = [
   "License :: OSI Approved :: Apache Software License",
   "Programming Language :: Python",
@@ -8,7 +12,7 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Typing :: Typed",
 ]
-description = "Python TUI database client that supports prql"
+description = "Python extensions for PRQL"
 homepage = "https://prql-lang.org"
 license = "Apache-2.0"
 name = "pyprql"
