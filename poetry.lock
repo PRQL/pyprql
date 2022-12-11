@@ -641,18 +641,19 @@ numpy = ">=1.14"
 
 [[package]]
 name = "duckdb-engine"
-version = "0.1.11"
-description = ""
+version = "0.6.5"
+description = "SQLAlchemy driver for duckdb"
 category = "main"
 optional = false
-python-versions = ">=3.6.1"
+python-versions = ">=3.7"
 files = [
-    {file = "duckdb_engine-0.1.11-py3-none-any.whl", hash = "sha256:8721775c71300b0b01350429e8727940e03a09e530c91b18861eb6b1d2d8cb1b"},
-    {file = "duckdb_engine-0.1.11.tar.gz", hash = "sha256:d958fa32b2f239616416431d474d7a2135fd444b5001339cbe99b868b79ccf50"},
+    {file = "duckdb_engine-0.6.5-py3-none-any.whl", hash = "sha256:86e2ac08a801f5d7d6fe70e4ca753ab4abd2f47f407dcbff3fe05afddeb6a004"},
+    {file = "duckdb_engine-0.6.5.tar.gz", hash = "sha256:893b9641ff6a46798b8c03325ad52b97a6990ce1c2eb336dab38ae9eb49d609b"},
 ]
 
 [package.dependencies]
-duckdb = ">=0.2.8"
+duckdb = ">=0.4.0"
+numpy = "*"
 sqlalchemy = ">=1.3.19,<2.0.0"
 
 [[package]]
@@ -2893,4 +2894,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "63c37cec83f88e6fe79d7fadbda8c31fbba5f19879e1c9ed533ec6f45cf3cbf3"
+content-hash = "6966260f94b432cff5410bbe97a075dd0ccb65df6283d84ee006dfb63bbe7ae7"
