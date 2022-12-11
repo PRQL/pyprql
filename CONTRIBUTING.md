@@ -1,124 +1,65 @@
 # Contributing
 
-````{admonition} TLDR
-:class: tip
+## Issues
 
-Create a virtual environment with your preferred tool.
-Then run `pre-commit install --install-hooks`.
-Then commit with `cz commit`,
-and everything should take care of itself!
-````
-
-Welcome, friend!
-Open-source software isn't open open-source without the community.
-We appreciate your interest and welcome all contributions.
-While your here,
-we respectfully ask that you abide by our [code of conduct](./coc.md).
-To help keep everything moving smoothly,
-we have a few guidelines.
-
-## Bugs
-
-If you think you've found a bug,
-let us know [here][issues].
-We'll do our best to deal with it ASAP,
-but please be patient as we also work many other projects!
+If you think you've found a bug, or have an idea for a feature, let us know
+[here][issues].
 
 ## Developing
 
-If you think you can fix one of the bugs,
-or would like to submit a new feature,
+If you think you can fix one of the bugs, or would like to submit a new feature,
 then let's get coding!
 
-Once you've cloned the repository,
-fork it,
-and get your development environment set up.
-We use [poetry][poetry],
-[nox][nox],
-and [pre-commit][pre-commit]
-to handle environments, testing, and linting.
-Between them,
-they make sure that all checks run in isolated environments.
-If you don't have `poetry`,
-please see the installation instructions [here][poetry_install].
-Once you have poetry,
-you can get set up with:
+Once you've cloned the repository, fork it, and get your development environment
+set up. We use [poetry][poetry], [nox][nox], and [pre-commit][pre-commit] to
+handle environments, testing, and linting. Between them, they make sure that all
+checks run in isolated environments. If you don't have `poetry`, please see the
+installation instructions [here][poetry_install]. Once you have poetry, you can
+get set up with:
 
 ```{code-block} shell
 poetry install
 poetry run pre-commit install --install-hooks
 ```
 
-Now,
-you don't even have to think about linting or testing.
-When you commit a change,
-pre-commit will automatically run [black][black],
-[isort][isort],
-[mypy][mypy],
-and a suite of [flake8][flake8]-based linters.
-When you push a change,
-github actions will trigger a more robust suit using Nox,
-including security check and automated documentation building.
+Then, to run static checks, run:
+
+```sh
+pre-commit run -a
+```
+
+Pre-commit will automatically run [black][black], [isort][isort], [mypy][mypy],
+and a suite of [flake8][flake8]-based linters. When you push a change, GitHub
+Actions will trigger a more robust suit using Nox, including security check and
+automated documentation building.
 
 ### Commits
 
-We use a GitHub action for
-[python-semantic-release][psr]
-to manage our version numbers.
-This automatically parses your commit messages to determine if a new release is nesessary,
-and, if so, what kind (ie. major, minor, patch).
-So your commit message is very important!
+We use a GitHub Action for [python-semantic-release][psr] to manage our version
+numbers. This automatically parses your commit messages to determine if a new
+release is necessary, and, if so, what kind (ie. major, minor, patch). So your
+commit message is important!
 
-But we also don't want you stressing about how to format your commit message.
-To that end,
-we use a python implementation of
-[commitizen][cz]
-to handle that for you!
-Just commit using `cz commit` instead of `git commit`,
-and enjoy the magic!
+You can use a python implementation of [commitizen][cz] to handle that for you!
+Just commit using `cz commit` instead of `git commit`.
 
-### Documentation and Testing
+### Documentation & testing
 
-Speaking of documentation and testing -
-if you add new code,
-please add documentation and tests for it as well.
-We use [napoleon numpy][docstrings]
-for our docstrings,
-and [sphinx][sphinx] for automatic documentation.
-Our testing suite is [pytest][pytest].
+If you add new code, please add documentation and tests for it as well. We use
+[napoleon numpy][docstrings] for our docstrings, and [sphinx][sphinx] for
+automatic documentation. Our testing suite is [pytest][pytest].
 
-## Review
+## Releasing
 
-Once your happy with your code,
-open a pull-request,
-and we will reveiw ASAP.
-If you pull-request is not passing on github actions,
-or something else confuses us
-(we are, after all, only human!),
-we might ask for some small changes.
-Once everything is looking good,
-we will merges in your changes!
+PyPrql uses [python-semantic-release][psr] to automate the release process.
 
-## From the Command-Line
+To trigger a release, in the commit message add the terms `fix:`, `perf:`, or
+`feat:`.
 
-```{admonition} :fireworks: Optional fun!
-
-None of this section is required, but we find it useful and hope you do, too!
-```
-
-If you haven't heard of it already,
-give a peek to to [gh][gh],
-GitHub's official CLI.
-It allows to manage all of the above steps from the command-line,
-from forking,
-to raising issues,
-and checking on the status of your pull request.
-Not a necessity,
-but for you terminal warriors out there,
-it just might help!
+The version number will get updated automatically there is no need to update
+them (in `pyproject.toml` and `pyprql/__init__.py`) manually.
 
 [issues]: https://github.com/prql/pyprql/issues "Issues"
-[gh]: https://github.com/cli/cli "GH CLI"
 [poetry]: https://python-poetry.org/ "Poetry"
 [poetry_install]: https://python-poetry.org/docs/#installation "Poetry Installation Instructions"
 [nox]: https://nox.thea.codes/en/stable/ "Nox"
