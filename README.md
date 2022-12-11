@@ -18,8 +18,8 @@
 
 PyPRQL contains
 
-- pyprql.pandas_accessor - Pandas integration for PRQL
-- pyprql.magic - IPython magic for connecting to databases using `%%prql`
+- pyprql.pandas_accessor — Pandas integration for PRQL
+- pyprql.magic — IPython magic for connecting to databases using `%%prql`
 
 For docs, Check out the [PyPRQL Docs](https://pyprql.readthedocs.io/), and the
 [PRQL Book][prql_docs].
