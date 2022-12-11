@@ -1,11 +1,9 @@
 """The command line interface implementation for PyPRQL."""
-import warnings
-
 import sys
+import warnings
 from typing import List, Optional
 
 from pyprql.cli.cli import CLI
-
 
 warnings.warn(
     """
