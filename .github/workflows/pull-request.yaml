@@ -47,20 +47,3 @@ jobs:
           files: ./coverage.xml
           fail_ci_if_error: true
           verbose: true
-
-  release:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [test, security]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Upload to PyPI
-        uses: ./.github/actions/setup_psr
-        with:
-          gh_token: ${{ secrets.GITHUB_TOKEN }}
-          pypi_token: ${{ secrets.PYPI_TOKEN }}
-          cache_number: ${{ env.CACHE_NUMBER }}
-          poetry_version: ${{ env.POETRY_VERSION }}
