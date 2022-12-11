@@ -94,7 +94,11 @@ profile = "black"
 skip_gitignore = true
 
 [tool.mypy]
+disable_error_code = ["union-attr", 'operator']
+exclude = "/tests/"
 files = "pyprql"
+# TODO: ideally we would list the modules that aren't yet typed
+ignore_missing_imports = true
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
