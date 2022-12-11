@@ -7,5 +7,5 @@
 
 magic
 magic_readme
-contributing
+changelog
 ```
