@@ -5,8 +5,7 @@
 :hidden:
 :maxdepth: 3
 
-readme
-pyprql
+magic
 magic_readme
 contributing
 ```
