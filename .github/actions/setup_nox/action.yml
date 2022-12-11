@@ -29,7 +29,10 @@ runs:
     - name: "Cache Nox"
       uses: actions/cache@v3
       with:
-        path: .nox
+        path:
+          - .nox
+          # The poetry installation
+          - ~/.local
         key: nox-${{ github.job }}-${{inputs.cache_number }}-${{ hashFiles('noxfile.py') }}-${{ hashFiles('poetry.lock') }}
     - name: Install Poetry
       uses: snok/install-poetry@v1
