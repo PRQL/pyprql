@@ -2,11 +2,8 @@
 
 Examples
 --------
-A single function is defined herein.
-It should **_never_** be used directly by the user.
-Rather,
-any users should load the magic using the IPython line magic,
-like below:
+A single function is defined herein. It should not be used directly by the user. Rather,
+any users should load the magic using the IPython line magic, like below:
 
     In [1]: %load_ext pyprql.magic
 
@@ -19,8 +16,8 @@ from .prql import PRQLMagic
 def load_ipython_extension(ipython: InteractiveShell) -> None:
     """Load the ``pyprql.magic`` extension.
 
-    This function is called automatically by ``IPython`` when
-    the magic is loaded using ``%load_ext``.
+    This function is called automatically by ``IPython`` when the magic is loaded using
+    ``%load_ext``.
 
     Parameters
     ----------
