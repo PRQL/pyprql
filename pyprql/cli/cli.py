@@ -65,7 +65,7 @@ bindings = KeyBindings()
 BOTTOM_TOOLBAR_TXT = read_file("../assets/cli_bottom_toolbar.txt")
 
 
-@bindings.add("c-l")
+@bindings.add("c-l")  # type: ignore
 def clear_screen() -> None:
     """Create clear screen keybinding."""
     print(chr(27) + "[2j")
@@ -75,7 +75,7 @@ def clear_screen() -> None:
 
 def clean_column_names(data: pd.DataFrame) -> pd.DataFrame:
     return (
-        data.columns.str.lower()
+        data.columns.str.lower()  # type: ignore
         .str.strip()
         .str.replace('"', "")
         .str.replace(" ", "_")
