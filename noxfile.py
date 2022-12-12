@@ -7,7 +7,6 @@ from nox.sessions import Session
 PACKAGE: str = "pyprql"
 LOCATIONS: List[str] = [
     PACKAGE,
-    "tests",
     "noxfile.py",
 ]
 VERSIONS: List[str] = [
@@ -25,8 +24,7 @@ def type(session: Session) -> None:
     """Type check files with mypy."""
     session.run_always("poetry", "install", external=True)
     args = session.posargs or LOCATIONS
-    # TODO: move these to configs
-    session.run("mypy", "--ignore-missing-imports", "--show-error-codes", *args)
+    session.run("mypy", "--show-error-codes", *args)
 
 
 @nox.session(python="3.10")
