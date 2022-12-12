@@ -1,4 +1,4 @@
-"""The command line interface implementation for PyPRQL."""
+"""The command line interface implementation for pyprql."""
 import sys
 import warnings
 from typing import List, Optional
@@ -7,7 +7,7 @@ from pyprql.cli.cli import CLI
 
 warnings.warn(
     """
-Currently the PyPRQL CLI is unfortunately deprecated, since the original creators are no
+Currently the pyprql CLI is unfortunately deprecated, since the original creators are no
 longer active. It was a valiant effort, and of the first things that was built on top of
 PRQL. But it's a big project that requires work to keep it current.
 

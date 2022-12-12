@@ -1,4 +1,4 @@
-# Loading PyPRQL Magic
+# Loading pyprql Magic
 
 ```{eval-rst}
 .. automodule:: pyprql.magic

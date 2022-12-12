@@ -17,11 +17,11 @@ plus those features we think you are mostly likely to find useful.
 
 ### Installation
 
-If you have already installed PyPRQL into your environment,
+If you have already installed pyprql into your environment,
 then you should be could to go!
 We bundle in `IPython` and `pandas`,
 though you'll need to install `Jupyter` separately.
-If you haven't installed PyPRQL,
+If you haven't installed pyprql,
 that's as simple as:
 
 ```shell

@@ -51,7 +51,7 @@ automatic documentation. Our testing suite is [pytest][pytest].
 
 ## Releasing
 
-PyPrql uses [python-semantic-release][psr] to automate the release process.
+pyprql uses [python-semantic-release][psr] to automate the release process.
 
 To trigger a release, in the commit message add the terms `fix:`, `perf:`, or
 `feat:`.

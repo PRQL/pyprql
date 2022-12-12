@@ -1,4 +1,4 @@
-"""Prompt_toolkit completion engine for PyPRQL CLI."""
+"""Prompt_toolkit completion engine for pyprql CLI."""
 from typing import Dict, Iterable, List, Optional
 
 from prompt_toolkit.completion import CompleteEvent, Completer, Completion
@@ -6,7 +6,7 @@ from prompt_toolkit.document import Document
 
 
 class PRQLCompleter(Completer):
-    """Prompt_toolkit completion engine for PyPRQL CLI.
+    """Prompt_toolkit completion engine for pyprql CLI.
 
     This provides some of the root completion material.
     Inherits from  prompt_toolkit's ``Completer`` class,
