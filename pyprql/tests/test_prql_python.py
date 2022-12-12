@@ -5,7 +5,7 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def import_accessor():
-    import pyprql.pandas_accessor
+    import pyprql.pandas_accessor  # noqa
 
 
 def test_pyql_python():
