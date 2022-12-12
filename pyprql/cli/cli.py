@@ -302,7 +302,7 @@ class CLI:
             rich.print(read_file("../assets/examples.txt"))
             return
         elif user_input == "?" or user_input == "help":
-            rich.print(f"PyPRQL version: {pyprql_version}")
+            rich.print(f"pyprql version: {pyprql_version}")
 
             if self.sql_mode:
                 rich.print(read_file("../assets/sql_mode_help.txt"))

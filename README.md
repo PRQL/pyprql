@@ -1,4 +1,4 @@
-# PyPrql
+# pyprql
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ![PyPI - License](https://img.shields.io/pypi/l/pyprql)
@@ -10,18 +10,18 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/prql/pyprql)
 ![GitHub Repo stars](https://img.shields.io/github/stars/prql/pyprql)
 
-[![CI/CD](https://github.com/prql/PyPrql/actions/workflows/pull-request.yaml/badge.svg?branch=main)](https://github.com/prql/PyPrql/actions/workflows/pull-request.yaml)
-[![codecov](https://codecov.io/gh/prql/PyPrql/branch/main/graph/badge.svg?token=C6J2UI7FR5)](https://codecov.io/gh/prql/PyPrql)
+[![CI/CD](https://github.com/prql/pyprql/actions/workflows/pull-request.yaml/badge.svg?branch=main)](https://github.com/prql/pyprql/actions/workflows/pull-request.yaml)
+[![codecov](https://codecov.io/gh/prql/pyprql/branch/main/graph/badge.svg?token=C6J2UI7FR5)](https://codecov.io/gh/prql/pyprql)
 
 [![Codestyle: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
-PyPRQL contains
+pyprql contains
 
 - pyprql.pandas_accessor — Pandas integration for PRQL
 - pyprql.magic — IPython magic for connecting to databases using `%%prql`
 
-For docs, Check out the [PyPRQL Docs](https://pyprql.readthedocs.io/), and the
+For docs, Check out the [pyprql Docs](https://pyprql.readthedocs.io/), and the
 [PRQL Book][prql_docs].
 
 This project was created by

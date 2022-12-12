@@ -1,4 +1,4 @@
-# The PyPRQL Magic Implementation
+# The pyprql Magic Implementation
 
 ```{eval-rst}
 .. automodule:: pyprql.magic.prql
