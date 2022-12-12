@@ -1,4 +1,4 @@
-"""A Pygments RegexLexer for the PyPRQL CLI.
+"""A Pygments RegexLexer for the pyprql CLI.
 
 Attributes
 ----------

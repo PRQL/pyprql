@@ -1,4 +1,4 @@
-"""Pygments Style object for PyPRQL CLI."""
+"""Pygments Style object for pyprql CLI."""
 from pygments.style import Style
 from pygments.token import (
     Comment,

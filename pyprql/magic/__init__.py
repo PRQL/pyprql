@@ -1,4 +1,4 @@
-"""IPython/Jupyter magic for PyPRQL.
+"""IPython/Jupyter magic for pyprql.
 
 Examples
 --------
