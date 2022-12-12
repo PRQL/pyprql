@@ -9,6 +9,10 @@ on:
 
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.job }}
+  cancel-in-progress: true
+
 env:
   POETRY_VERSION: 1.3.0
 
