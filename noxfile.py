@@ -7,7 +7,6 @@ from nox.sessions import Session
 PACKAGE: str = "pyprql"
 LOCATIONS: List[str] = [
     PACKAGE,
-    "tests",
     "noxfile.py",
 ]
 VERSIONS: List[str] = [
