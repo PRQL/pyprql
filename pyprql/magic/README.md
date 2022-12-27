@@ -4,14 +4,10 @@ Work with pandas and PRQL in an IPython terminal or Jupyter notebook.
 
 ## Implementation
 
-This is a thin wrapper around the fantastic
-[IPython-sql][ipysql] magic.
-Roughly speaking,
-all we do is parse PRQL to SQL and pass that through to `ipython-sql`.
-A full documentation of the supported features is available at their
-[repository][ipysql].
-Here,  we document those places where we differ from them,
-plus those features we think you are mostly likely to find useful.
+This is a thin wrapper around [ploomber/jupysql][jupysql] magic. Full
+documentation of the supported features is available at their
+[repository][jupysql]. Here, we document the most salient features or those
+where we differ.
 
 ## Usage
 
@@ -208,7 +204,7 @@ you can do that with the `%config` line magic as well.
 In [7]: %config PRQLMagic.autoview = False
 ```
 
-[ipysql]: https://github.com/catherinedevlin/ipython-sql
+[jupysql]: https://github.com/ploomber/jupysql
 [conn_str]: https://docs.sqlalchemy.org/en/14/core/engines.html#database-urls
 [duckdb]: https://duckdb.org
 [pandas]: https://pandas.pydata.org

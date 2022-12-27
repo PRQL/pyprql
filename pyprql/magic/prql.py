@@ -14,7 +14,7 @@ class PRQLMagic(SqlMagic):
 
     This is a thin wrapper around ``sql.SqlMagic``, the class that provides the
     ``%%sql`` magic. For full documentation on usage and features, please see their
-    `docs <https://github.com/catherinedevlin/ipython-sql>`_.
+    `docs <https://jupysql.readthedocs.io/en/latest/quick-start.html>`_.
 
     We override their defaults in two cases:
 
@@ -81,13 +81,13 @@ class PRQLMagic(SqlMagic):
     ) -> None:
         """Create the PRQL magic.
 
-        To handle parsing to PRQL,
-        there is one limitation relative to the `original <https://github.com/catherinedevlin/ipython-sql>`_
-        ``%%sql`` magic. Namely,
-        line magics can only be used to pass connection strings and arguments.
-        To figure out whether the ``line`` argument contained PRQL or not
-        required heavy parsing followed by recosntruction of the input to pass
-        on to the ``%sql`` magic we are wrapping.
+        To handle parsing to PRQL, there is one limitation relative to the `original
+        <https://github.com/ploomber/jupysql>`_ ``%%sql`` magic. Namely, line magics can
+        only be used to pass connection strings and arguments.
+
+        To figure out whether the ``line`` argument contained PRQL or not required heavy
+        parsing followed by recosntruction of the input to pass on to the ``%sql`` magic
+        we are wrapping, so we avoid it.
 
         Parameters
         ----------
@@ -103,28 +103,9 @@ class PRQLMagic(SqlMagic):
         None
         """
         local_ns = local_ns or {}
-        # If cell is occupied, it must be parsed to SQL
+        # If cell is occupied, parsed to SQL
         if cell:
             cell = to_sql(cell)
 
-        # TODO: evaluate whether this is required — it was here previously, but do we
-        # need to do more than just super up to ipython-sql?
-        # If cell is occupied and line is empty,
-        # we artificially populate line to ensure a return value.
-        # if cell and not line:
-        #     line = "_ <<"
-
         result = super().execute(line=line, cell=cell, local_ns=local_ns)
         return result
-
-        # TODO: evaluate whether this is required — it was here previously, but do we
-        # need to do more than just super up to ipython-sql?
-        # If results should be printed,
-        # check line for the results name.
-        # Default to `_`.
-        # if self.autoview:
-        #     if "<<" in line:
-        #         print(local_ns[line.split()[0]])
-        #     else:
-        #         print(local_ns["_"])
-        #         print(local_ns["_"])
