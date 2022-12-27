@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.10 (2022-12-11)
+
+* Lots of docs & devops fixes
+
 ## v0.5.9 (2022-12-10)
 
 ### Fix
