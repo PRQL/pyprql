@@ -79,7 +79,7 @@ class PRQLMagic(SqlMagic):
     )
     @argument("-f", "--file", type=str, help="Run SQL from file at this path")
     def prql(
-        self, line: str = "", cell: str = "", local_ns: Dict | None = None
+        self, line: str = "", cell: str = "", local_ns: dict | None = None
     ) -> None:
         """Create the PRQL magic.
 
