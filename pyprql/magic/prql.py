@@ -1,5 +1,5 @@
 """A magic class for parsing PRQL in IPython or Jupyter."""
-from typing import Dict
+from __future__ import annotations
 
 from IPython.core.magic import cell_magic, line_magic, magics_class, needs_local_scope
 from IPython.core.magic_arguments import argument, magic_arguments
@@ -77,7 +77,7 @@ class PRQLMagic(SqlMagic):
     )
     @argument("-f", "--file", type=str, help="Run SQL from file at this path")
     def prql(
-        self, line: str = "", cell: str = "", local_ns: Dict | None = None
+        self, line: str = "", cell: str = "", local_ns: dict | None = None
     ) -> None:
         """Create the PRQL magic.
 
