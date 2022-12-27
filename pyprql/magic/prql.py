@@ -1,4 +1,6 @@
 """A magic class for parsing PRQL in IPython or Jupyter."""
+from __future__ import annotations
+
 from typing import Dict
 
 from IPython.core.magic import cell_magic, line_magic, magics_class, needs_local_scope
