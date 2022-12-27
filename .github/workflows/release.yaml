@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Setup Pyton
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.9
@@ -41,9 +41,8 @@ jobs:
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'gha@prql-lang.org'
       - name: Python Semantic Release
-        env:
-          GH_TOKEN: ${{ secrets.PRQL_BOT_GH_TOKEN }}
-          REPOSITORY_USERNAME: __token__
-          REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          poetry run semantic-release -v DEBUG publish
+        uses: relekang/python-semantic-release@master
+        with:
+          github_token: ${{ secrets.PRQL_BOT_GH_TOKEN }}
+          repository_username: __token__
+          repository_password: ${{ secrets.PYPI_TOKEN }}
