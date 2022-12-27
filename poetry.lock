@@ -197,6 +197,18 @@ files = [
 ]
 
 [[package]]
+name = "backoff"
+version = "1.11.1"
+description = "Function decoration for backoff and retry"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+files = [
+    {file = "backoff-1.11.1-py2.py3-none-any.whl", hash = "sha256:61928f8fa48d52e4faa81875eecf308eccfb1016b018bb6bd21e05b5d90a96c5"},
+    {file = "backoff-1.11.1.tar.gz", hash = "sha256:ccb962a2378418c667b3c979b504fdeb7d9e0d29c0579e3b13b86467177728cb"},
+]
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.11.1"
 description = "Screen-scraping library"
@@ -275,7 +287,7 @@ dev = ["Sphinx (==4.3.2)", "black (==22.3.0)", "build (==0.8.0)", "flake8 (==4.0
 name = "certifi"
 version = "2022.12.7"
 description = "Python package for providing Mozilla's CA Bundle."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -376,7 +388,7 @@ files = [
 name = "charset-normalizer"
 version = "2.1.1"
 description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6.0"
 files = [
@@ -1324,26 +1336,6 @@ files = [
 ]
 
 [[package]]
-name = "ipython-sql"
-version = "0.4.1"
-description = "RDBMS access via IPython"
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "ipython-sql-0.4.1.tar.gz", hash = "sha256:3786344ce208a58047a4bcf43afd3c143d935a395c72ea849bf0e3fc24fad9e4"},
-    {file = "ipython_sql-0.4.1-py3-none-any.whl", hash = "sha256:fda28e16edf6692eb680fa99726932c75bc27b284ad9678c45347c97fd680bd2"},
-]
-
-[package.dependencies]
-ipython = ">=1.0"
-ipython-genutils = ">=0.1.0"
-prettytable = "<1"
-six = "*"
-sqlalchemy = ">=0.6.7"
-sqlparse = "*"
-
-[[package]]
 name = "ipywidgets"
 version = "8.0.3"
 description = "Jupyter interactive widgets"
@@ -1512,6 +1504,31 @@ webcolors = {version = ">=1.11", optional = true, markers = "extra == \"format-n
 [package.extras]
 format = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3987", "uri-template", "webcolors (>=1.11)"]
 format-nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3986-validator (>0.1.0)", "uri-template", "webcolors (>=1.11)"]
+
+[[package]]
+name = "jupysql"
+version = "0.5.1"
+description = "Better SQL in Jupyter"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "jupysql-0.5.1-py3-none-any.whl", hash = "sha256:246fe41fcfcd585b61916e26216e403dea0b6cc3ebf53d0a8f34b74bfffb141c"},
+    {file = "jupysql-0.5.1.tar.gz", hash = "sha256:735c2f5cb4a3ed1e2483c593ec968adfe7d8837f7b4ffa0202fbd579b38d9f30"},
+]
+
+[package.dependencies]
+ipython = ">=1.0"
+ipython-genutils = ">=0.1.0"
+jinja2 = "*"
+ploomber-core = ">=0.0.4"
+prettytable = "<1"
+six = "*"
+sqlalchemy = ">=0.6.7"
+sqlparse = "*"
+
+[package.extras]
+dev = ["duckdb", "duckdb-engine", "invoke", "matplotlib", "pandas", "pkgmt", "pytest", "twine"]
 
 [[package]]
 name = "jupyter"
@@ -1873,6 +1890,18 @@ python-versions = "*"
 files = [
     {file = "mistune-2.0.4-py2.py3-none-any.whl", hash = "sha256:182cc5ee6f8ed1b807de6b7bb50155df7b66495412836b9a74c8fbdfc75fe36d"},
     {file = "mistune-2.0.4.tar.gz", hash = "sha256:9ee0a66053e2267aba772c71e06891fa8f1af6d4b01d5e84e267b4570d4d9808"},
+]
+
+[[package]]
+name = "monotonic"
+version = "1.6"
+description = "An implementation of time.monotonic() for Python 2 & < 3.3"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "monotonic-1.6-py2.py3-none-any.whl", hash = "sha256:68687e19a14f11f26d140dd5c86f3dba4bf5df58003000ed467e0e2a69bca96c"},
+    {file = "monotonic-1.6.tar.gz", hash = "sha256:3a55207bcfed53ddd5c5bae174524062935efed17792e9de2ad0205ce9ad63f7"},
 ]
 
 [[package]]
@@ -2403,6 +2432,26 @@ docs = ["furo (>=2022.9.29)", "proselint (>=0.13)", "sphinx (>=5.3)", "sphinx-au
 test = ["appdirs (==1.4.4)", "pytest (>=7.2)", "pytest-cov (>=4)", "pytest-mock (>=3.10)"]
 
 [[package]]
+name = "ploomber-core"
+version = "0.0.13"
+description = ""
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "ploomber-core-0.0.13.tar.gz", hash = "sha256:ae251e5bd4b9c742e7f6139b0e3758add7399d93a81436f79581dc424a2414fb"},
+    {file = "ploomber_core-0.0.13-py3-none-any.whl", hash = "sha256:0496b2ab792a707a90505687521195fabc413f8020ab379da35e9a84481c3e2b"},
+]
+
+[package.dependencies]
+click = "*"
+posthog = "*"
+pyyaml = "*"
+
+[package.extras]
+dev = ["flake8", "invoke", "pkgmt", "pytest", "twine"]
+
+[[package]]
 name = "pluggy"
 version = "1.0.0"
 description = "plugin and hook calling mechanisms for python"
@@ -2417,6 +2466,30 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
+
+[[package]]
+name = "posthog"
+version = "2.2.0"
+description = "Integrate PostHog into any python application."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "posthog-2.2.0-py2.py3-none-any.whl", hash = "sha256:cf3561a23d6770991f0b890fbe09e20c488e54efe65f9202ffd4e37dd6a90f8a"},
+    {file = "posthog-2.2.0.tar.gz", hash = "sha256:1f450a20f7bed217874ded234f6ffc24ae73da37a16aa5bf76335249b34a9f60"},
+]
+
+[package.dependencies]
+backoff = ">=1.10.0,<2.0.0"
+monotonic = ">=1.5"
+python-dateutil = ">2.1"
+requests = ">=2.7,<3.0"
+six = ">=1.5"
+
+[package.extras]
+dev = ["black", "isort", "pre-commit"]
+sentry = ["django", "sentry-sdk"]
+test = ["coverage", "flake8", "freezegun (==0.3.15)", "mock (>=2.0.0)", "pylint", "pytest"]
 
 [[package]]
 name = "pprintpp"
@@ -3169,7 +3242,7 @@ md = ["cmarkgfm (>=0.8.0)"]
 name = "requests"
 version = "2.28.1"
 description = "Python HTTP for Humans."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7, <4"
 files = [
@@ -3936,7 +4009,7 @@ dev = ["flake8 (<4.0.0)", "flake8-annotations", "flake8-bugbear", "flake8-commas
 name = "urllib3"
 version = "1.26.13"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 files = [
@@ -4091,4 +4164,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "42b93b92dfea8aab9b0eead4d002fe893f95537241ce9eb2486bb3420a427dfa"
+content-hash = "c312cc00fa8af5eb6beeb11ed3f3b171fe3973de942df822e2f301d0af218f66"
