@@ -74,12 +74,14 @@ build_command = "poetry build"
 changelog_file = "CHANGELOG.md"
 upload_to_pypi = true
 upload_to_release = true
-version_toml = [
-  "pyproject.toml:tool.poetry.version",
-]
-version_variable = [
-  "pyprql/__init__.py:__version__",
-]
+# version_source = "commit"
+# version_pattern = 
+# version_toml = [
+#   "pyproject.toml:tool.poetry.version",
+# ]
+# version_variable = [
+#   "pyprql/__init__.py:__version__",
+# ]
 
 [tool.pytest.ini_options]
 addopts = """
