@@ -89,18 +89,9 @@ class PRQLMagic(SqlMagic):
         parsing followed by recosntruction of the input to pass on to the ``%sql`` magic
         we are wrapping, so we avoid it.
 
-        Parameters
-        ----------
-        line : str
-            The magic's line contents.
-        cell : str
-            The magic's cell contents.
-        local_ns : Dict
-            The variables local to the running IPython shell.
-
         Returns
         -------
-        None
+            None
         """
         local_ns = local_ns or {}
         # If cell is occupied, parsed to SQL
