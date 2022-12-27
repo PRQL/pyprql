@@ -75,7 +75,7 @@ changelog_file = "CHANGELOG.md"
 upload_to_pypi = true
 upload_to_release = true
 # version_source = "commit"
-# version_pattern = 
+# version_pattern =
 # version_toml = [
 #   "pyproject.toml:tool.poetry.version",
 # ]
