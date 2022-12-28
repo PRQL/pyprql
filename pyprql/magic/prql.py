@@ -9,7 +9,7 @@ from traitlets import Bool
 
 
 @magics_class
-class PRQLMagic(SqlMagic):
+class PrqlMagic(SqlMagic):
     """Perform PRQL magics.
 
     This is a thin wrapper around ``sql.SqlMagic``, the class that provides the

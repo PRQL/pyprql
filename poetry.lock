@@ -2837,6 +2837,20 @@ py = "*"
 pytest = ">=3.10"
 
 [[package]]
+name = "pytest-regtest"
+version = "1.5.0"
+description = "pytest plugin for regression tests"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pytest-regtest-1.5.0.tar.gz", hash = "sha256:348f9f23b45d5a674fbdf2a70429221242063baf6a1521f30fb0aa03f7bea5db"},
+]
+
+[package.dependencies]
+pytest = ">=4.1.0"
+
+[[package]]
 name = "pytest-sugar"
 version = "0.9.6"
 description = "pytest-sugar is a plugin for pytest that changes the default look and feel of pytest (e.g. progressbar, show tests that fail instantly)."
@@ -2852,6 +2866,21 @@ files = [
 packaging = ">=14.1"
 pytest = ">=2.9"
 termcolor = ">=1.1.0"
+
+[[package]]
+name = "pytest-testmon"
+version = "1.3.3"
+description = "selects tests affected by changed files and methods"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "pytest-testmon-1.3.3.tar.gz", hash = "sha256:0ac839c089bdf99740418759a33971d3dacc695cf719acde4b967f7f88d1102c"},
+]
+
+[package.dependencies]
+coverage = ">=5,<7"
+pytest = ">=5,<8"
 
 [[package]]
 name = "pytest-xdist"
@@ -4164,4 +4193,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "c312cc00fa8af5eb6beeb11ed3f3b171fe3973de942df822e2f301d0af218f66"
+content-hash = "e782fee457a8c2384adc57323d1625d36d219213ea92602e46e2238329676993"

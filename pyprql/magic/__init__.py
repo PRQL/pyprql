@@ -10,7 +10,7 @@ any users should load the magic using the IPython line magic, like below:
 """
 from IPython import InteractiveShell
 
-from .prql import PRQLMagic
+from .prql import PrqlMagic
 
 
 def load_ipython_extension(ipython: InteractiveShell) -> None:
@@ -24,4 +24,4 @@ def load_ipython_extension(ipython: InteractiveShell) -> None:
     ipython: InteractiveShell
         The current IPython instance.
     """
-    ipython.register_magics(PRQLMagic)
+    ipython.register_magics(PrqlMagic)

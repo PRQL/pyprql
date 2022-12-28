@@ -77,7 +77,7 @@ We have two options for connecting a database
 
 ### Querying
 
-Now, let's do a query! By default, `PRQLMagic` always returns the results as
+Now, let's do a query! By default, `PrqlMagic` always returns the results as
 dataframe, and always prints the results. The results of the previous query are
 accessible in the `_` variable.
 
@@ -155,43 +155,43 @@ should you need to change settings,
 a list of settings is available using the `%config` line magic.
 
 ```
-In [7]: %config PRQLMagic
-PRQLMagic(SqlMagic) options
+In [7]: %config PrqlMagic
+PrqlMagic(SqlMagic) options
 -------------------------
-PRQLMagic.autocommit=<Bool>
+PrqlMagic.autocommit=<Bool>
     Set autocommit mode
     Current: True
-PRQLMagic.autolimit=<Int>
+PrqlMagic.autolimit=<Int>
     Automatically limit the size of the returned result sets
     Current: 0
-PRQLMagic.autopandas=<Bool>
+PrqlMagic.autopandas=<Bool>
     Return Pandas DataFrames instead of regular result sets
     Current: True
-PRQLMagic.autoview=<Bool>
+PrqlMagic.autoview=<Bool>
     Display results
     Current: True
-PRQLMagic.column_local_vars=<Bool>
+PrqlMagic.column_local_vars=<Bool>
     Return data into local variables from column names
     Current: False
-PRQLMagic.displaycon=<Bool>
+PrqlMagic.displaycon=<Bool>
     Show connection string after execute
     Current: False
-PRQLMagic.displaylimit=<Int>
+PrqlMagic.displaylimit=<Int>
     Automatically limit the number of rows displayed (full result set is still
     stored)
     Current: None
-PRQLMagic.dsn_filename=<Unicode>
+PrqlMagic.dsn_filename=<Unicode>
     Path to DSN file. When the first argument is of the form [section], a
     sqlalchemy connection string is formed from the matching section in the DSN
     file.
     Current: 'odbc.ini'
-PRQLMagic.feedback=<Bool>
+PrqlMagic.feedback=<Bool>
     Print number of rows affected by DML
     Current: True
-PRQLMagic.short_errors=<Bool>
+PrqlMagic.short_errors=<Bool>
     Don't display the full traceback on SQL Programming Error
     Current: True
-PRQLMagic.style=<Unicode>
+PrqlMagic.style=<Unicode>
     Set the table printing style to any of prettytable's defined styles
     (currently DEFAULT, MSWORD_FRIENDLY, PLAIN_COLUMNS, RANDOM)
     Current: 'DEFAULT'
@@ -201,7 +201,7 @@ If you want to change any of these,
 you can do that with the `%config` line magic as well.
 
 ```
-In [7]: %config PRQLMagic.autoview = False
+In [7]: %config PrqlMagic.autoview = False
 ```
 
 [jupysql]: https://github.com/ploomber/jupysql
