@@ -83,7 +83,7 @@ def test_result_var_multiline_shovel(ip):
         "",
         """
         x << from author
-        select last_name 
+        select last_name
         """,
     )
     result = ip.user_global_ns["x"]
