@@ -2,7 +2,8 @@
 These tests are heavily borrowed from
 https://github.com/ploomber/jupysql/blob/0.5.1/src/tests/test_magic.py
 
-They're lightly adapted for PRQL, and there are some TODOs around a fuller transition.
+Many are xfailed because we don't yet support them. Others are lightly adapted for PRQL,
+and there are some TODOs around a fuller transition.
 
 Thanks to @ploomber for providing the base for these tests as well as the extension.
 """
@@ -30,11 +31,13 @@ def test_html(ip):
     assert "<td>foo</td>" in result._repr_html_().lower()
 
 
+@pytest.mark.skip(reason="We only support pandas")
 def test_print(ip):
     result = run_prql(ip, "from test")
     assert re.search(r"1\s+\|\s+foo", str(result))
 
 
+@pytest.mark.skip(reason="We only support pandas")
 def test_plain_style(ip):
     ip.run_line_magic("config", "SqlMagic.style = 'PLAIN_COLUMNS'")
     result = run_prql(ip, "from test")
@@ -54,6 +57,7 @@ def test_multi_sql(ip):
     assert "Shakespeare" in str(result) and "Brecht" in str(result)
 
 
+@pytest.mark.xfail(reason="Not supported in PRQL")
 def test_result_var(ip, capsys):
     ip.run_line_magic("prql", "sqlite://")
     ip.run_cell_magic(
@@ -72,21 +76,23 @@ def test_result_var(ip, capsys):
     assert "Returning data to local variable" not in out
 
 
+@pytest.mark.xfail(reason="Not supported in PRQL")
 def test_result_var_multiline_shovel(ip):
     ip.run_cell_magic(
         "prql",
         "",
         """
-        sqlite:// x << SELECT last_name
-        FROM author;
+        x << from author
+        select last_name 
         """,
     )
     result = ip.user_global_ns["x"]
     assert "Shakespeare" in str(result) and "Brecht" in str(result)
 
 
+@pytest.mark.skip(reason="We only support pandas")
 def test_access_results_by_keys(ip):
-    assert run_prql(ip, "FROM author")["William"] == (
+    assert run_prql(ip, "from author")["author"] == (
         "William",
         "Shakespeare",
         1616,
@@ -105,9 +111,10 @@ def test_duplicate_column_names_accepted(ip):
     assert ("Brecht", "Brecht") in result
 
 
+@pytest.mark.xfail(reason="Need to resolve line vs cell magic")
 def test_persist(ip):
     # This currently fails
-    # run_prql(ip, "")
+    run_prql(ip, "")
     ip.run_cell("results = %sql SELECT * FROM test")
     ip.run_cell("results_dframe = results.DataFrame()")
     ip.run_cell("%sql --persist sqlite:// results_dframe")
@@ -115,8 +122,9 @@ def test_persist(ip):
     assert persisted == [(0, 1, "foo"), (1, 2, "bar")]
 
 
+@pytest.mark.xfail(reason="Need to resolve line vs cell magic")
 def test_persist_no_index(ip):
-    # run_prql(ip, "")
+    run_prql(ip, "")
     ip.run_cell("results = %sql from test")
     ip.run_cell("results_no_index = results.DataFrame()")
     ip.run_cell("%sql --persist sqlite:// results_no_index --no-index")
@@ -124,8 +132,9 @@ def test_persist_no_index(ip):
     assert persisted == [(1, "foo"), (2, "bar")]
 
 
+@pytest.mark.xfail(reason="Need to resolve line vs cell magic")
 def test_append(ip):
-    # run_prql(ip, "")
+    run_prql(ip, "")
     ip.run_cell("results = %sql from test")
     ip.run_cell("results_dframe_append = results.DataFrame()")
     ip.run_cell("%sql --persist sqlite:// results_dframe_append")
@@ -135,15 +144,17 @@ def test_append(ip):
     assert appended[0][0] == persisted[0][0] * 2
 
 
+@pytest.mark.xfail(reason="Need to resolve line vs cell magic")
 def test_persist_nonexistent_raises(ip):
-    # run_prql(ip, "")
+    run_prql(ip, "")
     result = ip.run_cell("%sql --persist sqlite:// no_such_dataframe")
     assert result.error_in_exec
 
 
+@pytest.mark.xfail(reason="Need to resolve line vs cell magic")
 def test_persist_non_frame_raises(ip):
     ip.run_cell("not_a_dataframe = 22")
-    # run_prql(ip, "")
+    run_prql(ip, "")
     result = ip.run_cell("%sql --persist sqlite:// not_a_dataframe")
     assert result.error_in_exec
 
@@ -153,6 +164,7 @@ def test_persist_bare(ip):
     assert result.error_in_exec
 
 
+@pytest.mark.xfail(reason="Need to resolve line vs cell magic")
 def test_persist_frame_at_its_creation(ip):
     ip.run_cell("results = %sql from author")
     ip.run_cell("%sql --persist sqlite:// results.DataFrame()")
@@ -217,6 +229,7 @@ def test_displaylimit(ip, regtest):
     assert "cherry" not in result._repr_html_()
 
 
+@pytest.mark.xfail(reason="Not supported in PRQL")
 def test_column_local_vars(ip):
     ip.run_line_magic("config", "SqlMagic.column_local_vars = True")
     result = run_prql(ip, "from author")
@@ -227,6 +240,7 @@ def test_column_local_vars(ip):
     ip.run_line_magic("config", "SqlMagic.column_local_vars = False")
 
 
+@pytest.mark.skip(reason="Not supported in PRQL")
 def test_userns_not_changed(ip):
     ip.run_cell(
         dedent(
@@ -240,7 +254,7 @@ def test_userns_not_changed(ip):
     assert "local_var" not in ip.user_ns
 
 
-# @pytest.mark.xfail("Not supported in PRQL")
+@pytest.mark.xfail(reason="Not supported in PRQL")
 def test_bind_vars(ip):
     ip.user_global_ns["x"] = 22
     result = run_prql(ip, "SELECT :x")
@@ -308,6 +322,7 @@ def test_dict(ip):
     assert len(result["last_name"]) == 2
 
 
+@pytest.mark.skip("We only support pandas")
 def test_dicts(ip):
     result = run_prql(ip, "from author")
     for row in result.dicts():
@@ -317,6 +332,7 @@ def test_dicts(ip):
         assert "year_of_death" in row
 
 
+@pytest.mark.xfail(reason="Not supported in PRQL")
 def test_bracket_var_substitution(ip):
 
     ip.user_global_ns["col"] = "first_name"
@@ -332,7 +348,7 @@ def test_bracket_var_substitution(ip):
 
 
 # the next two tests had the same name, so I added a _2 to the second one
-@pytest.mark.skip("Superfluous")
+@pytest.mark.xfail(reason="Not supported in PRQL")
 def test_multiline_bracket_var_substitution(ip):
 
     ip.user_global_ns["col"] = "first_name"
@@ -347,11 +363,11 @@ def test_multiline_bracket_var_substitution(ip):
     assert not result
 
 
-@pytest.mark.skip("Superfluous")
+@pytest.mark.xfail(reason="Not supported in PRQL")
 def test_multiline_bracket_var_substitution_2(ip):
     ip.user_global_ns["col"] = "first_name"
     result = ip.run_cell_magic(
-        "sql",
+        "prql",
         "",
         """
         sqlite:// SELECT * FROM author
@@ -362,7 +378,7 @@ def test_multiline_bracket_var_substitution_2(ip):
 
     ip.user_global_ns["col"] = "last_name"
     result = ip.run_cell_magic(
-        "sql",
+        "prql",
         "",
         """
         sqlite:// SELECT * FROM author
@@ -394,8 +410,8 @@ def test_close_connection(ip):
     # TODO: change this to testing run_prql
     connections = run_sql(ip, "%sql -l")
     connection_name = list(connections)[0]
-    run_prql(ip, f"%sql -x {connection_name}")
-    connections_afterward = run_prql(ip, "%sql -l")
+    run_sql(ip, f"%sql -x {connection_name}")
+    connections_afterward = run_sql(ip, "%sql -l")
     assert connection_name not in connections_afterward
 
 
