@@ -96,6 +96,7 @@ source = ["pyprql"]
 show_missing = true
 
 [tool.isort]
+# Remove these configs in time; consolidate onto ruff
 float_to_top = false
 profile = "black"
 skip_gitignore = true
