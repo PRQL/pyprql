@@ -10,8 +10,8 @@ def import_accessor():
 
 def test_pyql_python():
     """It compiles sql from prql."""
-    sql = prql.to_sql("from employees | select [ name, age ]").replace("\n", " ")
-    assert sql == "SELECT   name,   age FROM   employees"
+    sql: str = prql.compile("from employees | select [ name, age ]").replace("\n", " ")
+    assert sql.startswith("SELECT   name,   age FROM   employees")
 
 
 def test_df_accessor():

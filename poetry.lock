@@ -2560,15 +2560,15 @@ wcwidth = "*"
 
 [[package]]
 name = "prql-python"
-version = "0.3.1"
+version = "0.4.0"
 description = ""
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "prql_python-0.3.1-cp37-abi3-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:5bb0f098e1b154c710ef7f7a11f19db6f9f7a20a38268e96637c1059ed99c0d6"},
-    {file = "prql_python-0.3.1-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:fbbbb6f10a32fc8bb77df5e47488bd2dfeb2200b903a336330e6960f2c205eaf"},
-    {file = "prql_python-0.3.1-cp37-abi3-win_amd64.whl", hash = "sha256:503d6d12029ac33da191faaa44f1c3cc78c676764e06d9cee453f8fe53294a95"},
+    {file = "prql_python-0.4.0-cp37-abi3-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:d0eab3a5c41fd2c6d88cc48107ca7bdb8462ffa60c08e79e4286a3511b20b81f"},
+    {file = "prql_python-0.4.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:32f2c62f3a533820a9c6f444be3138c1e3a85fbd10ab1aef3a8844d921dc46d3"},
+    {file = "prql_python-0.4.0-cp37-abi3-win_amd64.whl", hash = "sha256:60eca1407997d8ca38cf33b6c912fc4090279b65c379a14ced4dc9ffc3eb7b6c"},
 ]
 
 [[package]]
@@ -4201,4 +4201,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "16cad584aca086505993f86b65b1168b0b1f68ab816b9cd98de530f84d856631"
+content-hash = "14797f0f204366893c85a76beef4f6a907c9ca1add1b4141ed5231ae740b2d7b"
