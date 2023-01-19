@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from IPython.core.magic import cell_magic, line_magic, magics_class, needs_local_scope
 from IPython.core.magic_arguments import argument, magic_arguments
-from prql_python import to_sql
+from prql_python import compile
 from sql.magic import SqlMagic
 from traitlets import Bool
 
@@ -96,7 +96,7 @@ class PrqlMagic(SqlMagic):
         local_ns = local_ns or {}
         # If cell is occupied, parsed to SQL
         if cell:
-            cell = to_sql(cell)
+            cell = compile(cell)
 
         result = super().execute(line=line, cell=cell, local_ns=local_ns)
         return result

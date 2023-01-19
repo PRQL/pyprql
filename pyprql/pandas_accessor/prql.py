@@ -21,7 +21,7 @@ class PrqlAccessor:
 
     def query(self, prql_query: str) -> pd.DataFrame:
         prepended_query = f"from df \n {prql_query}"
-        sql_query = prql.to_sql(prepended_query)
+        sql_query = prql.compile(prepended_query)
         return duckdb.query_df(
             self._obj,
             virtual_table_name="df",

@@ -63,7 +63,7 @@ We have two options for connecting a database
      !wget https://raw.githubusercontent.com/graphql-compose/graphql-compose-examples/master/examples/northwind/data/csv/products.csv
      ```
 
-     ...and then `from products.csv` will work.
+     ...and then `` from `products.csv`  `` will work.
 
 2. Connect to an existing database
 
@@ -81,13 +81,13 @@ Now, let's do a query! By default, `PrqlMagic` always returns the results as
 dataframe, and always prints the results. The results of the previous query are
 accessible in the `_` variable.
 
-These examples are based on the `products.csv` example above.
+These examples are based on the `` from `products.csv`  ``example above.
 
 ```
 
 
 In [4]: %%prql
-   ...: from p = products.csv
+   ...: from p = `products.csv`
    ...: filter supplierID == 1
 
 Done.
@@ -100,7 +100,7 @@ Returning data to local variable _
 
 ```
 In [5]: %%prql
-   ...: from p = products.csv
+   ...: from p = `products.csv`
    ...: group categoryID (
    ...:   aggregate [average unitPrice]
    ...: )
@@ -122,7 +122,7 @@ We can capture the results into a different variable like so:
 
 ```
 In [6]: %%prql results <<
-   ...: from p = products.csv
+   ...: from p = `products.csv`
    ...: aggregate [min unitsInStock, max unitsInStock]
 
 Done.
