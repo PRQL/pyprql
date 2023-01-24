@@ -37,13 +37,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.target_option }}
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
           version: ${{ inputs.poetry_version }}
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ inputs.target_option }}
       - name: Test Code and Docs
         run: pytest
       - name: Upload to codecov
