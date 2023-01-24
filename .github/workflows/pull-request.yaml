@@ -44,8 +44,9 @@ jobs:
         uses: snok/install-poetry@v1
         with:
           version: ${{ inputs.poetry_version }}
+      - run: poetry install
       - name: Test Code and Docs
-        run: pytest
+        run: poetry run pytest
       - name: Upload to codecov
         if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v2
