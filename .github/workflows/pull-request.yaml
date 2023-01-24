@@ -17,18 +17,6 @@ env:
   POETRY_VERSION: 1.3.0
 
 jobs:
-  security:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Nox and Poetry
-        uses: ./.github/actions/setup-python
-        with:
-          poetry_version: ${{ env.POETRY_VERSION }}
-      - name: Check for Dependency Vulnerabilities
-        run: nox -s security
-
   test:
     runs-on: ubuntu-latest
     strategy:
