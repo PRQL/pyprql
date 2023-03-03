@@ -14,12 +14,12 @@ pyprql contains:
 - pyprql.pandas_accessor — Pandas integration for PRQL
 - pyprql.magic — IPython magic for connecting to databases using `%%prql`
 
-For docs, Check out the [pyprql docs](https://pyprql.readthedocs.io/), and the
+For docs, check out the [pyprql docs](https://pyprql.readthedocs.io/), and the
 [PRQL Book][prql_docs].
 
 ## Installation
 
-```bash
+```sh
 pip install pyprql
 ```
 
@@ -32,7 +32,7 @@ import pandas as pd
 import pyprql.pandas_accessor
 
 df = (...)
-results_df = df.prql.query('select [age,name,occupation] | filter age > 21')
+results_df = df.prql.query("select [age,name,occupation] | filter age > 21")
 ```
 
 ### Jupyter Magic
@@ -56,6 +56,6 @@ In [4]: %%prql results <<
 This project was created by
 [@charlie-sanders](https://github.com/charlie-sanders/) &
 [@rbpatt2019](https://github.com/rbpatt2019) and is now maintained by the
-broader prql team.
+broader PRQL team.
 
 [prql_docs]: https://prql-lang.org/book
