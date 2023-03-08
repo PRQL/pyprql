@@ -272,14 +272,16 @@ def test_autopandas(ip):
 def test_target_dialect(ip):
     ip.run_line_magic("config", 'PrqlMagic.target = "sql.sqlite"')
     dframe = run_prql(
-        ip, 'from author | select foo = f"{first_name}-{last_name}" | take 1')
+        ip, 'from author | select foo = f"{first_name}-{last_name}" | take 1'
+    )
     assert dframe.foo[0] == "William-Shakespeare"
 
 
 @pytest.mark.xfail(reason="no such function: CONCAT")
 def test_without_target(ip):
     dframe = run_prql(
-        ip, 'from author | select foo = f"{first_name}-{last_name}" | take 1')
+        ip, 'from author | select foo = f"{first_name}-{last_name}" | take 1'
+    )
     assert dframe.foo[0] == "William-Shakespeare"
 
 

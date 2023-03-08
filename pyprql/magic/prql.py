@@ -97,8 +97,10 @@ class PrqlMagic(SqlMagic):
         local_ns = local_ns or {}
         # If cell is occupied, parsed to SQL
         if cell:
-            cell = compile(cell, CompileOptions(target=self.target,
-                           format=True, signature_comment=True))
+            cell = compile(
+                cell,
+                CompileOptions(target=self.target, format=True, signature_comment=True),
+            )
 
         result = super().execute(line=line, cell=cell, local_ns=local_ns)
         return result
