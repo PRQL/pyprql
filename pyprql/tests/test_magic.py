@@ -278,11 +278,11 @@ def test_target_dialect(ip):
 
 
 def test_without_target(ip, capsys):
-    run_prql(
-        ip, 'from author | select foo = f"{first_name}-{last_name}" | take 1'
-    )
+    run_prql(ip, 'from author | select foo = f"{first_name}-{last_name}" | take 1')
     captured = capsys.readouterr()
-    assert captured.out.startswith("(sqlite3.OperationalError) no such function: CONCAT")
+    assert captured.out.startswith(
+        "(sqlite3.OperationalError) no such function: CONCAT"
+    )
 
 
 def test_csv(ip):
