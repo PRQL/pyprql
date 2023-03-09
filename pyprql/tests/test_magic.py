@@ -269,6 +269,22 @@ def test_autopandas(ip):
     assert dframe.name[0] == "foo"
 
 
+def test_target_dialect(ip):
+    ip.run_line_magic("config", 'PrqlMagic.target = "sql.sqlite"')
+    dframe = run_prql(
+        ip, 'from author | select foo = f"{first_name}-{last_name}" | take 1'
+    )
+    assert dframe.foo[0] == "William-Shakespeare"
+
+
+def test_without_target(ip, capsys):
+    run_prql(ip, 'from author | select foo = f"{first_name}-{last_name}" | take 1')
+    captured = capsys.readouterr()
+    assert captured.out.startswith(
+        "(sqlite3.OperationalError) no such function: CONCAT"
+    )
+
+
 def test_csv(ip):
     ip.run_line_magic("config", "SqlMagic.autopandas = False")  # uh-oh
     result = run_prql(ip, "from test")

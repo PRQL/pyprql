@@ -3,9 +3,9 @@ from __future__ import annotations
 
 from IPython.core.magic import cell_magic, line_magic, magics_class, needs_local_scope
 from IPython.core.magic_arguments import argument, magic_arguments
-from prql_python import compile
+from prql_python import compile, CompileOptions
 from sql.magic import SqlMagic
-from traitlets import Bool
+from traitlets import Bool, Unicode
 
 
 @magics_class
@@ -39,6 +39,7 @@ class PrqlMagic(SqlMagic):
     )
     autoview = Bool(True, config=True, help="Display results")
     feedback = Bool(False, config=True, help="Print number of rows affected by DML")
+    target = Unicode("sql.any", config=True, help="Compile target of prql-compiler")
 
     @needs_local_scope
     @line_magic("prql")
@@ -96,7 +97,10 @@ class PrqlMagic(SqlMagic):
         local_ns = local_ns or {}
         # If cell is occupied, parsed to SQL
         if cell:
-            cell = compile(cell)
+            cell = compile(
+                cell,
+                CompileOptions(target=self.target, format=True, signature_comment=True),
+            )
 
         result = super().execute(line=line, cell=cell, local_ns=local_ns)
         return result

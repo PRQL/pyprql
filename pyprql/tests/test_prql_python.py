@@ -22,6 +22,12 @@ def test_df_accessor():
     assert res.iloc[1]["latitude"] == 3
 
 
+def test_target_dialect():
+    df = pd.DataFrame({"foo": ["a"], "bar": ["b"]})
+    res = df.prql.query("select ![bar]")  # duckdb supports EXCLUDE
+    assert len(res.columns) == 1
+
+
 def test_df_supports_grouped_aggs():
     rows = {
         "title": ["ceo", "developer", "wizard"],
