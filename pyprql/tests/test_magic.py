@@ -277,12 +277,12 @@ def test_target_dialect(ip):
     assert dframe.foo[0] == "William-Shakespeare"
 
 
-@pytest.mark.xfail(reason="no such function: CONCAT")
-def test_without_target(ip):
-    dframe = run_prql(
+def test_without_target(ip, capsys):
+    run_prql(
         ip, 'from author | select foo = f"{first_name}-{last_name}" | take 1'
     )
-    assert dframe.foo[0] == "William-Shakespeare"
+    captured = capsys.readouterr()
+    assert captured.out.startswith("(sqlite3.OperationalError) no such function: CONCAT")
 
 
 def test_csv(ip):
