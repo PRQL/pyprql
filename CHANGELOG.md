@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.1 (2023-03-12)
+### Fix
+* Skip version 0.6.0 releasing and prepare for 0.6.1 ([#147](https://github.com/PRQL/pyprql/issues/147)) ([`8ce14ee`](https://github.com/PRQL/pyprql/commit/8ce14eea63e5a735b7d6517e4538f1c78af9e99a))
+
 ## v0.6.0 (2023-03-12)
 ### Feature
 * Prepare for next release (based on prql-python 0.6.0) ([#142](https://github.com/PRQL/pyprql/issues/142)) ([`05e0adf`](https://github.com/PRQL/pyprql/commit/05e0adff1bfe7b38955f7bed6afce68ffb4fa084))
