@@ -9,7 +9,7 @@ on:
 
 jobs:
   release:
-    # Run if we have a label `release` on a merged PR
+    # Run if we have a label `release` on a merged PR or it's run manually
     if: (github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'pr-release')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
