@@ -18,6 +18,23 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Python
+        uses: actions/setup-python@v4
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ inputs.poetry_version }}
+
+      - name: Cache Pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.pip
+          key: ${{ runner.os }}-pip
+          restore-keys: ${{ runner.os }}-pip
+
+      - run: poetry install
+
       - name: Configure git
         run: |
           git config --global user.name 'GitHub Actions'

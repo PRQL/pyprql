@@ -2,15 +2,6 @@
 
 <!--next-version-placeholder-->
 
-## v0.6.0 (2023-03-12)
-### Feature
-* Prepare for next release (based on prql-python 0.6.0) ([#142](https://github.com/PRQL/pyprql/issues/142)) ([`05e0adf`](https://github.com/PRQL/pyprql/commit/05e0adff1bfe7b38955f7bed6afce68ffb4fa084))
-* Support target option ([#140](https://github.com/PRQL/pyprql/issues/140)) ([`393bc65`](https://github.com/PRQL/pyprql/commit/393bc65690fc4e31d863708e1564a68225c7624d))
-* Upgrade to prql-python 0.4 ([#129](https://github.com/PRQL/pyprql/issues/129)) ([`ba5afa8`](https://github.com/PRQL/pyprql/commit/ba5afa80fb27b8d998c39789f110c4e1ce1904de))
-
-### Documentation
-* Fix docs build ([#118](https://github.com/PRQL/pyprql/issues/118)) ([`c7e7365`](https://github.com/PRQL/pyprql/commit/c7e73656c27b7891dc61053b5cca4b64c299e555))
-
 ## v0.5.13 (2022-12-27)
 
 ### Fix
