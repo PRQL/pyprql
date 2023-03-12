@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.2 (2023-03-12)
+### Fix
+* Run semantic-release via poetry run in ci ([#148](https://github.com/PRQL/pyprql/issues/148)) ([`af6e753`](https://github.com/PRQL/pyprql/commit/af6e75358c66ac76bfad8ed75dc03259d0333cb5))
+
 ## v0.6.1 (2023-03-12)
 ### Fix
 * Skip version 0.6.0 releasing and prepare for 0.6.1 ([#147](https://github.com/PRQL/pyprql/issues/147)) ([`8ce14ee`](https://github.com/PRQL/pyprql/commit/8ce14eea63e5a735b7d6517e4538f1c78af9e99a))
