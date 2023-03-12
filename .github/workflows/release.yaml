@@ -41,8 +41,9 @@ jobs:
           git config --global user.email 'gha@prql-lang.org'
 
       - name: Python Semantic Release
-        uses: python-semantic-release/python-semantic-release@v7.33.2
-        with:
-          github_token: ${{ secrets.PRQL_BOT_GH_TOKEN }}
-          repository_username: __token__
-          repository_password: ${{ secrets.PYPI_TOKEN }}
+        env:
+          GH_TOKEN: ${{ secrets.PRQL_BOT_GH_TOKEN }}
+          REPOSITORY_USERNAME: __token__
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          poetry run semantic-release -v DEBUG publish
