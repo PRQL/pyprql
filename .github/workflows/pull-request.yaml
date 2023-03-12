@@ -37,7 +37,7 @@ jobs:
         run: poetry run pytest
       - name: Upload to codecov
         if: matrix.os == 'ubuntu-latest'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
