@@ -28,8 +28,8 @@ Then, to run static checks, run:
 pre-commit run -a
 ```
 
-Pre-commit will automatically run [black][black], [isort][isort], [mypy][mypy],
-and a suite of [flake8][flake8]-based linters. When you push a change, GitHub
+Pre-commit will automatically run [black][black], [mypy][mypy],
+and ruff. When you push a change, GitHub
 Actions will trigger a more robust suit using Nox, including security check and
 automated documentation building.
 
@@ -65,9 +65,7 @@ them (in `pyproject.toml` and `pyprql/__init__.py`) manually.
 [nox]: https://nox.thea.codes/en/stable/ "Nox"
 [pre-commit]: https://pre-commit.com/ "Pre-commit"
 [black]: https://github.com/psf/black "Black"
-[isort]: https://pycqa.github.io/isort/ "iSort"
 [mypy]: https://mypy.readthedocs.io/en/stable/index.html "Mypy"
-[flake8]: https://flake8.pycqa.org/en/latest/ "Flake8"
 [psr]: https://github.com/relekang/python-semantic-release "Python Semantic Release"
 [cz]: https://commitizen-tools.github.io/commitizen/index.html "Commitizen"
 [docstrings]: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html "Numpy Napoleon Docstrings"
