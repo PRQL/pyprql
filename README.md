@@ -13,6 +13,7 @@ pyprql contains:
 
 - pyprql.pandas_accessor — Pandas integration for PRQL
 - pyprql.magic — IPython magic for connecting to databases using `%%prql`
+- pyprql.compile — An export of `prql-python`'s `compile` function
 
 For docs, check out the [pyprql docs](https://pyprql.readthedocs.io/), and the
 [PRQL Book][prql_docs].
@@ -50,6 +51,29 @@ In [4]: %%prql results <<
    ...: aggregate [min unitsInStock, max unitsInStock]
 
 ```
+
+### Compilation
+
+This library exposes `prql-python.compile`, so we can simply generate SQL:
+
+```python
+import pyprql
+pyprql.compile("from artists | select track")
+print(pyprql.compile("from artists | select track"))
+```
+
+...returns...
+
+```sql
+SELECT
+  track
+FROM
+  artists
+```
+
+For context, `prql-python` is the Python binding for `prql-compiler`, so only
+contains functions for compilation; and this library offers broader python
+integrations and tooling.
 
 ## Support
 
