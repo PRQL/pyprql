@@ -284,13 +284,12 @@ def test_without_target(ip, capsys):
         "(sqlite3.OperationalError) no such function: CONCAT"
     )
 
+
 def test_dryrun(ip, capsys):
-    ip.run_line_magic("config", 'PrqlMagic.dryrun = True')
-    result=run_prql(ip, 'from a | select b = f"{c}-{d}"')
+    ip.run_line_magic("config", "PrqlMagic.dryrun = True")
+    result = run_prql(ip, 'from a | select b = f"{c}-{d}"')
     captured = capsys.readouterr()
-    assert captured.out.startswith(
-        "\nSELECT\n  CONCAT"
-    )
+    assert captured.out.startswith("\nSELECT\n  CONCAT")
     assert result is None
 
 
