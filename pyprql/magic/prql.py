@@ -4,8 +4,10 @@ from __future__ import annotations
 from IPython.core.magic import cell_magic, line_magic, magics_class, needs_local_scope
 from IPython.core.magic_arguments import argument, magic_arguments
 from prql_python import compile, CompileOptions
+from sql import parse
 from sql.magic import SqlMagic
 from traitlets import Bool, Unicode
+import re
 
 
 @magics_class
@@ -76,7 +78,7 @@ class PrqlMagic(SqlMagic):
         type=str,
         help="specify dictionary of connection arguments to pass to SQL driver",
     )
-    @argument("-f", "--file", type=str, help="Run SQL from file at this path")
+    @argument("-f", "--file", type=str, help="Run PRQL from file at this path")
     def prql(
         self, line: str = "", cell: str = "", local_ns: dict | None = None
     ) -> None:
@@ -95,6 +97,11 @@ class PrqlMagic(SqlMagic):
             None
         """
         local_ns = local_ns or {}
+        self.args = parse.magic_args(self.execute, line)
+        if self.args.file:
+            with open(self.args.file, "r") as infile:
+                cell = infile.read()
+            line = re.sub(r"(\-f|\-\-file)\s+" + self.args.file, "", line)
         # If cell is occupied, parsed to SQL
         if cell:
             cell = compile(
