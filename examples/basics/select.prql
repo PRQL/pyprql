@@ -1,6 +1,0 @@
-from t:tracks
-select [
-    t.Milliseconds | as float,
-    t.Bytes,
-    t.Composer
-]
