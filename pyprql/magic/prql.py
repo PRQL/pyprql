@@ -40,6 +40,7 @@ class PrqlMagic(SqlMagic):
     autoview = Bool(True, config=True, help="Display results")
     feedback = Bool(False, config=True, help="Print number of rows affected by DML")
     target = Unicode("sql.any", config=True, help="Compile target of prql-compiler")
+    dryrun = Bool(False, config=True, help="Only print the compiled SQL")
 
     @needs_local_scope
     @line_magic("prql")
@@ -101,6 +102,8 @@ class PrqlMagic(SqlMagic):
                 cell,
                 CompileOptions(target=self.target, format=True, signature_comment=True),
             )
-
+        if self.dryrun:
+            print(cell)
+            return None
         result = super().execute(line=line, cell=cell, local_ns=local_ns)
         return result
