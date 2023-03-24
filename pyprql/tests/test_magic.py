@@ -308,22 +308,23 @@ def test_csv_to_file(ip):
             assert len(content.splitlines()) == 3
 
 
-@pytest.mark.skip("We only support pandas")
 def test_sql_from_file(ip):
-    ip.run_line_magic("config", "SqlMagic.autopandas = False")
+    ip.run_line_magic("config", "PrqlMagic.autopandas = False")
     with tempfile.TemporaryDirectory() as tempdir:
         fname = os.path.join(tempdir, "test.sql")
         with open(fname, "w") as tempf:
             tempf.write("from test")
-        result = ip.run_cell("%sql --file " + fname)
+        result = ip.run_cell("%prql --file " + fname)
+        assert result.result == [(1, "foo"), (2, "bar")]
+        result = ip.run_cell("%prql -f " + fname)
         assert result.result == [(1, "foo"), (2, "bar")]
 
 
 def test_sql_from_nonexistent_file(ip):
-    ip.run_line_magic("config", "SqlMagic.autopandas = False")
+    ip.run_line_magic("config", "PrqlMagic.autopandas = False")
     with tempfile.TemporaryDirectory() as tempdir:
         fname = os.path.join(tempdir, "nonexistent.sql")
-        result = ip.run_cell("%sql --file " + fname)
+        result = ip.run_cell("%prql --file " + fname)
         assert isinstance(result.error_in_exec, FileNotFoundError)
 
 
