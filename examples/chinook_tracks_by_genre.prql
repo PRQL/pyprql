@@ -1,6 +1,0 @@
-from t:tracks
-join g:genres [ GenreId ]
-select g.GenreId
-derive [ genre: g.Name ]
-aggregate by:g.Name [ track_count: t.TrackId | count ]
-sort track_count order:desc
