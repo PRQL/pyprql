@@ -285,6 +285,14 @@ def test_without_target(ip, capsys):
     )
 
 
+def test_dryrun(ip, capsys):
+    ip.run_line_magic("config", "PrqlMagic.dryrun = True")
+    result = run_prql(ip, 'from a | select b = f"{c}-{d}"')
+    captured = capsys.readouterr()
+    assert captured.out.startswith("\nSELECT\n  CONCAT")
+    assert result is None
+
+
 def test_csv(ip):
     ip.run_line_magic("config", "SqlMagic.autopandas = False")  # uh-oh
     result = run_prql(ip, "from test")
