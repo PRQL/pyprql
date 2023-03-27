@@ -31,6 +31,11 @@ def test_html(ip):
     assert "<td>foo</td>" in result._repr_html_().lower()
 
 
+def test_line_magic(ip):
+    result = ip.run_line_magic("prql", "from      test   |     select [name]")
+    assert "foo" in str(result)
+
+
 @pytest.mark.skip(reason="We only support pandas")
 def test_print(ip):
     result = run_prql(ip, "from test")
