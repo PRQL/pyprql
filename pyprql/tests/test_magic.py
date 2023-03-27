@@ -57,14 +57,12 @@ def test_multi_sql(ip):
     assert "Shakespeare" in str(result) and "Brecht" in str(result)
 
 
-@pytest.mark.xfail(reason="Not supported in PRQL")
 def test_result_var(ip, capsys):
-    ip.run_line_magic("prql", "sqlite://")
+    ip.run_line_magic("config", "SqlMagic.autopandas = False")
     ip.run_cell_magic(
         "prql",
-        "sqlite://",
+        "sqlite:// x <<",
         """
-        x <<
         from author
         select last_name
         """,
@@ -100,12 +98,12 @@ def test_access_results_by_keys(ip):
 
 
 def test_duplicate_column_names_accepted(ip):
+    ip.run_line_magic("config", "SqlMagic.autopandas = False")
     result = ip.run_cell_magic(
-        "sql",
-        "",
+        "prql",
+        "sqlite://",
         """
-        sqlite://
-        SELECT last_name, last_name FROM author;
+        from author | select [last_name, last_name]
         """,
     )
     assert ("Brecht", "Brecht") in result
