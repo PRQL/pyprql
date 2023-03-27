@@ -133,19 +133,11 @@ Returning data to local variable results
 
 Now, the output of the query is saved to `results`.
 
-:::{Note}
-
-Unlike `IPython-SQL`, we currently only support queries in a cell magic (i.e.
-`%%prql`), and not a line magic (i.e. `%prql`). So the following will **not**
-work:
+We can also use a line magic to capture the results like this:
 
 ```
-In [4]: %prql from data | select freq
+In [7]: results = %prql from p = `products.csv` | aggregate [min unitsInStock, max unitsInStock]
 ```
-
-This mainly to work around some parsing challenges,
-and it may be added as a feature in a future release.
-:::
 
 ## Configuration
 
@@ -155,7 +147,7 @@ should you need to change settings,
 a list of settings is available using the `%config` line magic.
 
 ```
-In [7]: %config PrqlMagic
+In [8]: %config PrqlMagic
 PrqlMagic(SqlMagic) options
 -------------------------
 PrqlMagic.autocommit=<Bool>
@@ -180,6 +172,9 @@ PrqlMagic.displaylimit=<Int>
     Automatically limit the number of rows displayed (full result set is still
     stored)
     Current: None
+PrqlMagic.dryrun=<Bool>
+    Only print the compiled SQL
+    Current: False
 PrqlMagic.dsn_filename=<Unicode>
     Path to DSN file. When the first argument is of the form [section], a
     sqlalchemy connection string is formed from the matching section in the DSN
@@ -187,7 +182,7 @@ PrqlMagic.dsn_filename=<Unicode>
     Current: 'odbc.ini'
 PrqlMagic.feedback=<Bool>
     Print number of rows affected by DML
-    Current: True
+    Current: False
 PrqlMagic.short_errors=<Bool>
     Don't display the full traceback on SQL Programming Error
     Current: True
@@ -195,13 +190,16 @@ PrqlMagic.style=<Unicode>
     Set the table printing style to any of prettytable's defined styles
     (currently DEFAULT, MSWORD_FRIENDLY, PLAIN_COLUMNS, RANDOM)
     Current: 'DEFAULT'
+PrqlMagic.target=<Unicode>
+    Compile target of prql-compiler
+    Current: 'sql.any'
 ```
 
 If you want to change any of these,
 you can do that with the `%config` line magic as well.
 
 ```
-In [7]: %config PrqlMagic.autoview = False
+In [9]: %config PrqlMagic.autoview = False
 ```
 
 [jupysql]: https://github.com/ploomber/jupysql

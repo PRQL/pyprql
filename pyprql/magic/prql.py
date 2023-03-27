@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 from IPython.core.magic import cell_magic, line_magic, magics_class, needs_local_scope
-from IPython.core.magic_arguments import argument, magic_arguments
+from IPython.core.magic_arguments import argument, magic_arguments, parse_argstring
 from prql_python import compile, CompileOptions
-from sql import parse
 from sql.magic import SqlMagic
+from sql.parse import parse
 from traitlets import Bool, Unicode
 import re
 
@@ -69,6 +69,12 @@ class PrqlMagic(SqlMagic):
         help="create a table name in the database from the named DataFrame",
     )
     @argument(
+        "-n",
+        "--no-index",
+        action="store_true",
+        help="Do not store Data Frame index when persisting",
+    )
+    @argument(
         "--append",
         action="store_true",
         help="create, or append to, a table name in the database from the named DataFrame",
@@ -85,20 +91,18 @@ class PrqlMagic(SqlMagic):
     ) -> None:
         """Create the PRQL magic.
 
-        To handle parsing to PRQL, there is one limitation relative to the `original
-        <https://github.com/ploomber/jupysql>`_ ``%%sql`` magic. Namely, line magics can
-        only be used to pass connection strings and arguments.
-
-        To figure out whether the ``line`` argument contained PRQL or not required heavy
-        parsing followed by recosntruction of the input to pass on to the ``%sql`` magic
-        we are wrapping, so we avoid it.
-
         Returns
         -------
             None
         """
         local_ns = local_ns or {}
-        self.args = parse.magic_args(self.execute, line)
+        self.args = parse_argstring(self.execute, line)
+        line_prql = parse(" ".join(self.args.line), self.execute)["sql"]
+        if line_prql and not self.args.persist and not self.args.append:
+            cell = line_prql + "\n" + cell
+            _escaped_prql = re.escape(line_prql)
+            _pattern = re.sub(r"\\\s", r"\\s+", _escaped_prql)
+            line = re.sub(_pattern, "", line)
         if self.args.file:
             with open(self.args.file, "r") as infile:
                 cell = infile.read()

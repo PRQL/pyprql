@@ -31,6 +31,11 @@ def test_html(ip):
     assert "<td>foo</td>" in result._repr_html_().lower()
 
 
+def test_line_magic(ip):
+    result = ip.run_line_magic("prql", "from      test   |     select [name]")
+    assert "foo" in str(result)
+
+
 @pytest.mark.skip(reason="We only support pandas")
 def test_print(ip):
     result = run_prql(ip, "from test")
@@ -57,14 +62,12 @@ def test_multi_sql(ip):
     assert "Shakespeare" in str(result) and "Brecht" in str(result)
 
 
-@pytest.mark.xfail(reason="Not supported in PRQL")
 def test_result_var(ip, capsys):
-    ip.run_line_magic("prql", "sqlite://")
+    ip.run_line_magic("config", "SqlMagic.autopandas = False")
     ip.run_cell_magic(
         "prql",
-        "sqlite://",
+        "sqlite:// x <<",
         """
-        x <<
         from author
         select last_name
         """,
@@ -100,67 +103,64 @@ def test_access_results_by_keys(ip):
 
 
 def test_duplicate_column_names_accepted(ip):
+    ip.run_line_magic("config", "SqlMagic.autopandas = False")
     result = ip.run_cell_magic(
-        "sql",
-        "",
+        "prql",
+        "sqlite://",
         """
-        sqlite://
-        SELECT last_name, last_name FROM author;
+        from author | select [last_name, last_name]
         """,
     )
     assert ("Brecht", "Brecht") in result
 
 
-@pytest.mark.xfail(reason="Need to resolve line vs cell magic")
 def test_persist(ip):
-    # This currently fails
+    ip.run_line_magic("config", "SqlMagic.autopandas = False")
     run_prql(ip, "")
-    ip.run_cell("results = %sql SELECT * FROM test")
+    ip.run_cell("results = %prql from test")
     ip.run_cell("results_dframe = results.DataFrame()")
     ip.run_cell("%sql --persist sqlite:// results_dframe")
-    persisted = run_prql(ip, "SELECT * FROM results_dframe")
+    persisted = run_prql(ip, "from results_dframe")
     assert persisted == [(0, 1, "foo"), (1, 2, "bar")]
 
 
-@pytest.mark.xfail(reason="Need to resolve line vs cell magic")
 def test_persist_no_index(ip):
+    ip.run_line_magic("config", "SqlMagic.autopandas = False")
     run_prql(ip, "")
-    ip.run_cell("results = %sql from test")
+    ip.run_cell("results = %prql from test")
     ip.run_cell("results_no_index = results.DataFrame()")
-    ip.run_cell("%sql --persist sqlite:// results_no_index --no-index")
-    persisted = run_prql(ip, "SELECT * FROM results_no_index")
+    ip.run_cell("%prql --persist sqlite:// results_no_index --no-index")
+    persisted = run_prql(ip, "from results_no_index")
     assert persisted == [(1, "foo"), (2, "bar")]
 
 
-@pytest.mark.xfail(reason="Need to resolve line vs cell magic")
 def test_append(ip):
+    ip.run_line_magic("config", "SqlMagic.autopandas = False")
     run_prql(ip, "")
-    ip.run_cell("results = %sql from test")
+    ip.run_cell("results = %prql from test")
     ip.run_cell("results_dframe_append = results.DataFrame()")
-    ip.run_cell("%sql --persist sqlite:// results_dframe_append")
-    persisted = run_prql(ip, "SELECT COUNT(*) FROM results_dframe_append")
-    ip.run_cell("%sql --append sqlite:// results_dframe_append")
-    appended = run_prql(ip, "SELECT COUNT(*) FROM results_dframe_append")
+    ip.run_cell("%prql --persist sqlite:// results_dframe_append")
+    persisted = run_prql(ip, "from results_dframe_append")
+    ip.run_cell("%prql --append sqlite:// results_dframe_append")
+    appended = run_prql(ip, "from results_dframe_append")
     assert appended[0][0] == persisted[0][0] * 2
 
 
-@pytest.mark.xfail(reason="Need to resolve line vs cell magic")
 def test_persist_nonexistent_raises(ip):
     run_prql(ip, "")
-    result = ip.run_cell("%sql --persist sqlite:// no_such_dataframe")
+    result = ip.run_cell("%prql --persist sqlite:// no_such_dataframe")
     assert result.error_in_exec
 
 
-@pytest.mark.xfail(reason="Need to resolve line vs cell magic")
 def test_persist_non_frame_raises(ip):
     ip.run_cell("not_a_dataframe = 22")
     run_prql(ip, "")
-    result = ip.run_cell("%sql --persist sqlite:// not_a_dataframe")
+    result = ip.run_cell("%prql --persist sqlite:// not_a_dataframe")
     assert result.error_in_exec
 
 
 def test_persist_bare(ip):
-    result = ip.run_cell("%sql --persist sqlite://")
+    result = ip.run_cell("%prql --persist sqlite://")
     assert result.error_in_exec
 
 
@@ -289,7 +289,7 @@ def test_dryrun(ip, capsys):
     ip.run_line_magic("config", "PrqlMagic.dryrun = True")
     result = run_prql(ip, 'from a | select b = f"{c}-{d}"')
     captured = capsys.readouterr()
-    assert captured.out.startswith("\nSELECT\n  CONCAT")
+    assert captured.out.startswith("SELECT\n  CONCAT")
     assert result is None
 
 
