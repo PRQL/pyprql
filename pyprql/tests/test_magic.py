@@ -121,13 +121,13 @@ def test_persist(ip):
     assert persisted == [(0, 1, "foo"), (1, 2, "bar")]
 
 
-@pytest.mark.xfail(reason="Need to resolve line vs cell magic")
 def test_persist_no_index(ip):
+    ip.run_line_magic("config", "SqlMagic.autopandas = False")
     run_prql(ip, "")
-    ip.run_cell("results = %sql from test")
+    ip.run_cell("results = %prql from test")
     ip.run_cell("results_no_index = results.DataFrame()")
-    ip.run_cell("%sql --persist sqlite:// results_no_index --no-index")
-    persisted = run_prql(ip, "SELECT * FROM results_no_index")
+    ip.run_cell("%prql --persist sqlite:// results_no_index --no-index")
+    persisted = run_prql(ip, "from results_no_index")
     assert persisted == [(1, "foo"), (2, "bar")]
 
 

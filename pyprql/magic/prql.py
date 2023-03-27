@@ -69,6 +69,12 @@ class PrqlMagic(SqlMagic):
         help="create a table name in the database from the named DataFrame",
     )
     @argument(
+        "-n",
+        "--no-index",
+        action="store_true",
+        help="Do not store Data Frame index when persisting",
+    )
+    @argument(
         "--append",
         action="store_true",
         help="create, or append to, a table name in the database from the named DataFrame",
