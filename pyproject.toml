@@ -69,6 +69,7 @@ version_toml = [
 version_variable = [
   "pyprql/__init__.py:__version__",
 ]
+major_on_zero = false
 
 [tool.pytest.ini_options]
 addopts = """
