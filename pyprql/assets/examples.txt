@@ -1,5 +1,0 @@
-                    SQL  : SELECT * from employees
-                    [sandy_brown]PRQL : from employees[/sandy_brown]
-
-                    SQL  : SELECT name, salary from employees WHERE salary > 100000
-                    [sandy_brown]PRQL : from employees | select \[name,salary] | filter salary > 100000[/sandy_brown]
