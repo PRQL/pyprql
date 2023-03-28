@@ -1,2 +1,0 @@
-    Command [cornflower_blue bold]show tables[/cornflower_blue bold]: To show all tables in the database.
-    Command [cornflower_blue bold]show columns ${table}[/cornflower_blue bold]: To show all columns in a table

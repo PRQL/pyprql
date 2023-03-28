@@ -1,1 +1,0 @@
-Tab to complete suggestions (in white). Alt-f to complete history (in grey).
