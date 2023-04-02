@@ -23,7 +23,7 @@ repository = "https://github.com/prql/pyprql"
 version = "0.6.2"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 
 duckdb-engine = "^0.7"
 ipython = "^8"
