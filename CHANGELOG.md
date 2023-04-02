@@ -2,6 +2,22 @@
 
 <!--next-version-placeholder-->
 
+## v0.7.0 (2023-04-02)
+### Feature
+* **magic:** Support PRQL query in line magic ([#160](https://github.com/PRQL/pyprql/issues/160)) ([`0b0f8d8`](https://github.com/PRQL/pyprql/commit/0b0f8d87f780930d6dd8852cdcbb52353baed2da))
+* **magic:** Add `dryrun` config option to only print SQL output ([#159](https://github.com/PRQL/pyprql/issues/159)) ([`b5a602f`](https://github.com/PRQL/pyprql/commit/b5a602f2873c43666b6fed0d4423270c27e0f484))
+
+### Fix
+* Fix python versions ([#165](https://github.com/PRQL/pyprql/issues/165)) ([`fb70408`](https://github.com/PRQL/pyprql/commit/fb70408e183f4d94c103200362702f1274dd4c92))
+* Fix GitHub Actions workflows and more python versions support ([#164](https://github.com/PRQL/pyprql/issues/164)) ([`0901392`](https://github.com/PRQL/pyprql/commit/0901392fe4f698acb3db6d9b9fc9b039782643ae))
+* **magic:** Support `.prql` file with the `--file` arg option ([#158](https://github.com/PRQL/pyprql/issues/158)) ([`98dfcab`](https://github.com/PRQL/pyprql/commit/98dfcabecef0db540c11e59fce8c2c7c667176ba))
+
+### Breaking
+* remove deprecated cli module and update dependencies ([#162](https://github.com/PRQL/pyprql/issues/162)) ([`89e1199`](https://github.com/PRQL/pyprql/commit/89e11996a9f46ea6e16b07c8cba253f2d4e8341b))
+
+### Documentation
+* Add `compile` function ([#154](https://github.com/PRQL/pyprql/issues/154)) ([`917062e`](https://github.com/PRQL/pyprql/commit/917062e0850a96c6d7e9623abfb3f0a9c9397263))
+
 ## v0.6.2 (2023-03-12)
 ### Fix
 * Run semantic-release via poetry run in ci ([#148](https://github.com/PRQL/pyprql/issues/148)) ([`af6e753`](https://github.com/PRQL/pyprql/commit/af6e75358c66ac76bfad8ed75dc03259d0333cb5))
