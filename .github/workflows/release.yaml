@@ -1,16 +1,10 @@
 name: release
 on:
-  pull_request:
-    types:
-      - closed
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
   release:
-    # Run if we have a label `release` on a merged PR or it's run manually
-    if: (github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'pr-release')) || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,8 +17,6 @@ jobs:
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
-        with:
-          version: ${{ inputs.poetry_version }}
 
       - name: Cache Pip
         uses: actions/cache@v3
