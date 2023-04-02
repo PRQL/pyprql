@@ -35,7 +35,7 @@ jobs:
       - name: Test Code and Docs
         run: poetry run pytest
       - name: Upload to codecov
-        if: runner.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
