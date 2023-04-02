@@ -900,14 +900,14 @@ files = [
 
 [[package]]
 name = "ipython"
-version = "8.11.0"
+version = "8.12.0"
 description = "IPython: Productive Interactive Computing"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "ipython-8.11.0-py3-none-any.whl", hash = "sha256:5b54478e459155a326bf5f42ee4f29df76258c0279c36f21d71ddb560f88b156"},
-    {file = "ipython-8.11.0.tar.gz", hash = "sha256:735cede4099dbc903ee540307b9171fbfef4aa75cfcacc5a273b2cda2f02be04"},
+    {file = "ipython-8.12.0-py3-none-any.whl", hash = "sha256:1c183bf61b148b00bcebfa5d9b39312733ae97f6dad90d7e9b4d86c8647f498c"},
+    {file = "ipython-8.12.0.tar.gz", hash = "sha256:a950236df04ad75b5bc7f816f9af3d74dc118fd42f2ff7e80e8e60ca1f182e2d"},
 ]
 
 [package.dependencies]
@@ -923,6 +923,7 @@ prompt-toolkit = ">=3.0.30,<3.0.37 || >3.0.37,<3.1.0"
 pygments = ">=2.4.0"
 stack-data = "*"
 traitlets = ">=5"
+typing-extensions = {version = "*", markers = "python_version < \"3.10\""}
 
 [package.extras]
 all = ["black", "curio", "docrepr", "ipykernel", "ipyparallel", "ipywidgets", "matplotlib", "matplotlib (!=3.2.0)", "nbconvert", "nbformat", "notebook", "numpy (>=1.21)", "pandas", "pytest (<7)", "pytest (<7.1)", "pytest-asyncio", "qtconsole", "setuptools (>=18.5)", "sphinx (>=1.3)", "sphinx-rtd-theme", "stack-data", "testpath", "trio", "typing-extensions"]
@@ -1533,14 +1534,14 @@ test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.2.2)", "pytest-
 
 [[package]]
 name = "ploomber-core"
-version = "0.2.8"
+version = "0.2.9"
 description = ""
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "ploomber-core-0.2.8.tar.gz", hash = "sha256:3b61e288f8e1ef52720ec59a18b22a3f5a9f8307a2a939fa16636eb0d2e68281"},
-    {file = "ploomber_core-0.2.8-py3-none-any.whl", hash = "sha256:56cc4385af7e794318e87bb00188f027e0bd472c63f86442c06b8cf81bf4ce9d"},
+    {file = "ploomber-core-0.2.9.tar.gz", hash = "sha256:8d8a37a9f16d028e27f79b40ec625062967183a84b1116ca74e162f0d5742ce2"},
+    {file = "ploomber_core-0.2.9-py3-none-any.whl", hash = "sha256:412e34e5714fce82ead660d0cecdd240373f0ceebf145b01f5c106905d19679d"},
 ]
 
 [package.dependencies]
@@ -1569,14 +1570,14 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "posthog"
-version = "2.4.0"
+version = "2.4.2"
 description = "Integrate PostHog into any python application."
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "posthog-2.4.0-py2.py3-none-any.whl", hash = "sha256:864c41bf060b38cba0f43425f6c7f6342ee445da2b89a42d900857d7e4d34962"},
-    {file = "posthog-2.4.0.tar.gz", hash = "sha256:2db7921e376a98da30b6fe7fa8d4490aabbf108fb3e706b67860f8033f457424"},
+    {file = "posthog-2.4.2-py2.py3-none-any.whl", hash = "sha256:8c7c37de997d955aea61bf0aa0069970e71f0d9d79c9e6b3a134e6593d5aa3d6"},
+    {file = "posthog-2.4.2.tar.gz", hash = "sha256:652a628623aab26597e8421a7ddf9caaf19dd93cc1288901a6b23db9693d34e5"},
 ]
 
 [package.dependencies]
@@ -1587,7 +1588,7 @@ requests = ">=2.7,<3.0"
 six = ">=1.5"
 
 [package.extras]
-dev = ["black", "isort", "pre-commit"]
+dev = ["black", "flake8", "flake8-print", "isort", "pre-commit"]
 sentry = ["django", "sentry-sdk"]
 test = ["coverage", "flake8", "freezegun (==0.3.15)", "mock (>=2.0.0)", "pylint", "pytest"]
 
@@ -1657,15 +1658,15 @@ wcwidth = "*"
 
 [[package]]
 name = "prql-python"
-version = "0.6.1"
+version = "0.7.0"
 description = ""
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "prql_python-0.6.1-cp37-abi3-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:94967a14e717046a1f5bf5d36a12d76c4b3044b01f7d58c6b96883a18955def9"},
-    {file = "prql_python-0.6.1-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ad57445e0184a55c0b9a693e4d2673ab9f79ecd09e317395515b36ae35b0b5aa"},
-    {file = "prql_python-0.6.1-cp37-abi3-win_amd64.whl", hash = "sha256:e19cd311ab630a6cf9498da459ac3c7b998d9db0cd1d8b3d29a270fb763fa811"},
+    {file = "prql_python-0.7.0-cp37-abi3-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:8e5f685e4fd9fdddb2c361e4b996b1218bfe42cedbc5632fbe06b50f90cb7c2a"},
+    {file = "prql_python-0.7.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:59e61ef0c0fc1eef08f73229393a64f53dabc8339b718851ebce766c3ffc55ab"},
+    {file = "prql_python-0.7.0-cp37-abi3-win_amd64.whl", hash = "sha256:f77d13dd2be98d0c6637c2d9ec93d0fa9e784b9d41fd6ea76ec070ba17ba7803"},
 ]
 
 [[package]]
@@ -1947,14 +1948,14 @@ test = ["coverage (>=5,<6)", "mock (==1.3.0)", "pytest (>=7,<8)", "pytest-mock (
 
 [[package]]
 name = "pytz"
-version = "2023.2"
+version = "2023.3"
 description = "World timezone definitions, modern and historical"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pytz-2023.2-py2.py3-none-any.whl", hash = "sha256:8a8baaf1e237175b02f5c751eea67168043a749c843989e2b3015aa1ad9db68b"},
-    {file = "pytz-2023.2.tar.gz", hash = "sha256:a27dcf612c05d2ebde626f7d506555f10dfc815b3eddccfaadfc7d99b11c9a07"},
+    {file = "pytz-2023.3-py2.py3-none-any.whl", hash = "sha256:a151b3abb88eda1d4e34a9814df37de2a80e301e68ba0fd856fb9b46bfbbbffb"},
+    {file = "pytz-2023.3.tar.gz", hash = "sha256:1d8ce29db189191fb55338ee6d0387d82ab59f3d00eac103412d64e0ebd0c588"},
 ]
 
 [[package]]
@@ -2274,14 +2275,14 @@ files = [
 
 [[package]]
 name = "setuptools"
-version = "67.6.0"
+version = "67.6.1"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "setuptools-67.6.0-py3-none-any.whl", hash = "sha256:b78aaa36f6b90a074c1fa651168723acbf45d14cb1196b6f02c0fd07f17623b2"},
-    {file = "setuptools-67.6.0.tar.gz", hash = "sha256:2ee892cd5f29f3373097f5a814697e397cf3ce313616df0af11231e2ad118077"},
+    {file = "setuptools-67.6.1-py3-none-any.whl", hash = "sha256:e728ca814a823bf7bf60162daf9db95b93d532948c4c0bea762ce62f60189078"},
+    {file = "setuptools-67.6.1.tar.gz", hash = "sha256:257de92a9d50a60b8e22abfcbb771571fde0dbf3ec234463212027a4eeecbe9a"},
 ]
 
 [package.extras]
@@ -2714,7 +2715,7 @@ urllib3 = ">=1.26.0"
 name = "typing-extensions"
 version = "4.5.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -2840,4 +2841,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "d8ab5860f5afbc21cab5d601f4419070d1903dbf8fd0e5b9829f28ecfc019b34"
+content-hash = "24beb887efe180d73fb27c8ab29f1850efda35ed2c7e003a2d95505152d2bd16"
