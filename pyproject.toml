@@ -26,8 +26,8 @@ python = "^3.8"
 
 duckdb-engine = "^0.7"
 ipython = "^8"
-jupysql = "^0.6"
-pandas = "^1"
+jupysql = ">=0.6"
+pandas = ">=1.5"
 prql-python = "^0.7"
 traitlets = "^5"
 
