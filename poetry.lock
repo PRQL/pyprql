@@ -1590,6 +1590,39 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "polars"
+version = "0.17.2"
+description = "Blazingly fast DataFrame library"
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "polars-0.17.2-cp37-abi3-macosx_10_7_x86_64.whl", hash = "sha256:4631d29af25cebdec89d006afa9fee868138c1be91d6070dc7c8e1f3e9684287"},
+    {file = "polars-0.17.2-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:cb69717eebd52d289eb5bf50dc1e90f380874280c4ef3c25b56b6fbc22b706bc"},
+    {file = "polars-0.17.2-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e01317ea1902cc6ae327598b6998c6c6b8bcd6ff6dff15bad7a78c51231220fa"},
+    {file = "polars-0.17.2-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:96c2e1c99738634eaeb510a724bf1aecc4ecb030cb45a28595d9ceac842300e9"},
+    {file = "polars-0.17.2-cp37-abi3-win_amd64.whl", hash = "sha256:a6d1ba5396a241eabf5ab755c7fb9f18a92bebaa8be5327d7ee1f532823aaba7"},
+    {file = "polars-0.17.2.tar.gz", hash = "sha256:f121ad3515dfc4c0276067870c20585f5e4fa8368efc9cf7ff8c56da4372e312"},
+]
+
+[package.dependencies]
+typing_extensions = {version = ">=4.0.1", markers = "python_version < \"3.11\""}
+
+[package.extras]
+all = ["polars[connectorx,deltalake,fsspec,matplotlib,numpy,pandas,pyarrow,sqlalchemy,timezone,xlsx2csv,xlsxwriter]"]
+connectorx = ["connectorx"]
+deltalake = ["deltalake (>=0.8.0)"]
+fsspec = ["fsspec"]
+matplotlib = ["matplotlib"]
+numpy = ["numpy (>=1.16.0)"]
+pandas = ["pandas", "pyarrow (>=7.0.0)"]
+pyarrow = ["pyarrow (>=7.0.0)"]
+sqlalchemy = ["pandas", "sqlalchemy"]
+timezone = ["backports.zoneinfo", "tzdata"]
+xlsx2csv = ["xlsx2csv (>=0.8.0)"]
+xlsxwriter = ["xlsxwriter"]
+
+[[package]]
 name = "posthog"
 version = "2.5.0"
 description = "Integrate PostHog into any python application."
@@ -2892,4 +2925,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "e9b9d54164c412f396f54ea2a01350db5735010a73606465f98b1cf5db5edc68"
+content-hash = "db1b5a7e87301a42b7c4910ef7266214fbec3ca0d740b3f0268fedee03e4e797"
