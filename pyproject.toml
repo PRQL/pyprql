@@ -26,7 +26,7 @@ python = "^3.8"
 
 duckdb-engine = "^0.7"
 ipython = "^8"
-jupysql = ">=0.6"
+jupysql = ">=0.7"
 pandas = ">=1.5"
 prql-python = "^0.8"
 traitlets = "^5"
@@ -54,6 +54,7 @@ ruff = "^0.0.225"
 safety = "^2"
 sphinx-rtd-theme = "^1.0.0"
 xdoctest = "^0.15.10"
+polars = ">=0.16"
 
 [tool.poetry.scripts]
 pyprql = "pyprql.cli.__init__:main"

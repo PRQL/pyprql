@@ -14,6 +14,7 @@ import re
 import tempfile
 from textwrap import dedent
 
+import polars as pl
 import pytest
 from sqlalchemy import create_engine
 
@@ -262,11 +263,20 @@ def test_bind_vars(ip):
 
 
 def test_autopandas(ip):
-    ip.run_line_magic("config", "SqlMagic.autopandas = True")
     dframe = run_prql(ip, "from test")
     assert not dframe.empty
     assert dframe.ndim == 2
     assert dframe.name[0] == "foo"
+
+
+def test_autopolars(ip):
+    ip.run_line_magic("config", "PrqlMagic.autopolars = True")
+    dframe = run_prql(ip, "from test")
+
+    assert type(dframe) == pl.DataFrame
+    assert not dframe.is_empty()
+    assert len(dframe.shape) == 2
+    assert dframe["name"][0] == "foo"
 
 
 def test_target_dialect(ip):

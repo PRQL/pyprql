@@ -39,6 +39,11 @@ class PrqlMagic(SqlMagic):
         config=True,
         help="Return Pandas DataFrames instead of regular result sets",
     )
+    autopolars = Bool(
+        False,
+        config=True,
+        help="Return Polars DataFrames instead of regular result sets",
+    )
     autoview = Bool(True, config=True, help="Display results")
     feedback = Bool(False, config=True, help="Print number of rows affected by DML")
     target = Unicode("sql.any", config=True, help="Compile target of prql-compiler")

@@ -159,6 +159,9 @@ PrqlMagic.autolimit=<Int>
 PrqlMagic.autopandas=<Bool>
     Return Pandas DataFrames instead of regular result sets
     Current: True
+PrqlMagic.autopolars=<Bool>
+    Return Polars DataFrames instead of regular result sets
+    Current: False
 PrqlMagic.autoview=<Bool>
     Display results
     Current: True
@@ -183,6 +186,10 @@ PrqlMagic.dsn_filename=<Unicode>
 PrqlMagic.feedback=<Bool>
     Print number of rows affected by DML
     Current: False
+PrqlMagic.polars_dataframe_kwargs=<key-1>=<value-1>...
+    Polars DataFrame constructor keyword arguments(e.g. infer_schema_length,
+    nan_to_null, schema_overrides, etc)
+    Current: {}
 PrqlMagic.short_errors=<Bool>
     Don't display the full traceback on SQL Programming Error
     Current: True
