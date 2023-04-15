@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v0.8.0 (2023-04-15)
+### Feature
+* Autopolars support ([#170](https://github.com/PRQL/pyprql/issues/170)) ([`db3edf3`](https://github.com/PRQL/pyprql/commit/db3edf34b08fca5c7129b570de02441f6c4e2c83))
+* Based on prql-python 0.8 ([#169](https://github.com/PRQL/pyprql/issues/169)) ([`0e4a62f`](https://github.com/PRQL/pyprql/commit/0e4a62f086c5abe39a426ecc20ea3285b23fe4b4))
+
+### Breaking
+* based on prql-python 0.8 ([#169](https://github.com/PRQL/pyprql/issues/169)) ([`0e4a62f`](https://github.com/PRQL/pyprql/commit/0e4a62f086c5abe39a426ecc20ea3285b23fe4b4))
+
 ## v0.7.0 (2023-04-02)
 ### Feature
 * **magic:** Support PRQL query in line magic ([#160](https://github.com/PRQL/pyprql/issues/160)) ([`0b0f8d8`](https://github.com/PRQL/pyprql/commit/0b0f8d87f780930d6dd8852cdcbb52353baed2da))
