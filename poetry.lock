@@ -1712,15 +1712,15 @@ wcwidth = "*"
 
 [[package]]
 name = "prql-python"
-version = "0.7.1"
+version = "0.8.0"
 description = ""
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "prql_python-0.7.1-cp37-abi3-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:ac1ebd2e92463d27609d149f81fcfd3986e0e97e30d11811b357a9019ae966ac"},
-    {file = "prql_python-0.7.1-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1dbd055af07e525f9dec344babd65a3aee42ebbde4a95e972bd9789b52e02025"},
-    {file = "prql_python-0.7.1-cp37-abi3-win_amd64.whl", hash = "sha256:60be19174eec321b1fca28ee2df57657006a2e7e2b59da6abab2f5f049760889"},
+    {file = "prql_python-0.8.0-cp37-abi3-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:5702e372aefb5099ad4ad974ef5654d277f9bc7d99a0ebd02e2b818f92c72013"},
+    {file = "prql_python-0.8.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:28420442e23f17d52cfd51fb5ea9016ce696b60218f2983692f20cae51a23edc"},
+    {file = "prql_python-0.8.0-cp37-abi3-win_amd64.whl", hash = "sha256:a37173806c376fa42532742de7addd42639ae05e48264aa75c31c14333c43826"},
 ]
 
 [[package]]
