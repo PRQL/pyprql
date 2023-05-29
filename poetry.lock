@@ -1022,14 +1022,14 @@ i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "jupysql"
-version = "0.7.0"
+version = "0.7.2"
 description = "Better SQL in Jupyter"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "jupysql-0.7.0-py3-none-any.whl", hash = "sha256:ee00ca855af1feb49f0d3b09a09c181fc1f377a319353a899f1207b01014a450"},
-    {file = "jupysql-0.7.0.tar.gz", hash = "sha256:7661403dcb4736f529e152abbb9f0a33e28ab1da41e85dab44cf316f68d49986"},
+    {file = "jupysql-0.7.2-py3-none-any.whl", hash = "sha256:6ee01f3f530fb0780b7a5d5b229da1efa2fb902b1fb40fbc157f365215329389"},
+    {file = "jupysql-0.7.2.tar.gz", hash = "sha256:596200126198640c65e7e52069f4413d46b0091a2f53dcc5b818d5b026e798cb"},
 ]
 
 [package.dependencies]
@@ -1038,13 +1038,13 @@ ipython-genutils = ">=0.1.0"
 jinja2 = "*"
 ploomber-core = ">=0.2.7"
 prettytable = "*"
-sqlalchemy = "<2"
+sqlalchemy = "*"
 sqlglot = ">=11.3.7"
 sqlparse = "*"
 
 [package.extras]
-dev = ["black", "duckdb", "duckdb-engine", "flake8", "invoke", "ipywidgets", "matplotlib", "pandas", "pkgmt", "polars (==0.16.14)", "pyodbc", "pytest", "twine"]
-integration = ["black", "dockerctx", "duckdb", "duckdb-engine", "flake8", "invoke", "ipywidgets", "matplotlib", "pandas", "pgspecial (==2.0.1)", "pkgmt", "polars (==0.16.14)", "psycopg2-binary", "pyarrow", "pymysql", "pyodbc", "pytest", "twine"]
+dev = ["black", "duckdb", "duckdb-engine", "flake8", "invoke", "ipywidgets", "matplotlib", "pandas", "pkgmt", "polars (==0.17.2)", "pyodbc", "pytest", "twine"]
+integration = ["black", "dockerctx", "duckdb", "duckdb-engine", "flake8", "invoke", "ipywidgets", "matplotlib", "pandas", "pgspecial (==2.0.1)", "pkgmt", "polars (==0.17.2)", "psycopg2-binary", "pyarrow", "pymysql", "pyodbc", "pytest", "snowflake-sqlalchemy", "twine"]
 
 [[package]]
 name = "keyring"
