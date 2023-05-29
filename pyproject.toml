@@ -44,7 +44,7 @@ pre-commit = "^3.3.2"
 # pytest-regtest compat
 pytest = "<7.4"
 pytest-clarity = "^1.0.1"
-pytest-cov = "^3.0.0"
+pytest-cov = "^4.1.0"
 pytest-regtest = "*"
 pytest-sugar = "^0.9.4"
 pytest-testmon = "*"
