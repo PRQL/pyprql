@@ -52,7 +52,7 @@ pytest-xdist = "^2.5.0"
 python-semantic-release = "^7.32.2"
 ruff = "^0.0.225"
 safety = "^2"
-sphinx-rtd-theme = "^1.0.0"
+sphinx-rtd-theme = "^1.2.1"
 xdoctest = "^0.15.10"
 polars = ">=0.16"
 
