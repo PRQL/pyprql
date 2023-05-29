@@ -40,7 +40,7 @@ darglint = "^1.8.1"
 mypy = "^0.982"
 myst-parser = "^0.17.0"
 nox = "^2023.4.22"
-pre-commit = "^2.17.0"
+pre-commit = "^3.3.2"
 # pytest-regtest compat
 pytest = "<7.4"
 pytest-clarity = "^1.0.1"
