@@ -330,28 +330,28 @@ development = ["black", "flake8", "mypy", "pytest", "types-colorama"]
 
 [[package]]
 name = "commitizen"
-version = "2.42.1"
+version = "3.2.2"
 description = "Python commitizen client tool"
 category = "dev"
 optional = false
-python-versions = ">=3.6.2,<4.0.0"
+python-versions = ">=3.7,<4.0"
 files = [
-    {file = "commitizen-2.42.1-py3-none-any.whl", hash = "sha256:fad7d37cfae361a859b713d4ac591859d5ca03137dd52de4e1bd208f7f45d5dc"},
-    {file = "commitizen-2.42.1.tar.gz", hash = "sha256:eac18c7c65587061aac6829534907aeb208405b8230bfd35ec08503c228a7f17"},
+    {file = "commitizen-3.2.2-py3-none-any.whl", hash = "sha256:1d967de9d1dc3210947fdbe280b34ac184d83dbe35661f21463cf0305fe670ef"},
+    {file = "commitizen-3.2.2.tar.gz", hash = "sha256:62e06077e657ab6156baa8656a8d5e54db7c5c3f51feab6ea4d7b867ddeab325"},
 ]
 
 [package.dependencies]
-argcomplete = ">=1.12.1,<2.1"
-charset-normalizer = ">=2.1.0,<3.0.0"
+argcomplete = ">=1.12.1,<3.1"
+charset-normalizer = ">=2.1.0,<4"
 colorama = ">=0.4.1,<0.5.0"
-decli = ">=0.5.2,<0.6.0"
+decli = ">=0.6.0,<0.7.0"
+importlib_metadata = ">=4.13,<7"
 jinja2 = ">=2.10.3"
 packaging = ">=19"
 pyyaml = ">=3.08"
 questionary = ">=1.4.0,<2.0.0"
-termcolor = {version = ">=1.1,<3", markers = "python_version >= \"3.7\""}
+termcolor = ">=1.1,<3"
 tomlkit = ">=0.5.3,<1.0.0"
-typing-extensions = ">=4.0.1,<5.0.0"
 
 [[package]]
 name = "coverage"
@@ -476,14 +476,14 @@ files = [
 
 [[package]]
 name = "decli"
-version = "0.5.2"
+version = "0.6.0"
 description = "Minimal, easy-to-use, declarative cli tool"
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 files = [
-    {file = "decli-0.5.2-py3-none-any.whl", hash = "sha256:d3207bc02d0169bf6ed74ccca09ce62edca0eb25b0ebf8bf4ae3fb8333e15ca0"},
-    {file = "decli-0.5.2.tar.gz", hash = "sha256:f2cde55034a75c819c630c7655a844c612f2598c42c21299160465df6ad463ad"},
+    {file = "decli-0.6.0-py3-none-any.whl", hash = "sha256:d5ed1d509f5a6cf765a4d7350f7ffb0be0c1770840cbd38b05fb0aab642645e8"},
+    {file = "decli-0.6.0.tar.gz", hash = "sha256:2915a55525ef2b1a0ce88b8ccba62ac22df5b6ff3ed2094448e0f951f08e7ba5"},
 ]
 
 [[package]]
@@ -2947,4 +2947,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "08d579d4d0979ab15293732c9f3d8e0bc70950686c73908404f3db4c2d7d28b4"
+content-hash = "4b9823e859898410a0512d943924dbe5b9aa372e209c2a10e041e46edc5bcd40"
