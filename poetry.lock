@@ -613,20 +613,20 @@ files = [
 
 [[package]]
 name = "duckdb-engine"
-version = "0.7.0"
+version = "0.7.3"
 description = "SQLAlchemy driver for duckdb"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "duckdb_engine-0.7.0-py3-none-any.whl", hash = "sha256:272f8cb27cf7599372f6b2628c147c41cd656a316272d8ababdcc81447a5455c"},
-    {file = "duckdb_engine-0.7.0.tar.gz", hash = "sha256:3c17b2dba582fe7d74731d6cb52d73eaba7555a31ca602f7837dfc40f9db90c4"},
+    {file = "duckdb_engine-0.7.3-py3-none-any.whl", hash = "sha256:b2dffe1607e87c6bc9d2afd4c43f53f9fc45add8b3c86d276ccbf6ae16cbfcca"},
+    {file = "duckdb_engine-0.7.3.tar.gz", hash = "sha256:a4da04ae3e6bbce8af611b17e09b15212107c8f7871b876a358edfed313ad27d"},
 ]
 
 [package.dependencies]
 duckdb = ">=0.4.0"
 numpy = "*"
-sqlalchemy = ">=1.3.19"
+sqlalchemy = ">=1.3.22"
 
 [[package]]
 name = "exceptiongroup"
