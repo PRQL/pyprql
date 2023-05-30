@@ -40,9 +40,11 @@ darglint = "^1.8.1"
 mypy = "^1.3"
 myst-parser = "^0.18.1"
 nox = "^2023.4.22"
+polars = ">=0.16"
 pre-commit = "^3.3.2"
-# pytest-regtest compat
-pytest = "<7.4"
+pytest = ">7"
+# pytest-regtest compat https://gitlab.com/uweschmitt/pytest-regtest/-/merge_requests/9
+py = "1.11"
 pytest-clarity = "^1.0.1"
 pytest-cov = "^4.1.0"
 pytest-regtest = "*"
@@ -54,7 +56,6 @@ ruff = "^0.0.270"
 safety = "^2"
 sphinx-rtd-theme = "^1.2.1"
 xdoctest = "^1.1.1"
-polars = ">=0.16"
 
 [tool.poetry.scripts]
 pyprql = "pyprql.cli.__init__:main"
@@ -63,6 +64,7 @@ pyprql = "pyprql.cli.__init__:main"
 branch = "main"
 build_command = "poetry build"
 changelog_file = "CHANGELOG.md"
+major_on_zero = false
 upload_to_pypi = true
 upload_to_release = true
 version_toml = [
@@ -71,7 +73,6 @@ version_toml = [
 version_variable = [
   "pyprql/__init__.py:__version__",
 ]
-major_on_zero = false
 
 [tool.pytest.ini_options]
 addopts = """
