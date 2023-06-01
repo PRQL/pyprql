@@ -32,7 +32,7 @@ prql-python = "^0.8"
 traitlets = "^5"
 
 [tool.poetry.dev-dependencies]
-Sphinx = "~5.3"
+Sphinx = "~6.2"
 black = "^23.3.0"
 commitizen = "^3.2.2"
 coverage = "^7.2.7"
