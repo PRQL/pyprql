@@ -38,4 +38,6 @@ jobs:
           REPOSITORY_USERNAME: __token__
           REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          poetry run semantic-release -v DEBUG publish
+          poetry run semantic-release --verbose version
+          poetry run twine upload dist/*
+          poetry run semantic-release --verbose publish

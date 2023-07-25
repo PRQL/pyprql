@@ -60,6 +60,9 @@ xdoctest = "^1.1.1"
 [tool.poetry.scripts]
 pyprql = "pyprql.cli.__init__:main"
 
+[tool.poetry.group.dev.dependencies]
+twine = "^4.0.2"
+
 [tool.semantic_release]
 branch = "main"
 build_command = "poetry build"
