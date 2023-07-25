@@ -6,8 +6,6 @@ jobs:
   prep-release:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
