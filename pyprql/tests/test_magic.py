@@ -33,7 +33,7 @@ def test_html(ip):
 
 
 def test_line_magic(ip):
-    result = ip.run_line_magic("prql", "from      test   |     select [name]")
+    result = ip.run_line_magic("prql", "from      test   |     select {name}")
     assert "foo" in str(result)
 
 
@@ -109,7 +109,7 @@ def test_duplicate_column_names_accepted(ip):
         "prql",
         "sqlite://",
         """
-        from author | select [last_name, last_name]
+        from author | select {last_name, last_name}
         """,
     )
     assert ("Brecht", "Brecht") in result

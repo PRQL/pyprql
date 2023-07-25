@@ -10,13 +10,13 @@ def import_accessor():
 
 def test_pyql_python():
     """It compiles sql from prql."""
-    sql: str = prql.compile("from employees | select [ name, age ]").replace("\n", " ")
+    sql: str = prql.compile("from employees | select {name, age}").replace("\n", " ")
     assert sql.startswith("SELECT   name,   age FROM   employees")
 
 
 def test_df_accessor():
     df = pd.DataFrame({"latitude": [1, 2, 3], "longitude": [1, 2, 3]})
-    res = df.prql.query("select [latitude, longitude] | filter latitude > 1")
+    res = df.prql.query("select {latitude, longitude} | filter latitude > 1")
     assert len(res.index) == 2
     assert res.iloc[0]["latitude"] == 2
     assert res.iloc[1]["latitude"] == 3
@@ -24,7 +24,7 @@ def test_df_accessor():
 
 def test_target_dialect():
     df = pd.DataFrame({"foo": ["a"], "bar": ["b"]})
-    res = df.prql.query("select ![bar]")  # duckdb supports EXCLUDE
+    res = df.prql.query("select !{bar}")  # duckdb supports EXCLUDE
     assert len(res.columns) == 1
 
 
@@ -37,11 +37,11 @@ def test_df_supports_grouped_aggs():
     df = pd.DataFrame(rows)
     res = df.prql.query(
         """
-        group [country] (
-          aggregate [
+        group {country} (
+          aggregate {
             avg_sal = average salary,
-            ct = count
-          ]
+            ct = count this
+          }
         )
         """
     )
@@ -59,21 +59,21 @@ def test_df_supports_grouped_aggs():
 def test_df_big_prql_query():
     q = """
         filter start_date > @2021-01-01
-        derive [
+        derive {
           gross_salary = salary + tax ?? 0,
           gross_cost = gross_salary + benefits_cost,
-        ]
+        }
         filter gross_cost > 0
-        group [title, country] (
-          aggregate [
+        group {title, country} (
+          aggregate {
             avg_gross_salary = average gross_salary,
             sum_gross_cost = sum gross_cost,
-            cnt = count
-          ]
+            cnt = count this
+          }
         )
         filter sum_gross_cost > 100
         derive id = f"{title}_{country}"
-        sort [sum_gross_cost, -country]
+        sort {sum_gross_cost, -country}
         take 1..20
         """
     rows = {
