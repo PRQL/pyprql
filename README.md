@@ -33,7 +33,7 @@ import pandas as pd
 import pyprql.pandas_accessor
 
 df = (...)
-results_df = df.prql.query("select [age,name,occupation] | filter age > 21")
+results_df = df.prql.query("select {age, name, occupation} | filter age > 21")
 ```
 
 ### Jupyter Magic
@@ -44,11 +44,11 @@ In [2]: %prql postgresql://user:password@localhost:5432/database
 In [3]: %%prql
    ...: from p
    ...: group categoryID (
-   ...:   aggregate [average unitPrice]
+   ...:   aggregate {average unitPrice}
    ...: )
 In [4]: %%prql results <<
    ...: from p
-   ...: aggregate [min unitsInStock, max unitsInStock]
+   ...: aggregate {min unitsInStock, max unitsInStock}
 
 ```
 
