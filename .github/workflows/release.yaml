@@ -3,9 +3,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  release:
+  prep-release:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,9 +37,30 @@ jobs:
       - name: Python Semantic Release
         env:
           GH_TOKEN: ${{ secrets.PRQL_BOT_GH_TOKEN }}
-          REPOSITORY_USERNAME: __token__
-          REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          poetry run semantic-release --verbose version
-          poetry run twine upload dist/*
-          poetry run semantic-release --verbose publish
+          poetry run semantic-release --verbose version --skip-build
+          poetry build
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist
+
+  create-release:
+    needs: prep-release
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
