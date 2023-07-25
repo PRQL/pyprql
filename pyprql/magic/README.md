@@ -102,7 +102,7 @@ Returning data to local variable _
 In [5]: %%prql
    ...: from p = `products.csv`
    ...: group categoryID (
-   ...:   aggregate [average unitPrice]
+   ...:   aggregate {average unitPrice}
    ...: )
 
 Done.
@@ -123,7 +123,7 @@ We can capture the results into a different variable like so:
 ```
 In [6]: %%prql results <<
    ...: from p = `products.csv`
-   ...: aggregate [min unitsInStock, max unitsInStock]
+   ...: aggregate {min unitsInStock, max unitsInStock}
 
 Done.
 Returning data to local variable results
@@ -136,7 +136,7 @@ Now, the output of the query is saved to `results`.
 We can also use a line magic to capture the results like this:
 
 ```
-In [7]: results = %prql from p = `products.csv` | aggregate [min unitsInStock, max unitsInStock]
+In [7]: results = %prql from p = `products.csv` | aggregate {min unitsInStock, max unitsInStock}
 ```
 
 ## Configuration
