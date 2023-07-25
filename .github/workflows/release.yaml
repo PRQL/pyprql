@@ -6,8 +6,6 @@ jobs:
   release:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,12 +33,9 @@ jobs:
           git config --global user.email 'gha@prql-lang.org'
 
       - name: Python Semantic Release
-        id: release
         env:
           GH_TOKEN: ${{ secrets.PRQL_BOT_GH_TOKEN }}
+          REPOSITORY_USERNAME: __token__
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          poetry run semantic-release --verbose publish
-
-      - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        if: steps.release.outputs.released == 'true'
+          poetry run semantic-release -v DEBUG publish
