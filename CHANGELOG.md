@@ -184,6 +184,10 @@ Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.githu
 
 ### Ci
 
+* ci: fix permission (#235) ([`cfbf23b`](https://github.com/PRQL/pyprql/commit/cfbf23b7f48ae37dc64b1e3605df1954bc324d87))
+
+* ci: fix release workflow (#234) ([`916d77c`](https://github.com/PRQL/pyprql/commit/916d77cd72f91426467150284a4f8ff25205986f))
+
 * ci: fix release workflow for Python Semantic Release v8 (#232) ([`a2c26aa`](https://github.com/PRQL/pyprql/commit/a2c26aa494111609c92c4ad78043ac237ff9d0b2))
 
 * ci: fix release workflow for Python Semantic Release v8 (#231) ([`a3b5eb2`](https://github.com/PRQL/pyprql/commit/a3b5eb22b94a9eb6fa1b4566a4e84d6bf284c067))
