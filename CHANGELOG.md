@@ -184,6 +184,8 @@ Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.githu
 
 ### Ci
 
+* ci: can not create github release here (#236) ([`f1a1a52`](https://github.com/PRQL/pyprql/commit/f1a1a52b1dbfe2ba7d3e1cdbde1385658bc38dbd))
+
 * ci: fix permission (#235) ([`cfbf23b`](https://github.com/PRQL/pyprql/commit/cfbf23b7f48ae37dc64b1e3605df1954bc324d87))
 
 * ci: fix release workflow (#234) ([`916d77c`](https://github.com/PRQL/pyprql/commit/916d77cd72f91426467150284a4f8ff25205986f))
