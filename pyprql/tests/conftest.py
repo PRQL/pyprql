@@ -3,7 +3,6 @@ import urllib.request
 from pathlib import Path
 
 import pytest
-from IPython.core.interactiveshell import InteractiveShell
 from sql import connection
 from sql._testing import TestingShell
 from sql.connection import ConnectionManager
@@ -13,7 +12,6 @@ from sql.magic_plot import SqlPlotMagic
 from traitlets.config import Config
 
 from pyprql.magic import PrqlMagic
-from pyprql.tests import run_sql
 
 PATH_TO_TESTS = Path(__file__).absolute().parent
 PATH_TO_TMP_ASSETS = PATH_TO_TESTS / "tmp"
