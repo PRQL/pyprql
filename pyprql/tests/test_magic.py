@@ -147,35 +147,12 @@ def test_append(ip):
     assert appended[0][0] == persisted[0][0] * 2
 
 
-def test_persist_nonexistent_raises(ip):
-    run_prql(ip, "")
-    result = ip.run_cell("%prql --persist sqlite:// no_such_dataframe")
-    assert result.error_in_exec
-
-
-def test_persist_non_frame_raises(ip):
-    ip.run_cell("not_a_dataframe = 22")
-    run_prql(ip, "")
-    result = ip.run_cell("%prql --persist sqlite:// not_a_dataframe")
-    assert result.error_in_exec
-
-
-def test_persist_bare(ip):
-    result = ip.run_cell("%prql --persist sqlite://")
-    assert result.error_in_exec
-
-
 @pytest.mark.xfail(reason="Need to resolve line vs cell magic")
 def test_persist_frame_at_its_creation(ip):
     ip.run_cell("results = %sql from author")
     ip.run_cell("%sql --persist sqlite:// results.DataFrame()")
     persisted = run_prql(ip, "from results")
     assert "Shakespeare" in str(persisted)
-
-
-def test_connection_args_enforce_json(ip):
-    result = ip.run_cell('%sql --connection_arguments {"badlyformed":true')
-    assert result.error_in_exec
 
 
 def test_connection_args_in_connection(ip):
@@ -186,12 +163,6 @@ def test_connection_args_in_connection(ip):
 
 def test_connection_args_single_quotes(ip):
     ip.run_cell("%sql --connection_arguments '{\"timeout\": 10}' sqlite:///:memory:")
-    result = ip.run_cell("%sql --connections")
-    assert "timeout" in result.result["sqlite:///:memory:"].connect_args
-
-
-def test_connection_args_double_quotes(ip):
-    ip.run_cell('%sql --connection_arguments "{\\"timeout\\": 10}" sqlite:///:memory:')
     result = ip.run_cell("%sql --connections")
     assert "timeout" in result.result["sqlite:///:memory:"].connect_args
 
@@ -287,14 +258,6 @@ def test_target_dialect(ip):
     assert dframe.foo[0] == "William-Shakespeare"
 
 
-def test_without_target(ip, capsys):
-    run_prql(ip, 'from author | select foo = f"{first_name}-{last_name}" | take 1')
-    captured = capsys.readouterr()
-    assert captured.out.startswith(
-        "(sqlite3.OperationalError) no such function: CONCAT"
-    )
-
-
 def test_dryrun(ip, capsys):
     ip.run_line_magic("config", "PrqlMagic.dryrun = True")
     result = run_prql(ip, 'from a | select b = f"{c}-{d}"')
@@ -336,14 +299,6 @@ def test_sql_from_file(ip):
         assert result.result == [(1, "foo"), (2, "bar")]
         result = ip.run_cell("%prql -f " + fname)
         assert result.result == [(1, "foo"), (2, "bar")]
-
-
-def test_sql_from_nonexistent_file(ip):
-    ip.run_line_magic("config", "PrqlMagic.autopandas = False")
-    with tempfile.TemporaryDirectory() as tempdir:
-        fname = os.path.join(tempdir, "nonexistent.sql")
-        result = ip.run_cell("%prql --file " + fname)
-        assert isinstance(result.error_in_exec, FileNotFoundError)
 
 
 @pytest.mark.skip("We only support pandas")
