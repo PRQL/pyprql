@@ -34,7 +34,7 @@ jobs:
 
       - name: Python Semantic Release
         env:
-          GH_TOKEN: ${{ secrets.PRQL_BOT_GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.PRQL_BOT_GITHUB_TOKEN }}
         run: |
           poetry run semantic-release --verbose version --skip-build --no-vcs-release
           poetry build
