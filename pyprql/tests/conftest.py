@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 from sql import connection
+from sql import _current
 from sql._testing import TestingShell
 from sql.connection import ConnectionManager
 from sql.magic import RenderMagic, SqlMagic
@@ -59,7 +60,10 @@ def ip_empty():
     c.HistoryAccessor.enabled = False
     ip_session = TestingShell(config=c)
 
-    ip_session.register_magics(SqlMagic)
+    sql_magic = SqlMagic(ip_session)
+    _current._set_sql_magic(sql_magic)
+
+    ip_session.register_magics(sql_magic)
     ip_session.register_magics(RenderMagic)
     ip_session.register_magics(SqlPlotMagic)
     ip_session.register_magics(SqlCmdMagic)
