@@ -26,6 +26,4 @@ repos:
   - repo: https://github.com/python-poetry/poetry
     rev: 1.6.0
     hooks:
-      - id: poetry-lock
-        # https://github.com/python-poetry/poetry/issues/7029
-        args: ["--check"]
+      - id: poetry-check
