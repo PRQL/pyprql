@@ -34,7 +34,7 @@ traitlets = "^5"
 [tool.poetry.dev-dependencies]
 Sphinx = "~7.1"
 black = "^23.9.1"
-commitizen = "^3.8.0"
+commitizen = "^3.9.0"
 coverage = "^7.3.0"
 darglint = "^1.8.1"
 mypy = "^1.5"
