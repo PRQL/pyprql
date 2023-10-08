@@ -25,12 +25,6 @@ class PrqlMagic(SqlMagic):
 
     Additionally, to work around some quirky behaviour, we also provide an ``autoview``
     option to indicate whether results should be printed to the window.
-
-    Parameters
-    ----------
-    shell : InteractiveShell
-        The current IPython shell instance. Since instantiation is handled by IPython,
-        the user should never need to create this clas manually.
     """
 
     displaycon = Bool(False, config=True, help="Show connection string after execute")

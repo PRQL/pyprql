@@ -1,0 +1,18 @@
+project:
+  type: website
+  output-dir: ../_site
+
+metadata-files:
+  - _sidebar.yml
+
+quartodoc:
+  package: pyprql
+  title: Reference
+  sidebar: _sidebar.yml
+
+  sections:
+    - title: Some functions
+      desc: Functions to inspect docstrings.
+      contents:
+        - magic.prql
+        - pandas_accessor.prql
