@@ -41,7 +41,7 @@ mypy = "^1.6"
 myst-parser = "^2.0.0"
 nox = "^2023.4.22"
 polars = ">=0.16"
-pre-commit = "^3.4.0"
+pre-commit = "^3.5.0"
 pytest = ">7"
 # pytest-regtest compat https://gitlab.com/uweschmitt/pytest-regtest/-/merge_requests/9
 py = "1.11"
