@@ -2,6 +2,178 @@
 
 
 
+## v0.10.0 (2023-10-27)
+
+### Breaking
+
+* feat!: based on PRQL 0.10 (#285) ([`5e9faea`](https://github.com/PRQL/pyprql/commit/5e9faea6ff4fbf3e69c64ef2c15d21e2ecb1a1b5))
+
+### Chore
+
+* chore: bump prql-python from 0.9.0 to 0.10.0 (#283) ([`613f59f`](https://github.com/PRQL/pyprql/commit/613f59f0879712488f5730a189dd989cc6f66ff2))
+
+* chore: bump traitlets from 5.11.2 to 5.12.0 (#282)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`79af9a7`](https://github.com/PRQL/pyprql/commit/79af9a75dd051097fb34d93748f60f308fc8cf15))
+
+* chore: bump python-semantic-release from 8.1.1 to 8.3.0 (#281)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`802b0f1`](https://github.com/PRQL/pyprql/commit/802b0f1d990e1fa6e19517c501b9f4a67f4a9238))
+
+* chore: bump black from 23.9.1 to 23.10.0 (#279) ([`427f428`](https://github.com/PRQL/pyprql/commit/427f4280ed028375a92b2044f37254538e189dfe))
+
+* chore: bump commitizen from 3.10.0 to 3.12.0 (#278)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`60a0ea6`](https://github.com/PRQL/pyprql/commit/60a0ea648ccbf4081756aebae6f8baa9c1b7e4c3))
+
+* chore: bump ruff from 0.0.270 to 0.1.0 (#277)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`9692afe`](https://github.com/PRQL/pyprql/commit/9692afe3f5c0625ae9c57c7526b50c43dc4fb6ac))
+
+* chore: bump pre-commit from 3.4.0 to 3.5.0 (#275)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`0885532`](https://github.com/PRQL/pyprql/commit/0885532e57d9414da2abc4cb8d210f56a180d586))
+
+* chore: bump mypy from 1.5.0 to 1.6.0 (#274)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`31dabd3`](https://github.com/PRQL/pyprql/commit/31dabd3678caff10ca2fbbfcaeb568efa152b33f))
+
+* chore: update python version in pre-commit-config (#271) ([`ae53ac6`](https://github.com/PRQL/pyprql/commit/ae53ac6c721791386e4fa2198737ba2cb5dfdd74))
+
+* chore: bump traitlets from 5.10.0 to 5.11.2 (#269)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`c942b11`](https://github.com/PRQL/pyprql/commit/c942b1103d7ac5a28521b4be5c35fd9d83049dae))
+
+* chore: bump commitizen from 3.9.0 to 3.10.0 (#266)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`4ee8a74`](https://github.com/PRQL/pyprql/commit/4ee8a74d4e2312c9449827dcf5254940c86c2907))
+
+* chore: bump python-semantic-release from 8.0.3 to 8.1.1 (#265)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`d9f5745`](https://github.com/PRQL/pyprql/commit/d9f57454d1bef2c75065e7d47a7df7924c794708))
+
+* chore: bump commitizen from 3.8.0 to 3.9.0 (#263)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`fac6c84`](https://github.com/PRQL/pyprql/commit/fac6c84d19d44b0891cee3626981f5e7e9d0798d))
+
+* chore: bump traitlets from 5.9.0 to 5.10.0 (#262)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`70750bd`](https://github.com/PRQL/pyprql/commit/70750bdf98b3368342a3546f60ea338da0d7694d))
+
+* chore: bump black from 23.7.0 to 23.9.1 (#260)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`d68c7b8`](https://github.com/PRQL/pyprql/commit/d68c7b8dbc0468a9d0de04815dd172857b80f594))
+
+* chore: bump pre-commit from 3.3.3 to 3.4.0 (#256)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`7d52e40`](https://github.com/PRQL/pyprql/commit/7d52e40325dbd9738b880873c78675e64fc14994))
+
+* chore: bump commitizen from 3.7.0 to 3.8.0 (#258) ([`d64f485`](https://github.com/PRQL/pyprql/commit/d64f4858190cd70d8d1c4031082dbfbafddc68cb))
+
+* chore: bump actions/checkout from 3 to 4 (#259) ([`b2c8f5f`](https://github.com/PRQL/pyprql/commit/b2c8f5f6f15b2f68e1d24e96a0c8cc8224acd63b))
+
+* chore: bump polars from 0.18.8 to 0.19.0 (#255)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`ed616db`](https://github.com/PRQL/pyprql/commit/ed616dbebc5dfe5eb07817ea36bdbd90e2dbaabd))
+
+* chore: bump commitizen from 3.6.0 to 3.7.0 (#253) ([`457a3eb`](https://github.com/PRQL/pyprql/commit/457a3eb382033be12249688678b2cd1fa8ebb001))
+
+* chore: bump jupysql from 0.9.0 to 0.10.0 (#250) ([`b09bf36`](https://github.com/PRQL/pyprql/commit/b09bf368dceb4c4a0b3170223fd451f23217e548))
+
+* chore: bump sphinx from 6.2.1 to 7.1.2 (#249) ([`6e7b1c4`](https://github.com/PRQL/pyprql/commit/6e7b1c459f8844180194953b3c25caf9d19b7124))
+
+* chore: bump sphinx-rtd-theme from 1.2.2 to 1.3.0 (#248) ([`25f6687`](https://github.com/PRQL/pyprql/commit/25f6687ee0adef02b0f5b0cfbddefe0c2d2efc50))
+
+* chore: bump mypy from 1.4.1 to 1.5.0 (#242)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`579fe88`](https://github.com/PRQL/pyprql/commit/579fe8810440123f58d013eefbf199009adaac29))
+
+* chore: bump coverage from 7.2.7 to 7.3.0 (#243) ([`e906b81`](https://github.com/PRQL/pyprql/commit/e906b812b0267ea29d55974976728d73187bc5d6))
+
+* chore: bump jupysql from 0.8.0 to 0.9.0 (#239)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt;
+Co-authored-by: Maximilian Roos &lt;m@maxroos.com&gt;
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`368414d`](https://github.com/PRQL/pyprql/commit/368414dc6e06c90e05d8fecc54eada9ef7948dc9))
+
+* chore: bump commitizen from 3.5.3 to 3.6.0 (#238)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`ef70e4a`](https://github.com/PRQL/pyprql/commit/ef70e4ad5c1ece520653a73548a741f49877ed08))
+
+### Ci
+
+* ci: Use org token for @prql-bot (#241) ([`a9cca52`](https://github.com/PRQL/pyprql/commit/a9cca52085f5ee19c636ca0b734e3f7420e95122))
+
+### Unknown
+
+* [pre-commit.ci] pre-commit autoupdate (#280)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`ff7aa38`](https://github.com/PRQL/pyprql/commit/ff7aa38589ce1580eece59d32a31432ce2bffc79))
+
+* [pre-commit.ci] pre-commit autoupdate (#276)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`13b5b46`](https://github.com/PRQL/pyprql/commit/13b5b4616c6f2fdac35cb9293d0c47916196a36d))
+
+* [pre-commit.ci] pre-commit autoupdate (#273)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`8d64a24`](https://github.com/PRQL/pyprql/commit/8d64a248aaef5d8915518e3af133c990e807c8c4))
+
+* [pre-commit.ci] pre-commit autoupdate (#268)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`13d3f2a`](https://github.com/PRQL/pyprql/commit/13d3f2a323fbf16a716b63d4bdb67857317dabd0))
+
+* [pre-commit.ci] pre-commit autoupdate (#267)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`bf4d98a`](https://github.com/PRQL/pyprql/commit/bf4d98a76e0183f8639a529ba164eb842c384aa1))
+
+* [pre-commit.ci] pre-commit autoupdate (#264)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`4733919`](https://github.com/PRQL/pyprql/commit/4733919b61ec2b2432815b1cd3020703cb895831))
+
+* [pre-commit.ci] pre-commit autoupdate (#261)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`3d3cbd9`](https://github.com/PRQL/pyprql/commit/3d3cbd9aac314beaf87d0176ddfd21e60bcc8cb1))
+
+* [pre-commit.ci] pre-commit autoupdate (#257)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`51eaeb5`](https://github.com/PRQL/pyprql/commit/51eaeb56c1e887ab92afaa089169cd16a7966807))
+
+* [pre-commit.ci] pre-commit autoupdate (#254)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`b61b402`](https://github.com/PRQL/pyprql/commit/b61b402ccc7863b922e387dd746cabd70e329674))
+
+* Update pre-commit for latest poetry (#252) ([`b317821`](https://github.com/PRQL/pyprql/commit/b317821cbfe8ee9aad72863a3e13b8546079661a))
+
+* [pre-commit.ci] pre-commit autoupdate (#247)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`f397be8`](https://github.com/PRQL/pyprql/commit/f397be88c205b9e398d780a8d90bcb0a9fc68f7c))
+
+* [pre-commit.ci] pre-commit autoupdate (#244)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`7dd16b1`](https://github.com/PRQL/pyprql/commit/7dd16b1604f37d3dd8aa4ebce15cab7cde4ecca2))
+
+* [pre-commit.ci] pre-commit autoupdate (#240)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`714b7fc`](https://github.com/PRQL/pyprql/commit/714b7fcc098b70df6ac3770fcf183d454c0aeec9))
+
+
 ## v0.9.0 (2023-07-25)
 
 ### Breaking
