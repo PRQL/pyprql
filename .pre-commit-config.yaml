@@ -12,7 +12,7 @@ repos:
       - id: trailing-whitespace
       - id: check-added-large-files
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.3
+    rev: v0.1.4
     hooks:
       - id: ruff
   - repo: https://github.com/psf/black
@@ -24,6 +24,6 @@ repos:
     hooks:
       - id: mypy
   - repo: https://github.com/python-poetry/poetry
-    rev: 1.6.0
+    rev: 1.7.0
     hooks:
       - id: poetry-check
