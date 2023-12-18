@@ -1672,20 +1672,17 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "polars"
-version = "0.19.13"
+version = "0.20.0"
 description = "Blazingly fast DataFrame library"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "polars-0.19.13-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:583cbd01911936cdfa5bf2310944f4737f6c8fefdc1823f8efd559e6f4ea8df7"},
-    {file = "polars-0.19.13-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:f08605a4d1a6cf595c8a1617d33e4d096957a82835e43aa714cf7626aa9cfb4b"},
-    {file = "polars-0.19.13-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:fb8a39ca0e4ff953004e4fa34dbb76a9d19546cc20106fc87c51f6154fc09840"},
-    {file = "polars-0.19.13-cp38-abi3-manylinux_2_24_aarch64.whl", hash = "sha256:2342a090de16ffafe7cd37f66d77216a8c7bcc2fdd6471afbe349d97612c730d"},
-    {file = "polars-0.19.13-cp38-abi3-manylinux_2_24_x86_64.whl", hash = "sha256:79449978d68301211e104bc135e57967d3d505f59d438aa0d04c4f2503f84ef2"},
-    {file = "polars-0.19.13-cp38-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:141c131a53601fbde506c0ec8609feab1e1075b4aa027421d7c9d4e4774e54ee"},
-    {file = "polars-0.19.13-cp38-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:b34b19b3734bfc6b33fbb9aa0a53f13138d765ca2ebf5e59442d0c38dac55db0"},
-    {file = "polars-0.19.13-cp38-abi3-win_amd64.whl", hash = "sha256:605ba001415f140ba157d1c121658e5f500e3cb0f69a5cc96790c2fd408d1065"},
-    {file = "polars-0.19.13.tar.gz", hash = "sha256:9c7be97a8809f00359770245f722dcb2f019b77b585fe36cdf7b2871871fe236"},
+    {file = "polars-0.20.0-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:813707e28bdbdf00a849a72d856cad48a4063a1e7f4487bc7068f957988107ce"},
+    {file = "polars-0.20.0-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:7504c63e9783de6cec289f89383b797a5e1fd72c10abc137bba7ee022d34f193"},
+    {file = "polars-0.20.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e01beb3e3ad2c3efff209fafd5eff785489d1a6fb196aee2e29237d969389255"},
+    {file = "polars-0.20.0-cp38-abi3-manylinux_2_24_aarch64.whl", hash = "sha256:1d78313386fb46ab516eebb521c8612a9acb86c9972af195e771f468c0e5e77d"},
+    {file = "polars-0.20.0-cp38-abi3-win_amd64.whl", hash = "sha256:8b8856c7368b605b77e9cf231340ab39a4af86a1dafddde92a2b913c0c47007e"},
+    {file = "polars-0.20.0.tar.gz", hash = "sha256:cc70f7e4f195b438de54f51d411fa831d032d8528fc01fea186c8784f06d0f04"},
 ]
 
 [package.extras]
@@ -1693,7 +1690,7 @@ adbc = ["adbc_driver_sqlite"]
 all = ["polars[adbc,cloudpickle,connectorx,deltalake,fsspec,gevent,matplotlib,numpy,pandas,pyarrow,pydantic,pyiceberg,sqlalchemy,timezone,xlsx2csv,xlsxwriter]"]
 cloudpickle = ["cloudpickle"]
 connectorx = ["connectorx (>=0.3.2)"]
-deltalake = ["deltalake (>=0.13.0)"]
+deltalake = ["deltalake (>=0.14.0)"]
 fsspec = ["fsspec"]
 gevent = ["gevent"]
 matplotlib = ["matplotlib"]
