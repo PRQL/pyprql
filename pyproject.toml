@@ -25,11 +25,11 @@ version = "0.10.0"
 python = "^3.8"
 
 duckdb-engine = ">=0.7,<0.10"
-ipython = "^8"
+ipython = ">=8"
 jupysql = ">=0.10"
 pandas = ">=1.5"
-prql-python = ">=0.10,<0.12"
-traitlets = "^5"
+prql-python = "^0.11.0"
+traitlets = ">=5"
 
 [tool.poetry.dev-dependencies]
 Sphinx = "~7.1"
