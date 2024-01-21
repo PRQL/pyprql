@@ -1,0 +1,11 @@
+website:
+  sidebar:
+  - contents:
+    - reference/index.qmd
+    - contents:
+      - reference/magic.prql.qmd
+      - reference/pandas_accessor.qmd
+      - reference/pandas_accessor.prql.qmd
+      section: Some functions
+    id: reference
+  - id: dummy-sidebar

@@ -18,3 +18,7 @@ dist
 /*.ipynb
 *.csv
 _build
+
+/.quarto/
+_site
+reference/
