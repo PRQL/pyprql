@@ -8,7 +8,6 @@ and there are some TODOs around a fuller transition.
 Thanks to @ploomber for providing the base for these tests as well as the extension.
 """
 
-
 import os.path
 import re
 import tempfile
