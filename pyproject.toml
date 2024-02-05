@@ -24,7 +24,7 @@ version = "0.11.0"
 [tool.poetry.dependencies]
 python = "^3.8"
 
-duckdb-engine = ">=0.7,<0.11"
+duckdb-engine = ">=0.7,<0.12"
 ipython = ">=8"
 jupysql = ">=0.10"
 pandas = ">=1.5"
