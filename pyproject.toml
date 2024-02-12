@@ -55,7 +55,7 @@ python-semantic-release = "^9.0.3"
 ruff = "^0.2.0"
 safety = "^2"
 sphinx-rtd-theme = "^2.0.0"
-twine = "^4.0.2"
+twine = "^5.0.0"
 xdoctest = "^1.1.1"
 
 [tool.semantic_release]
