@@ -2055,16 +2055,19 @@ testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtuale
 
 [[package]]
 name = "pytest-regtest"
-version = "1.5.1"
-description = "pytest plugin for regression tests"
+version = "2.1.1"
+description = "pytest plugin for snapshot regression testing"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pytest-regtest-1.5.1.tar.gz", hash = "sha256:8deec797dcfd9313756e078bb82410c71a84c6571086bcf74f05d9064e659b57"},
+    {file = "pytest_regtest-2.1.1.tar.gz", hash = "sha256:bd08a6161832378b59ecd4f5815fbe26af7cd091db4a1e710e30476d5f3b8832"},
 ]
 
 [package.dependencies]
-pytest = ">=4"
+pytest = ">7.2"
+
+[package.extras]
+dev = ["black", "build", "hatchling", "pre-commit", "ruff", "twine", "wheel"]
 
 [[package]]
 name = "pytest-sugar"
