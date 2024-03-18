@@ -33,7 +33,7 @@ traitlets = ">=5"
 
 [tool.poetry.dev-dependencies]
 Sphinx = "~7.1"
-black = "^24.2.0"
+black = "^24.3.0"
 commitizen = "^3.18.0"
 coverage = "^7.4.0"
 darglint = "^1.8.1"
