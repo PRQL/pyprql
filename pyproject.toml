@@ -46,7 +46,7 @@ pytest = ">7"
 # pytest-regtest compat https://gitlab.com/uweschmitt/pytest-regtest/-/merge_requests/9
 py = "1.11"
 pytest-clarity = "^1.0.1"
-pytest-cov = "^4.1.0"
+pytest-cov = "^5.0.0"
 pytest-regtest = "*"
 pytest-sugar = "^1.0.0"
 pytest-testmon = "*"
