@@ -1,1 +1,1 @@
-from .prql import PrqlSubNamespace  # noqa: F401
+from .prql import PrqlNamespace  # noqa: F401

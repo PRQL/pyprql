@@ -4,7 +4,7 @@ import prqlc
 
 @pl.api.register_dataframe_namespace("prql")
 @pl.api.register_lazyframe_namespace("prql")
-class PrqlSubNamespace:
+class PrqlNamespace:
     def __init__(self, df: pl.DataFrame | pl.LazyFrame):
         self._df = df
 
