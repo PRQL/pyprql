@@ -1017,45 +1017,6 @@ test = ["pytest (<7.1)", "pytest-asyncio", "testpath"]
 test-extra = ["curio", "matplotlib (!=3.2.0)", "nbformat", "numpy (>=1.21)", "pandas", "pytest (<7.1)", "pytest-asyncio", "testpath", "trio"]
 
 [[package]]
-name = "ipython"
-version = "8.12.3"
-description = "IPython: Productive Interactive Computing"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "ipython-8.12.3-py3-none-any.whl", hash = "sha256:b0340d46a933d27c657b211a329d0be23793c36595acf9e6ef4164bc01a1804c"},
-    {file = "ipython-8.12.3.tar.gz", hash = "sha256:3910c4b54543c2ad73d06579aa771041b7d5707b033bd488669b4cf544e3b363"},
-]
-
-[package.dependencies]
-appnope = {version = "*", markers = "sys_platform == \"darwin\""}
-backcall = "*"
-colorama = {version = "*", markers = "sys_platform == \"win32\""}
-decorator = "*"
-jedi = ">=0.16"
-matplotlib-inline = "*"
-pexpect = {version = ">4.3", markers = "sys_platform != \"win32\""}
-pickleshare = "*"
-prompt-toolkit = ">=3.0.30,<3.0.37 || >3.0.37,<3.1.0"
-pygments = ">=2.4.0"
-stack-data = "*"
-traitlets = ">=5"
-typing-extensions = {version = "*", markers = "python_version < \"3.10\""}
-
-[package.extras]
-all = ["black", "curio", "docrepr", "ipykernel", "ipyparallel", "ipywidgets", "matplotlib", "matplotlib (!=3.2.0)", "nbconvert", "nbformat", "notebook", "numpy (>=1.21)", "pandas", "pytest (<7)", "pytest (<7.1)", "pytest-asyncio", "qtconsole", "setuptools (>=18.5)", "sphinx (>=1.3)", "sphinx-rtd-theme", "stack-data", "testpath", "trio", "typing-extensions"]
-black = ["black"]
-doc = ["docrepr", "ipykernel", "matplotlib", "pytest (<7)", "pytest (<7.1)", "pytest-asyncio", "setuptools (>=18.5)", "sphinx (>=1.3)", "sphinx-rtd-theme", "stack-data", "testpath", "typing-extensions"]
-kernel = ["ipykernel"]
-nbconvert = ["nbconvert"]
-nbformat = ["nbformat"]
-notebook = ["ipywidgets", "notebook"]
-parallel = ["ipyparallel"]
-qtconsole = ["qtconsole"]
-test = ["pytest (<7.1)", "pytest-asyncio", "testpath"]
-test-extra = ["curio", "matplotlib (!=3.2.0)", "nbformat", "numpy (>=1.21)", "pandas", "pytest (<7.1)", "pytest-asyncio", "testpath", "trio"]
-
-[[package]]
 name = "ipython-genutils"
 version = "0.2.0"
 description = "Vestigial utilities from IPython"
@@ -1183,7 +1144,10 @@ files = [
 ]
 
 [package.dependencies]
-ipython = {version = "*", markers = "python_version > \"3.8\""}
+ipython = [
+    {version = "<=8.12.0", markers = "python_version <= \"3.8\""},
+    {version = "*", markers = "python_version > \"3.8\""},
+]
 ipython-genutils = ">=0.1.0"
 jinja2 = "*"
 jupysql-plugin = "*"
@@ -1196,33 +1160,6 @@ sqlparse = "*"
 [package.extras]
 dev = ["black", "duckdb", "duckdb-engine", "flake8", "invoke", "ipywidgets", "js2py", "jupyter-server", "matplotlib (==3.7.2)", "pandas (==2.0.3)", "pkgmt", "polars (==0.17.2)", "psutil", "pyarrow", "pyodbc", "pytest", "twine"]
 integration = ["black", "clickhouse-sqlalchemy", "dockerctx", "duckdb", "duckdb-engine", "flake8", "invoke", "ipywidgets", "js2py", "jupyter-server", "matplotlib (==3.7.2)", "oracledb", "pandas (==2.0.3)", "pgspecial (==2.0.1)", "pkgmt", "polars (==0.17.2)", "psutil", "psycopg2-binary", "pyarrow", "pymysql", "pyodbc", "pytest", "python-tds", "redshift-connector", "snowflake-sqlalchemy", "sqlalchemy-pytds", "sqlalchemy-redshift", "twine"]
-
-[[package]]
-name = "jupysql"
-version = "0.10.10"
-description = "Better SQL in Jupyter"
-optional = false
-python-versions = "*"
-files = [
-    {file = "jupysql-0.10.10-py3-none-any.whl", hash = "sha256:811031ff2be5289e2840d294bb6d809ab6772d5a61d1ad7c2ab51c8ce807a68b"},
-    {file = "jupysql-0.10.10.tar.gz", hash = "sha256:8259111a943ad0da61ef6bbe1281787c37a1535d15553b8bbcfaca2919c03742"},
-]
-
-[package.dependencies]
-ipython = {version = "<=8.12.0", markers = "python_version <= \"3.8\""}
-ipython-genutils = ">=0.1.0"
-jinja2 = "*"
-jupysql-plugin = ">=0.4.2"
-ploomber-core = ">=0.2.7"
-ploomber-extension = "*"
-prettytable = "*"
-sqlalchemy = "*"
-sqlglot = ">=11.3.7"
-sqlparse = "*"
-
-[package.extras]
-dev = ["black", "duckdb", "duckdb-engine", "flake8", "invoke", "ipywidgets", "js2py", "jupyter-server", "matplotlib (==3.7.2)", "pandas (<2.2.0)", "pkgmt", "polars (==0.17.2)", "psutil", "pyarrow", "pyodbc", "pytest", "twine"]
-integration = ["black", "clickhouse-sqlalchemy", "dockerctx", "duckdb", "duckdb-engine", "flake8", "grpcio-status", "invoke", "ipywidgets", "js2py", "jupyter-server", "matplotlib (==3.7.2)", "oracledb", "pandas (<2.2.0)", "pgspecial (==2.0.1)", "pkgmt", "polars (==0.17.2)", "psutil", "psycopg2-binary", "pyarrow", "pymysql", "pyodbc", "pyspark", "pytest", "python-tds", "redshift-connector", "snowflake-sqlalchemy", "sqlalchemy-pytds", "sqlalchemy-redshift", "twine"]
 
 [[package]]
 name = "jupysql-plugin"
@@ -1717,8 +1654,8 @@ files = [
 [package.dependencies]
 numpy = [
     {version = ">=1.20.3", markers = "python_version < \"3.10\""},
-    {version = ">=1.21.0", markers = "python_version >= \"3.10\" and python_version < \"3.11\""},
     {version = ">=1.23.2", markers = "python_version >= \"3.11\""},
+    {version = ">=1.21.0", markers = "python_version >= \"3.10\" and python_version < \"3.11\""},
 ]
 python-dateutil = ">=2.8.2"
 pytz = ">=2020.1"
@@ -1845,20 +1782,6 @@ pyyaml = "*"
 
 [package.extras]
 dev = ["flake8", "invoke", "pkgmt", "pytest", "pywin32", "twine"]
-
-[[package]]
-name = "ploomber-extension"
-version = "0.1.0"
-description = "A JupyterLab extension."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "ploomber_extension-0.1.0-py3-none-any.whl", hash = "sha256:e0581608419314adb11c6a912a6cea271e99adad12944737266e7edc1105c36e"},
-    {file = "ploomber_extension-0.1.0.tar.gz", hash = "sha256:d54db9f05831e2bd0d1cf1c2d58988fac3044478ae61e899f1d75a108c0980b2"},
-]
-
-[package.dependencies]
-ploomber-core = "*"
 
 [[package]]
 name = "pluggy"
@@ -2346,13 +2269,13 @@ yaml = ["PyYaml (>=6.0.1)"]
 
 [[package]]
 name = "python-semantic-release"
-version = "9.5.0"
+version = "9.6.0"
 description = "Automatic Semantic Versioning for Python projects"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "python_semantic_release-9.5.0-py3-none-any.whl", hash = "sha256:1a33e1b038b89e0811da071a355babeaf1c3ede6762ebd831335071884e1d1bd"},
-    {file = "python_semantic_release-9.5.0.tar.gz", hash = "sha256:e82da3caf96e1f917c26b530214443da70c440d58d1ff46e1e8120f76f0c7b2c"},
+    {file = "python_semantic_release-9.6.0-py3-none-any.whl", hash = "sha256:da25609085377492bc3a00e6cb0d443ac201abad97f44d842ccd1f2d16fb9a3e"},
+    {file = "python_semantic_release-9.6.0.tar.gz", hash = "sha256:96c74195f64e5c3bba13509e60720c23ec923271f9abcc034b949037a4536e69"},
 ]
 
 [package.dependencies]
@@ -2422,6 +2345,7 @@ files = [
     {file = "PyYAML-6.0.1-cp311-cp311-win_amd64.whl", hash = "sha256:bf07ee2fef7014951eeb99f56f39c9bb4af143d8aa3c21b1677805985307da34"},
     {file = "PyYAML-6.0.1-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:855fb52b0dc35af121542a76b9a84f8d1cd886ea97c84703eaa6d88e37a2ad28"},
     {file = "PyYAML-6.0.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:40df9b996c2b73138957fe23a16a4f0ba614f4c0efce1e9406a184b6d07fa3a9"},
+    {file = "PyYAML-6.0.1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a08c6f0fe150303c1c6b71ebcd7213c2858041a7e01975da3a99aed1e7a378ef"},
     {file = "PyYAML-6.0.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6c22bec3fbe2524cde73d7ada88f6566758a8f7227bfbf93a408a9d86bcc12a0"},
     {file = "PyYAML-6.0.1-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:8d4e9c88387b0f5c7d5f281e55304de64cf7f9c0021a3525bd3b1c542da3b0e4"},
     {file = "PyYAML-6.0.1-cp312-cp312-win32.whl", hash = "sha256:d483d2cdf104e7c9fa60c544d92981f12ad66a457afae824d146093b8c294c54"},
@@ -3280,4 +3204,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "4029f4b64485d9418f520ffd2e5f175d1f51ca28e95cb4b444410f9173ad273e"
+content-hash = "544bd8e8d7210bc36f8337d56bcf233a6f531875644658c2fbcd976471e9f3d4"
