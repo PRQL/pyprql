@@ -12,6 +12,7 @@
 pyprql contains:
 
 - pyprql.pandas_accessor — Pandas integration for PRQL
+- pyprql.polars_namespace — Polars integration for PRQL
 - pyprql.magic — IPython magic for connecting to databases using `%%prql`
 - pyprql.compile — An export of `prqlc`'s `compile` function
 
@@ -24,6 +25,12 @@ For docs, check out the [pyprql docs](https://pyprql.readthedocs.io/), and the
 pip install pyprql
 ```
 
+Or, install with optional dependencies:
+
+```sh
+pip install pyprql[polars]
+```
+
 ## Usage
 
 ### Pandas integration
@@ -31,6 +38,16 @@ pip install pyprql
 ```python
 import pandas as pd
 import pyprql.pandas_accessor
+
+df = (...)
+results_df = df.prql.query("select {age, name, occupation} | filter age > 21")
+```
+
+### Polars integration
+
+```python
+import polars as pl
+import pyprql.polars_namespace
 
 df = (...)
 results_df = df.prql.query("select {age, name, occupation} | filter age > 21")
@@ -71,7 +88,7 @@ FROM
   artists
 ```
 
-For context, `prqlc` is the Python binding for `prql-compiler`, so only
+For context, `prqlc` in Python is the Python binding for the `prqlc` Rust crate, so only
 contains functions for compilation; and this library offers broader python
 integrations and tooling.
 

@@ -31,6 +31,7 @@ jupysql = ">=0.10"
 pandas = ">=1.5"
 prqlc = "^0.11.0"
 traitlets = ">=5"
+polars = { version = ">= 0.20.23", extras = ["polars"] }
 
 [tool.poetry.dev-dependencies]
 Sphinx = "~7.1"
@@ -66,12 +67,7 @@ changelog_file = "CHANGELOG.md"
 major_on_zero = false
 upload_to_pypi = true
 upload_to_release = true
-version_toml = [
-  "pyproject.toml:tool.poetry.version",
-]
-version_variable = [
-  "pyprql/__init__.py:__version__",
-]
+version_toml = ["pyproject.toml:tool.poetry.version"]
 
 [tool.pytest.ini_options]
 addopts = """
@@ -97,7 +93,7 @@ requires = ["poetry-core>=1.3.0"]
 
 [tool.ruff]
 fix = true
-ignore = [
+lint.ignore = [
   # Line length — black handles
   "E5", #
   # No lambdas — too strict
