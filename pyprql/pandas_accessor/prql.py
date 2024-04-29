@@ -11,7 +11,7 @@ results_df = df.prql.query('select [age,name,occupation] | filter age > 21')
 
 import duckdb
 import pandas as pd
-import prql_python as prql
+import prqlc
 
 
 @pd.api.extensions.register_dataframe_accessor("prql")
@@ -21,9 +21,9 @@ class PrqlAccessor:
 
     def query(self, prql_query: str) -> pd.DataFrame:
         prepended_query = f"from df \n {prql_query}"
-        sql_query = prql.compile(
+        sql_query = prqlc.compile(
             prepended_query,
-            options=prql.CompileOptions(
+            options=prqlc.CompileOptions(
                 target="sql.duckdb", format=False, signature_comment=False
             ),
         )
