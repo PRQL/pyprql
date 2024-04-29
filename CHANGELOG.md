@@ -2,6 +2,101 @@
 
 
 
+## v0.11.0 (2023-12-21)
+
+### Breaking
+
+* feat!: Update prql-python to 0.11 (#313) ([`dfb8056`](https://github.com/PRQL/pyprql/commit/dfb80569b7745b6ee155ad5c216926a1bfba14e1))
+
+### Build
+
+* build: Update dependencies (#296) ([`3410ce4`](https://github.com/PRQL/pyprql/commit/3410ce44fae99c10995d2921d79efd7814a9af79))
+
+* build: Upgrade dependencies (#286) ([`9905005`](https://github.com/PRQL/pyprql/commit/9905005cc7bbb4f1ef925e582dbaebc29e38cd51))
+
+### Chore
+
+* chore: bump prql-python from 0.10.1 to 0.11.0 (#312)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`5fae1a9`](https://github.com/PRQL/pyprql/commit/5fae1a958b670d93da890e32e33a88eba0a7143a))
+
+* chore: bump polars from 0.19.13 to 0.20.0 (#310) ([`df7fa0b`](https://github.com/PRQL/pyprql/commit/df7fa0b60ac5bdd0baed2856d240612f7aeeb1e8))
+
+* chore: bump actions/upload-artifact from 3 to 4 (#308) ([`a2310c6`](https://github.com/PRQL/pyprql/commit/a2310c62130414d0acde53001bdc0240cfa92ea4))
+
+* chore: bump actions/download-artifact from 3 to 4 (#309) ([`ea4fd59`](https://github.com/PRQL/pyprql/commit/ea4fd5905927ee792027a88b2c8758fe809c7f95))
+
+* chore: bump black from 23.11.0 to 23.12.0 (#307)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`8e5aad6`](https://github.com/PRQL/pyprql/commit/8e5aad6da625446bfc8fc3b807cd999def059f1a))
+
+* chore: bump python-semantic-release from 8.3.0 to 8.5.0 (#305)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`34c3464`](https://github.com/PRQL/pyprql/commit/34c3464940f5b1c274e675e19025e869be38471f))
+
+* chore: bump actions/setup-python from 4 to 5 (#304)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`0385b7f`](https://github.com/PRQL/pyprql/commit/0385b7f4cda6b280ead7c44a4aee370437d7b790))
+
+* chore: bump commitizen from 3.12.0 to 3.13.0 (#303)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`26972fc`](https://github.com/PRQL/pyprql/commit/26972fcfa2b25825d0cd8c3c46cdc63e953b8b3c))
+
+* chore: bump sphinx-rtd-theme from 1.3.0 to 2.0.0 (#302)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`c97350a`](https://github.com/PRQL/pyprql/commit/c97350aa056322db47d967985ff98118c9f9301d))
+
+* chore: bump traitlets from 5.13.0 to 5.14.0 (#301)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`7195c8a`](https://github.com/PRQL/pyprql/commit/7195c8a092b304f666b35e47b308c3320335bd81))
+
+* chore: bump pytest-xdist from 3.4.0 to 3.5.0 (#298)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`0b0cca6`](https://github.com/PRQL/pyprql/commit/0b0cca654a4f102eb5327dd066c7341cf8836ca5))
+
+* chore: Remove flake8 config file (#287) ([`d763aed`](https://github.com/PRQL/pyprql/commit/d763aed9247a71b2a7d4c004ee24017739ffc8cc))
+
+### Unknown
+
+* [pre-commit.ci] pre-commit autoupdate (#311)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`8a825df`](https://github.com/PRQL/pyprql/commit/8a825dff0743f18f97528dc814e81d901fa5a833))
+
+* [pre-commit.ci] pre-commit autoupdate (#306)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`140cf4d`](https://github.com/PRQL/pyprql/commit/140cf4dd50fc3cb1a0f7743f3db07fa8fc3a7dbb))
+
+* Remove duplicate `jupysql` in lock file (#300) ([`55e97af`](https://github.com/PRQL/pyprql/commit/55e97afd5b329b1301613a428df892aa5cb5c58d))
+
+* [pre-commit.ci] pre-commit autoupdate (#299)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`80ec1b1`](https://github.com/PRQL/pyprql/commit/80ec1b1bb994133e174c5beee53b5db070a0f7fc))
+
+* [pre-commit.ci] pre-commit autoupdate (#297)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`8d65e32`](https://github.com/PRQL/pyprql/commit/8d65e321af80df121f9234f8f719d6a4440bc435))
+
+* [pre-commit.ci] pre-commit autoupdate (#295)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`bcdbdd1`](https://github.com/PRQL/pyprql/commit/bcdbdd1c602af63a98f3d1e5ae113a5cb2c0ce6b))
+
+* [pre-commit.ci] pre-commit autoupdate (#290)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`e62e55e`](https://github.com/PRQL/pyprql/commit/e62e55ea60b6fbdad903b1a0792af7e0ca2fe28b))
+
+* [pre-commit.ci] pre-commit autoupdate (#288)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`c4f9ce3`](https://github.com/PRQL/pyprql/commit/c4f9ce3ecb455a1662960fe26f85272428be8fee))
+
+
 ## v0.10.0 (2023-10-27)
 
 ### Breaking

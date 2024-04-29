@@ -1,4 +1,5 @@
 """Nox session configuration."""
+
 from typing import List
 
 import nox

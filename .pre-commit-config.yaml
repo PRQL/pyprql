@@ -4,7 +4,7 @@ default_stages: [commit]
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: check-toml
       - id: check-yaml
@@ -12,18 +12,18 @@ repos:
       - id: trailing-whitespace
       - id: check-added-large-files
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.5
+    rev: v0.4.1
     hooks:
       - id: ruff
   - repo: https://github.com/psf/black
-    rev: 23.11.0
+    rev: 24.4.0
     hooks:
       - id: black
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.0
+    rev: v1.9.0
     hooks:
       - id: mypy
   - repo: https://github.com/python-poetry/poetry
-    rev: 1.7.0
+    rev: 1.8.0
     hooks:
       - id: poetry-check

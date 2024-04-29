@@ -8,6 +8,7 @@ any users should load the magic using the IPython line magic, like below:
     In [1]: %load_ext pyprql.magic
 
 """
+
 from IPython import InteractiveShell
 
 from .prql import PrqlMagic

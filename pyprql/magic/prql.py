@@ -1,9 +1,10 @@
 """A magic class for parsing PRQL in IPython or Jupyter."""
+
 from __future__ import annotations
 
 from IPython.core.magic import cell_magic, line_magic, magics_class, needs_local_scope
 from IPython.core.magic_arguments import argument, magic_arguments, parse_argstring
-from prql_python import compile, CompileOptions
+from prqlc import compile, CompileOptions
 from sql.magic import SqlMagic
 from sql.parse import parse
 from traitlets import Bool, Unicode
