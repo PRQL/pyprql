@@ -1,5 +1,5 @@
 import pandas as pd
-import prql_python as prql
+import prqlc
 import pytest
 
 
@@ -10,7 +10,7 @@ def import_accessor():
 
 def test_pyql_python():
     """It compiles sql from prql."""
-    sql: str = prql.compile("from employees | select {name, age}").replace("\n", " ")
+    sql: str = prqlc.compile("from employees | select {name, age}").replace("\n", " ")
     assert sql.startswith("SELECT   name,   age FROM   employees")
 
 
@@ -58,7 +58,7 @@ def test_df_supports_grouped_aggs():
 
 def test_df_big_prql_query():
     q = """
-        filter start_date > @2021-01-01
+        filter start_date > @2021-01-01T00:00:00
         derive {
           gross_salary = salary + tax ?? 0,
           gross_cost = gross_salary + benefits_cost,
