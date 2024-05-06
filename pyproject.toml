@@ -20,7 +20,7 @@ license = "Apache-2.0"
 name = "pyprql"
 readme = "README.md"
 repository = "https://github.com/prql/pyprql"
-version = "0.12.0"
+version = "0.12.1"
 
 [tool.poetry.dependencies]
 python = "^3.8"

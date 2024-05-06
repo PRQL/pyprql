@@ -2,6 +2,45 @@
 
 
 
+## v0.12.1 (2024-05-06)
+
+### Chore
+
+* chore: bump safety from 3.1.0 to 3.2.0 (#378)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`ec5aac0`](https://github.com/PRQL/pyprql/commit/ec5aac0633ef2b36ff1da204da4e4249687fe9ad))
+
+* chore: bump python-semantic-release from 9.6.0 to 9.7.0 (#379)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`b1a36dc`](https://github.com/PRQL/pyprql/commit/b1a36dc445ccc3fd630f68de8e0914fb5e7dc202))
+
+* chore: bump commitizen from 3.24.0 to 3.25.0 (#377)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`34ff83c`](https://github.com/PRQL/pyprql/commit/34ff83c12f7a32634f19fbae1359a0d6704e0eb9))
+
+* chore: bump python-semantic-release from 9.5.0 to 9.6.0 (#375)
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt; ([`7f9134b`](https://github.com/PRQL/pyprql/commit/7f9134b1ecb0804465a36050ff34e756454689de))
+
+### Fix
+
+* fix: Adjust `polars` extras definition (#382) ([`e52b72f`](https://github.com/PRQL/pyprql/commit/e52b72f6bd1e8dcdbe9cdb89c6512dbf85f931bf))
+
+### Unknown
+
+* [pre-commit.ci] pre-commit autoupdate (#380)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`dee2ec9`](https://github.com/PRQL/pyprql/commit/dee2ec9bf43c2ce08e265ed01bec4998975bbf5c))
+
+* [pre-commit.ci] pre-commit autoupdate (#376)
+
+Co-authored-by: pre-commit-ci[bot] &lt;66853113+pre-commit-ci[bot]@users.noreply.github.com&gt; ([`e6bcb4e`](https://github.com/PRQL/pyprql/commit/e6bcb4e0b1fcb9719f9a268a3b23ee3d2d34d834))
+
+
 ## v0.12.0 (2024-04-29)
 
 ### Chore
