@@ -38,7 +38,7 @@ polars = ["polars"]
 [tool.poetry.dev-dependencies]
 Sphinx = "~7.1"
 black = "^24.4.0"
-commitizen = "^3.25.0"
+commitizen = "^3.26.0"
 coverage = "^7.5.0"
 darglint = "^1.8.1"
 mypy = "^1.10"
