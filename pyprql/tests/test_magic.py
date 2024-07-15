@@ -243,7 +243,7 @@ def test_autopolars(ip):
     ip.run_line_magic("config", "PrqlMagic.autopolars = True")
     dframe = run_prql(ip, "from test")
 
-    assert type(dframe) == pl.DataFrame
+    assert type(dframe) is pl.DataFrame
     assert not dframe.is_empty()
     assert len(dframe.shape) == 2
     assert dframe["name"][0] == "foo"
