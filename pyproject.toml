@@ -58,7 +58,7 @@ pytest-xdist = "^3.5.0"
 python-semantic-release = "^9.8.0"
 ruff = "^0.6.0"
 safety = "^3"
-sphinx-rtd-theme = "^2.0.0"
+sphinx-rtd-theme = "^3.0.0"
 twine = "^5.1.0"
 xdoctest = "^1.2.0"
 
