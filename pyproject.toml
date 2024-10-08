@@ -23,7 +23,7 @@ repository = "https://github.com/prql/pyprql"
 version = "0.12.1"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 
 duckdb-engine = ">=0.7,<0.14"
 jupysql = ">=0.10"
@@ -31,13 +31,13 @@ pandas = ">=1.5"
 polars = { version = ">= 0.20.23", optional = true }
 prqlc = "^0.11.0"
 traitlets = ">=5"
+ipython = "^8.28.0"
 
 [tool.poetry.extras]
 polars = ["polars"]
 
 [tool.poetry.dev-dependencies]
 Sphinx = "~7.1"
-commitizen = "^3.29.0"
 coverage = "^7.6.0"
 darglint = "^1.8.1"
 mypy = "^1.11"

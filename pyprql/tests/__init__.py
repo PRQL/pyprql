@@ -1,7 +1,10 @@
-import IPython
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import IPython
 
 
-def run_sql(ip_session: IPython.core.interactiveshell.InteractiveShell, statements):
+def run_sql(ip_session: "IPython.core.interactiveshell.InteractiveShell", statements):
     if isinstance(statements, str):
         statements = [statements]
     for statement in statements:
@@ -9,7 +12,7 @@ def run_sql(ip_session: IPython.core.interactiveshell.InteractiveShell, statemen
     return result  # returns only last result
 
 
-def run_prql(ip_session: IPython.core.interactiveshell.InteractiveShell, statements):
+def run_prql(ip_session: "IPython.core.interactiveshell.InteractiveShell", statements):
     if isinstance(statements, str):
         statements = [statements]
     for statement in statements:
