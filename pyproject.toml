@@ -23,12 +23,12 @@ repository = "https://github.com/prql/pyprql"
 version = "0.12.1"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 
 duckdb-engine = ">=0.7,<0.14"
 jupysql = ">=0.10"
 pandas = ">=1.5"
-polars = {version = ">= 0.20.23", optional = true}
+polars = { version = ">= 0.20.23", optional = true }
 prqlc = "^0.11.0"
 traitlets = ">=5"
 
@@ -37,7 +37,6 @@ polars = ["polars"]
 
 [tool.poetry.dev-dependencies]
 Sphinx = "~7.1"
-black = "^24.8.0"
 commitizen = "^3.29.0"
 coverage = "^7.6.0"
 darglint = "^1.8.1"
@@ -46,7 +45,7 @@ myst-parser = "^3.0.0"
 nox = "^2024.4.15"
 polars = ">=0.16"
 pre-commit = "^3.5.0"
-pytest = ">7"
+pytest = ">8"
 # pytest-regtest compat https://gitlab.com/uweschmitt/pytest-regtest/-/merge_requests/9
 py = "1.11"
 pytest-clarity = "^1.0.1"
