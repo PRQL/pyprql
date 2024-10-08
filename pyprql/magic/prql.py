@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import re
+
 from IPython.core.magic import cell_magic, line_magic, magics_class, needs_local_scope
 from IPython.core.magic_arguments import argument, magic_arguments, parse_argstring
-from prqlc import compile, CompileOptions
+from prqlc import CompileOptions, compile
 from sql.magic import SqlMagic
 from sql.parse import parse
 from traitlets import Bool, Unicode
-import re
 
 
 @magics_class
@@ -110,7 +111,7 @@ class PrqlMagic(SqlMagic):
             _pattern = re.sub(r"\\\s", r"\\s+", _escaped_prql)
             line = re.sub(_pattern, "", line)
         if self.args.file:
-            with open(self.args.file, "r") as infile:
+            with open(self.args.file) as infile:
                 cell = infile.read()
             line = re.sub(r"(\-f|\-\-file)\s+" + self.args.file, "", line)
         # If cell is occupied, parsed to SQL

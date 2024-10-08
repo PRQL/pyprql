@@ -40,9 +40,6 @@ numbers. This automatically parses your commit messages to determine if a new
 release is necessary, and, if so, what kind (ie. major, minor, patch). So your
 commit message is important!
 
-You can use a python implementation of [commitizen][cz] to handle that for you!
-Just commit using `cz commit` instead of `git commit`.
-
 ### Documentation & testing
 
 If you add new code, please add documentation and tests for it as well. We use
@@ -67,7 +64,6 @@ them (in `pyproject.toml` and `pyprql/__init__.py`) manually.
 [black]: https://github.com/psf/black "Black"
 [mypy]: https://mypy.readthedocs.io/en/stable/index.html "Mypy"
 [psr]: https://github.com/relekang/python-semantic-release "Python Semantic Release"
-[cz]: https://commitizen-tools.github.io/commitizen/index.html "Commitizen"
 [docstrings]: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html "Numpy Napoleon Docstrings"
 [sphinx]: https://www.sphinx-doc.org/en/master/index.html "Sphinx"
 [pytest]: https://docs.pytest.org/en/7.0.x/ "pytest"
