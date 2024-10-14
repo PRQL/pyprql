@@ -2271,13 +2271,13 @@ yaml = ["PyYaml (>=6.0.1)"]
 
 [[package]]
 name = "python-semantic-release"
-version = "9.10.0"
+version = "9.11.0"
 description = "Automatic Semantic Versioning for Python projects"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "python_semantic_release-9.10.0-py3-none-any.whl", hash = "sha256:05a29ce7441e486cfd09d455cfb32abeb64b9c94eb4d2d148ff280578fd95558"},
-    {file = "python_semantic_release-9.10.0.tar.gz", hash = "sha256:45a0199f7805dfe76bb57b932be4a9a5a3f7ff03a897c375eb5a1fa5dcfe5608"},
+    {file = "python_semantic_release-9.11.0-py3-none-any.whl", hash = "sha256:f944f65b1945258aa0f0fd78acd4198a7001d26d47d93a67456704decce605f9"},
+    {file = "python_semantic_release-9.11.0.tar.gz", hash = "sha256:0c75e35abe2ba95f1bf58a65e0324997793459b25ff7b655068787c910625eca"},
 ]
 
 [package.dependencies]
@@ -3215,4 +3215,4 @@ polars = ["polars"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "4765361cfd40565e216753eb065b2d38b575d9486258627fed19b9d90fd1a82c"
+content-hash = "09b95e35f9ca4851f73f75932c99b09c01974b4690ce5b00d6bd69cf1fea12fb"
