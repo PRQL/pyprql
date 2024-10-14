@@ -2168,19 +2168,19 @@ testing = ["fields", "hunter", "process-tests", "pytest-xdist", "virtualenv"]
 
 [[package]]
 name = "pytest-regtest"
-version = "2.1.1"
+version = "2.2.1"
 description = "pytest plugin for snapshot regression testing"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pytest_regtest-2.1.1.tar.gz", hash = "sha256:bd08a6161832378b59ecd4f5815fbe26af7cd091db4a1e710e30476d5f3b8832"},
+    {file = "pytest_regtest-2.2.1-py2.py3-none-any.whl", hash = "sha256:6a03b9a5e7078efc7184efb81440f7aeb531ff5cf13d3011598f462aed0996e9"},
 ]
 
 [package.dependencies]
 pytest = ">7.2"
 
 [package.extras]
-dev = ["black", "build", "hatchling", "pre-commit", "ruff", "twine", "wheel"]
+dev = ["black", "build", "hatchling", "jinja2-cli", "mistletoe", "mkdocs", "mkdocs-awesome-pages-plugin", "mkdocs-material", "mkdocstrings[python]", "numpy", "pandas", "pre-commit", "pytest-cov", "ruff", "twine", "wheel"]
 
 [[package]]
 name = "pytest-sugar"
