@@ -3,8 +3,7 @@ import urllib.request
 from pathlib import Path
 
 import pytest
-from sql import connection
-from sql import _current
+from sql import _current, connection
 from sql._testing import TestingShell
 from sql.connection import ConnectionManager
 from sql.magic import RenderMagic, SqlMagic

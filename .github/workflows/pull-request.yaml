@@ -23,7 +23,7 @@ jobs:
           - windows-latest
           - macos-latest
         python-version:
-          - "3.8"
+          - "3.10"
           - "3.12"
     steps:
       - name: Checkout
