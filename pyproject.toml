@@ -37,7 +37,7 @@ ipython = "^8.28.0"
 polars = ["polars"]
 
 [tool.poetry.dev-dependencies]
-Sphinx = "~7.1"
+Sphinx = "~8.1"
 coverage = "^7.6.0"
 darglint = "^1.8.1"
 mypy = "^1.12"
