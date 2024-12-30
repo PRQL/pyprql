@@ -1732,17 +1732,18 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "polars"
-version = "1.17.0"
+version = "1.18.0"
 description = "Blazingly fast DataFrame library"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "polars-1.17.0-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:616c93faaf6bbbdfbe6add3299d5baae2eabf8bc728c22d3d6582dabd25f5bfe"},
-    {file = "polars-1.17.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:444d432ab97d7c57ebba8fb05b3c616d4c3853d0ec181f6347317ab170719669"},
-    {file = "polars-1.17.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f8b7d41167c7f381baf9a44c4a7945db74435fde591960106dfceb0e4764a20a"},
-    {file = "polars-1.17.0-cp39-abi3-manylinux_2_24_aarch64.whl", hash = "sha256:fb800b7b7ae56ff4e62350aeed38c3ef82dc95fcffe99c2552fc40cd9965485b"},
-    {file = "polars-1.17.0-cp39-abi3-win_amd64.whl", hash = "sha256:e42847a813f9cfb969839e27cf9ab4c73b8c08a8729b764ec77f8efe0abd745f"},
-    {file = "polars-1.17.0.tar.gz", hash = "sha256:f9e9cc1cd1e31a21e521624f70c5c0277162c0f1937d48d35c356d53571aa20c"},
+    {file = "polars-1.18.0-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:27a6c7e5d2d15afb5f06291433019411c9a28e59e49741442d11a6a945f21daa"},
+    {file = "polars-1.18.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:6431563aee2dfa6787b0debbed3f565ebb4322da32317d95c8eac3e48330bc28"},
+    {file = "polars-1.18.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a333ff578373e29e0cacc79c35afe42c0620813c9b0c832009ab8b330e421093"},
+    {file = "polars-1.18.0-cp39-abi3-manylinux_2_24_aarch64.whl", hash = "sha256:3a3a65a3ad6b6b0bd61a33f215856cfdd3e3abc9942e69526b2b88c0ef8683a4"},
+    {file = "polars-1.18.0-cp39-abi3-win_amd64.whl", hash = "sha256:a79ef2542454d9cace63e8fa528cf808b6377077173be522df9b8c0e792ce96a"},
+    {file = "polars-1.18.0-cp39-abi3-win_arm64.whl", hash = "sha256:52b543da52f4f6a661a2fa3cdd4b499938bdb34eeae538ec3bcef6c8c41bfc33"},
+    {file = "polars-1.18.0.tar.gz", hash = "sha256:5c2f119555ae8d822a5322509c6abd91601a8931115d2e4c3fff13fadf39e877"},
 ]
 
 [package.extras]
@@ -1767,7 +1768,7 @@ pyarrow = ["pyarrow (>=7.0.0)"]
 pydantic = ["pydantic"]
 sqlalchemy = ["polars[pandas]", "sqlalchemy"]
 style = ["great-tables (>=0.8.0)"]
-timezone = ["backports-zoneinfo", "tzdata"]
+timezone = ["tzdata"]
 xlsx2csv = ["xlsx2csv (>=0.8.0)"]
 xlsxwriter = ["xlsxwriter"]
 
