@@ -1,16 +1,14 @@
 """Nox session configuration."""
 
-from typing import List
-
 import nox
 from nox.sessions import Session
 
 PACKAGE: str = "pyprql"
-LOCATIONS: List[str] = [
+LOCATIONS: list[str] = [
     PACKAGE,
     "noxfile.py",
 ]
-VERSIONS: List[str] = [
+VERSIONS: list[str] = [
     "3.8",
     "3.9",
     "3.10",
