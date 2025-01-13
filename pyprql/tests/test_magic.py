@@ -339,14 +339,14 @@ def test_bracket_var_substitution(ip):
 @pytest.mark.xfail(reason="Not supported in PRQL")
 def test_multiline_bracket_var_substitution(ip):
     ip.user_global_ns["col"] = "first_name"
-    assert run_prql(ip, "SELECT * FROM author\n" " WHERE {col} = 'William' ")[0] == (
+    assert run_prql(ip, "SELECT * FROM author\n WHERE {col} = 'William' ")[0] == (
         "William",
         "Shakespeare",
         1616,
     )
 
     ip.user_global_ns["col"] = "last_name"
-    result = run_prql(ip, "SELECT * FROM author" " WHERE {col} = 'William' ")
+    result = run_prql(ip, "SELECT * FROM author WHERE {col} = 'William' ")
     assert not result
 
 
