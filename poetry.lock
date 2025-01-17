@@ -1738,18 +1738,18 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "polars"
-version = "1.19.0"
+version = "1.20.0"
 description = "Blazingly fast DataFrame library"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "polars-1.19.0-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:51c01837268a1aa41785e60ed7d3363d4b52f652ab0eef4981f887bdfa2e9ca7"},
-    {file = "polars-1.19.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:20f8235e810f6ee795d7a215a3560945e6a1b57d017f87ba0c8542dced1fc665"},
-    {file = "polars-1.19.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:be0ea51f7b3553652bf0d53f3b925e969a898d4feb9980acecf8e3037d696903"},
-    {file = "polars-1.19.0-cp39-abi3-manylinux_2_24_aarch64.whl", hash = "sha256:30305ef4e1b634c67a5d985832296fade9908482c5b1abb0100800808b2d090e"},
-    {file = "polars-1.19.0-cp39-abi3-win_amd64.whl", hash = "sha256:de4aa45e24f8f94a1da9cc6031a7db6fa65ac7de8246fac0bc581ebb427d0643"},
-    {file = "polars-1.19.0-cp39-abi3-win_arm64.whl", hash = "sha256:d7ca7aeb63fa22c0a00f6cfa95dd5252c249e83dd4d1b954583a59f97a8e407b"},
-    {file = "polars-1.19.0.tar.gz", hash = "sha256:b52ada5c43fcdadf64f282522198c5549ee4e46ea57d236a4d7e572643070d9d"},
+    {file = "polars-1.20.0-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:9a313e10ea80b99a0d32bfb942b2260b9658155287b0c2ac5876323acaff4f2c"},
+    {file = "polars-1.20.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:4474bd004376599f7e4906bd350026cbbe805ba604121090578a97f63da15381"},
+    {file = "polars-1.20.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4996e17cb6f57d9aeaf79f66c54ef2913cea7bd025410c076ef8c05d4f7d792a"},
+    {file = "polars-1.20.0-cp39-abi3-manylinux_2_24_aarch64.whl", hash = "sha256:d488ffb92d4934d9c326fa2d0fb2e9a4e3c2c625c59f4a77a77e4acd4d5a0d66"},
+    {file = "polars-1.20.0-cp39-abi3-win_amd64.whl", hash = "sha256:5ce417d2b6d4f3b8f422fcb3482039e8076182cceacbd880175fe970c6f99c84"},
+    {file = "polars-1.20.0-cp39-abi3-win_arm64.whl", hash = "sha256:f474f3d65450138cd2dbab2d9b6041b8646c30fad0b28e6d62457788f994bf62"},
+    {file = "polars-1.20.0.tar.gz", hash = "sha256:e8e9e3156fae02b58e276e5f2c16a5907a79b38617a9e2d731b533d87798f451"},
 ]
 
 [package.extras]
