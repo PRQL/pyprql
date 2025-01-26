@@ -1868,20 +1868,20 @@ wcwidth = "*"
 
 [[package]]
 name = "prqlc"
-version = "0.11.3"
-description = ""
+version = "0.13.3"
+description = "Python bindings for prqlc, the PRQL compiler"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "prqlc-0.11.3-cp37-abi3-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:13a2d1e3725bb10aeae698bb567d5b26048e9597e93fb72ce0931740c7c1bb4e"},
-    {file = "prqlc-0.11.3-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:b4d692ef76261fbc5bfe1db8e99143301cf67529f66f1c2ee8060ad7850af9f7"},
-    {file = "prqlc-0.11.3-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9e753641b3a2549a45bbfc9b33d9e783840cd300e29c6505671ca1360fa8078a"},
-    {file = "prqlc-0.11.3-cp37-abi3-win_amd64.whl", hash = "sha256:0bbe0e6963dd27812821cff1cbe550e1a72cd772caa3675dbc48fafdfe5714e5"},
-    {file = "prqlc-0.11.3.tar.gz", hash = "sha256:da7a87086b11a7503c7dae2403bc62279e76950addcfbfde90e48532cbe78ee7"},
+    {file = "prqlc-0.13.3-cp37-abi3-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:72fa5a006e6aa1a53885e42941c62b0557e1666e230298dd12effa3eb92725d3"},
+    {file = "prqlc-0.13.3-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a98769bee486a70c7eeff85bc6b92a721595724af39f1038275bdb4b052111b1"},
+    {file = "prqlc-0.13.3-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c2eed2d95eb7da5920345a065fd2cd0f9e280bbeaa67312bcf9d3e30fe34e8fa"},
+    {file = "prqlc-0.13.3-cp37-abi3-win_amd64.whl", hash = "sha256:b6cb20346b4fdb1fa301dbcd5fdfaf64e6c6ce575f399d635d96b8d365ae7160"},
+    {file = "prqlc-0.13.3.tar.gz", hash = "sha256:6062bf3ee10e3f0c709a23676f6e7a17bbefcfc9cd20ba147406e3879b949720"},
 ]
 
 [package.extras]
-test = ["mypy (==1.8.0)", "pytest (>=7)"]
+dev = ["mypy (==1.14.0)", "pytest (>=7)"]
 
 [[package]]
 name = "ptyprocess"
@@ -3177,4 +3177,4 @@ polars = ["polars"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "cafc306a73c989705cac802258ad9c75dfd6cbf7514b26137d5c958106abbb1e"
+content-hash = "732be0b64f8925595abb213920c2dabc4f88114f2ec1246c591debcd66fc28e2"
