@@ -29,7 +29,7 @@ duckdb-engine = ">=0.7,<0.16"
 jupysql = ">=0.10"
 pandas = ">=1.5"
 polars = { version = ">= 0.20.23", optional = true }
-prqlc = ">=0.11,<0.14"
+prqlc = ">=0.13,<0.14"
 traitlets = ">=5"
 ipython = "^8.28.0"
 
