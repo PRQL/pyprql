@@ -720,14 +720,14 @@ files = [
 
 [[package]]
 name = "duckdb-engine"
-version = "0.15.0"
+version = "0.17.0"
 description = "SQLAlchemy driver for duckdb"
 optional = false
-python-versions = "<4,>=3.8"
+python-versions = "<4,>=3.9"
 groups = ["main"]
 files = [
-    {file = "duckdb_engine-0.15.0-py3-none-any.whl", hash = "sha256:d18acd73f03202145e1baa86605dca3612080fd0a849dbc42b38111ffee6857c"},
-    {file = "duckdb_engine-0.15.0.tar.gz", hash = "sha256:59f67ec95ebf9eb4dea22994664dfd34edce3c7416b862daa46da43f572ad6ef"},
+    {file = "duckdb_engine-0.17.0-py3-none-any.whl", hash = "sha256:3aa72085e536b43faab635f487baf77ddc5750069c16a2f8d9c6c3cb6083e979"},
+    {file = "duckdb_engine-0.17.0.tar.gz", hash = "sha256:396b23869754e536aa80881a92622b8b488015cf711c5a40032d05d2cf08f3cf"},
 ]
 
 [package.dependencies]
@@ -3474,4 +3474,4 @@ polars = ["polars"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "fc23eb91995b31274050cef31d81cd6a84a95b46019c04785b9a18623a660792"
+content-hash = "cce930d7a1edf4d8b6b92651d15184eff74f44b0cc0e63d0dd24d43e3224fd62"
