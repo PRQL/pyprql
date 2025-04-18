@@ -6,7 +6,7 @@ Work with pandas and PRQL in an IPython terminal or Jupyter notebook.
 
 This is a thin wrapper around [ploomber/jupysql][jupysql] magic. Full
 documentation of the supported features is available at their
-[repository][jupysql]. Here, we document the most salient features or those
+[repository][jupysqlfeat]. Here, we document the most salient features or those
 where we differ.
 
 ## Usage
@@ -210,6 +210,7 @@ In [9]: %config PrqlMagic.autoview = False
 ```
 
 [jupysql]: https://github.com/ploomber/jupysql
+[jupysqlfeat]: https://github.com/ploomber/jupysql#features
 [conn_str]: https://docs.sqlalchemy.org/en/14/core/engines.html#database-urls
 [duckdb]: https://duckdb.org
 [pandas]: https://pandas.pydata.org
