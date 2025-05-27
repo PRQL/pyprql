@@ -1602,14 +1602,14 @@ files = [
 
 [[package]]
 name = "nox"
-version = "2025.2.9"
+version = "2025.5.1"
 description = "Flexible test automation."
 optional = false
 python-versions = ">=3.8"
 groups = ["dev"]
 files = [
-    {file = "nox-2025.2.9-py3-none-any.whl", hash = "sha256:7d1e92d1918c6980d70aee9cf1c1d19d16faa71c4afe338fffd39e8a460e2067"},
-    {file = "nox-2025.2.9.tar.gz", hash = "sha256:d50cd4ca568bd7621c2e6cbbc4845b3b7f7697f25d5fb0190ce8f4600be79768"},
+    {file = "nox-2025.5.1-py3-none-any.whl", hash = "sha256:56abd55cf37ff523c254fcec4d152ed51e5fe80e2ab8317221d8b828ac970a31"},
+    {file = "nox-2025.5.1.tar.gz", hash = "sha256:2a571dfa7a58acc726521ac3cd8184455ebcdcbf26401c7b737b5bc6701427b2"},
 ]
 
 [package.dependencies]
@@ -3474,4 +3474,4 @@ polars = ["polars"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "1ed9fe3ff9f67ba2b114f53f04c1ba89e1d8c52f037e997aa7908e9d7e5a6462"
+content-hash = "c98d343cb8b6793b31824b6ea75b19589fe3ab8a0310716a879229e30bba6e45"
