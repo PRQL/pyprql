@@ -40,7 +40,7 @@ polars = ["polars"]
 Sphinx = "~8.1"
 coverage = "^7.8.0"
 darglint = "^1.8.1"
-mypy = "^1.15"
+mypy = "^1.16"
 myst-parser = "^4.0.0"
 nox = "^2025.5.1"
 polars = ">=0.16"
