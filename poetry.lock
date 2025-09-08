@@ -2575,14 +2575,14 @@ yaml = ["PyYaml (>=6.0.1)"]
 
 [[package]]
 name = "python-semantic-release"
-version = "10.3.0"
+version = "10.4.0"
 description = "Automatic Semantic Versioning for Python projects"
 optional = false
-python-versions = ">=3.8"
+python-versions = "~=3.8"
 groups = ["dev"]
 files = [
-    {file = "python_semantic_release-10.3.0-py3-none-any.whl", hash = "sha256:0e07387c3f746dc164b4f5f8f54aa3bf9b4d79cbc2e06a2bc11a7b91469bccd9"},
-    {file = "python_semantic_release-10.3.0.tar.gz", hash = "sha256:9f1ba9d3d72c2d81b2da5ff71b3ca457ee0ff999a5dcade5b648d7739d3db2e6"},
+    {file = "python_semantic_release-10.4.0-py3-none-any.whl", hash = "sha256:e962a0da286e09ce798f681bcd7bc534d347f2e142818ac781bc50e35bab571b"},
+    {file = "python_semantic_release-10.4.0.tar.gz", hash = "sha256:1528e939af2d3128be471d94bb39a675f35adb4ea17e9c4bf4f86289cc20e006"},
 ]
 
 [package.dependencies]
@@ -3823,4 +3823,4 @@ polars = ["polars"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "f1c1d823c49ee74377bd94f10152323a4fbb494f9d1d76df93229040ad8749ba"
+content-hash = "b2bec34071bfd351cd9c87f868b08df0104e323373443b9d2f44734f9b40f15b"
