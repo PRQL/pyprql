@@ -12,15 +12,15 @@ repos:
       - id: trailing-whitespace
       - id: check-added-large-files
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.12
+    rev: v0.13.0
     hooks:
       - id: ruff
       - id: ruff-format
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.17.1
+    rev: v1.18.1
     hooks:
       - id: mypy
   - repo: https://github.com/python-poetry/poetry
-    rev: 2.1.3
+    rev: 2.2.0
     hooks:
       - id: poetry-check
