@@ -49,7 +49,7 @@ pytest = ">8"
 # pytest-regtest compat https://gitlab.com/uweschmitt/pytest-regtest/-/merge_requests/9
 py = "1.11"
 pytest-clarity = "^1.0.1"
-pytest-cov = "^6.3.0"
+pytest-cov = "^7.0.0"
 pytest-regtest = "*"
 pytest-sugar = "^1.1.1"
 pytest-testmon = "*"
