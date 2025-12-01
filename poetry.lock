@@ -2515,19 +2515,19 @@ dev = ["black", "flake8", "pre-commit"]
 
 [[package]]
 name = "pytest-testmon"
-version = "2.1.1"
+version = "2.2.0"
 description = "selects tests affected by changed files and methods"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "pytest-testmon-2.1.1.tar.gz", hash = "sha256:8ebe2c3de42d99306ee54cd4536fed0fc48346a954420da904b18e8d59b5da98"},
-    {file = "pytest_testmon-2.1.1-py3-none-any.whl", hash = "sha256:8271ca47bc8c80760c4fc7fd7895ea786b111bbb31f13eeea879a6fd11fe2226"},
+    {file = "pytest_testmon-2.2.0-py3-none-any.whl", hash = "sha256:2604ca44a54d61a2e830d9ce828b41a837075e4ebc1f81b148add8e90d34815b"},
+    {file = "pytest_testmon-2.2.0.tar.gz", hash = "sha256:01f488e955ed0e0049777bee598bf1f647dd524e06f544c31a24e68f8d775a51"},
 ]
 
 [package.dependencies]
 coverage = ">=6,<8"
-pytest = ">=5,<9"
+pytest = ">=5,<10"
 
 [[package]]
 name = "pytest-xdist"
