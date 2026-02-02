@@ -21,6 +21,6 @@ repos:
     hooks:
       - id: mypy
   - repo: https://github.com/python-poetry/poetry
-    rev: 2.3.1
+    rev: 2.3.2
     hooks:
       - id: poetry-check
