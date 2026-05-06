@@ -614,6 +614,30 @@ files = [
 ]
 
 [[package]]
+name = "deepdiff"
+version = "9.0.0"
+description = "Deep Difference and Search of any Python object/data. Recreate objects by adding adding deltas to each other."
+optional = false
+python-versions = ">=3.10"
+groups = ["dev"]
+files = [
+    {file = "deepdiff-9.0.0-py3-none-any.whl", hash = "sha256:b1ae0dd86290d86a03de5fbee728fde43095c1472ae4974bdab23ab4656305bd"},
+    {file = "deepdiff-9.0.0.tar.gz", hash = "sha256:4872005306237b5b50829803feff58a1dfd20b2b357a55de22e7ded65b2008a7"},
+]
+
+[package.dependencies]
+orderly-set = ">=5.5.0,<6"
+
+[package.extras]
+cli = ["click (>=8.3.1,<8.4.0)", "pyyaml (>=6.0.3,<6.1.0)"]
+coverage = ["coverage (>=7.13.5,<7.14.0)"]
+dev = ["bump2version (>=1.0.1,<1.1.0)", "flit-core (==3.12.0)", "ipdb (>=0.13.13,<0.14.0)", "jsonpickle (>=4.1.1,<4.2.0)", "nox (==2026.2.9)", "numpy (>=2.2.0,<2.3.0) ; python_version < \"3.14\"", "numpy (>=2.4.3,<2.5.0) ; python_version >= \"3.14\"", "orjson (>=3.11.7,<3.12.0)", "pandas (>=2.2.0,<2.3.0) ; python_version < \"3.11\"", "pandas (>=3.0.1,<3.1.0) ; python_version >= \"3.11\"", "polars (>=1.39.3,<1.40.0)", "python-dateutil (>=2.9.0.post0,<2.10.0)", "pytz", "tomli (>=2.4.0,<2.5.0)", "tomli-w (>=1.2.0,<1.3.0)", "uuid6 (==2025.0.1)"]
+docs = ["Sphinx (>=8.1.3,<8.2.0)", "furo (>=2024.8.6)", "sphinx-sitemap (>=2.9.0,<2.10.0)", "sphinxemoji (>=0.3.2,<0.4.0)"]
+optimize = ["orjson"]
+static = ["flake8 (>=7.3.0,<7.4.0)", "flake8-pyproject (>=1.2.4,<1.3.0)", "pydantic (>=2.12.5,<2.13.0)"]
+test = ["pytest (>=9.0.2,<9.1.0)", "pytest-benchmark (>=5.2.3,<5.3.0)", "pytest-cov (>=7.1.0,<7.2.0)", "python-dotenv (>=1.2.2,<1.3.0)"]
+
+[[package]]
 name = "dependency-groups"
 version = "1.3.0"
 description = "A tool for resolving PEP 735 Dependency Group data"
@@ -1971,6 +1995,25 @@ files = [
 ]
 
 [[package]]
+name = "orderly-set"
+version = "5.5.0"
+description = "Orderly set"
+optional = false
+python-versions = ">=3.8"
+groups = ["dev"]
+files = [
+    {file = "orderly_set-5.5.0-py3-none-any.whl", hash = "sha256:46f0b801948e98f427b412fcabb831677194c05c3b699b80de260374baa0b1e7"},
+    {file = "orderly_set-5.5.0.tar.gz", hash = "sha256:e87185c8e4d8afa64e7f8160ee2c542a475b738bc891dc3f58102e654125e6ce"},
+]
+
+[package.extras]
+coverage = ["coverage (>=7.6.0,<7.7.0)"]
+dev = ["bump2version (>=1.0.0,<1.1.0)", "ipdb (>=0.13.0,<0.14.0)"]
+optimize = ["orjson"]
+static = ["flake8 (>=7.1.0,<7.2.0)", "flake8-pyproject (>=1.2.3,<1.3.0)"]
+test = ["pytest (>=8.3.0,<8.4.0)", "pytest-benchmark (>=5.1.0,<5.2.0)", "pytest-cov (>=6.0.0,<6.1.0)", "python-dotenv (>=1.0.0,<1.1.0)"]
+
+[[package]]
 name = "packaging"
 version = "24.1"
 description = "Core utilities for Python packages"
@@ -2609,17 +2652,18 @@ testing = ["process-tests", "pytest-xdist", "virtualenv"]
 
 [[package]]
 name = "pytest-regtest"
-version = "2.4.0"
+version = "2.5.1"
 description = "pytest plugin for snapshot regression testing"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "pytest_regtest-2.4.0-py3-none-any.whl", hash = "sha256:5a794cf6e9bd03add9099f55668f599a25abbb9255069b4f784f8809315cf162"},
-    {file = "pytest_regtest-2.4.0.tar.gz", hash = "sha256:9a971c67c8709c431659c557a13c5e2991420cdb92c038e50eecfbb9062646b0"},
+    {file = "pytest_regtest-2.5.1-py3-none-any.whl", hash = "sha256:8d94eb5dd08137cd4353250120ebb7b6e318d699721dca6bd8d5e436cb5bbe9f"},
+    {file = "pytest_regtest-2.5.1.tar.gz", hash = "sha256:84f77f18fa70295377662de96d721d03b32d05509c53e1366aeec11dbed56ec0"},
 ]
 
 [package.dependencies]
+deepdiff = ">=9.0.0"
 pytest = ">7.2"
 
 [[package]]
