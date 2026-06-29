@@ -2712,14 +2712,14 @@ testing = ["process-tests", "pytest-xdist", "virtualenv"]
 
 [[package]]
 name = "pytest-regtest"
-version = "2.5.1"
+version = "2.6.0"
 description = "pytest plugin for snapshot regression testing"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "pytest_regtest-2.5.1-py3-none-any.whl", hash = "sha256:8d94eb5dd08137cd4353250120ebb7b6e318d699721dca6bd8d5e436cb5bbe9f"},
-    {file = "pytest_regtest-2.5.1.tar.gz", hash = "sha256:84f77f18fa70295377662de96d721d03b32d05509c53e1366aeec11dbed56ec0"},
+    {file = "pytest_regtest-2.6.0-py3-none-any.whl", hash = "sha256:f17841f64439c76a9753863cf4fb9ff82a2a840e6ab7aa7e3caacc61162840ba"},
+    {file = "pytest_regtest-2.6.0.tar.gz", hash = "sha256:6fbe24523e0d32d4fbc900ba3596bab061bcfb1db1bb386b878127bf3d8d64df"},
 ]
 
 [package.dependencies]
