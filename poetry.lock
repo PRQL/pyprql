@@ -1955,14 +1955,14 @@ files = [
 
 [[package]]
 name = "nox"
-version = "2025.11.12"
+version = "2026.7.11"
 description = "Flexible test automation."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "nox-2025.11.12-py3-none-any.whl", hash = "sha256:707171f9f63bc685da9d00edd8c2ceec8405b8e38b5fb4e46114a860070ef0ff"},
-    {file = "nox-2025.11.12.tar.gz", hash = "sha256:3d317f9e61f49d6bde39cf2f59695bb4e1722960457eee3ae19dacfe03c07259"},
+    {file = "nox-2026.7.11-py3-none-any.whl", hash = "sha256:f5e811693ee8374d269396204eb39990d2084da67ed968239f94301805c9a169"},
+    {file = "nox-2026.7.11.tar.gz", hash = "sha256:dec9bd2c854540a2d5c0b841eaaf1d23a7c26cd90af36d9f1f1668b34524bfd9"},
 ]
 
 [package.dependencies]
@@ -1971,13 +1971,13 @@ attrs = ">=24.1"
 colorlog = ">=2.6.1,<7"
 dependency-groups = ">=1.1"
 humanize = ">=4"
-packaging = {version = ">=21", markers = "python_version >= \"3.10\""}
+packaging = ">=22"
 tomli = {version = ">=1.1", markers = "python_version < \"3.11\""}
-virtualenv = {version = ">=20.15", markers = "python_version >= \"3.10\""}
+virtualenv = ">=20.15"
 
 [package.extras]
 pbs = ["pbs-installer[all] (>=2025.1.6)"]
-tox-to-nox = ["importlib-resources ; python_version < \"3.9\"", "jinja2", "tox (>=4)"]
+tox-to-nox = ["jinja2", "tox (>=4)"]
 uv = ["uv (>=0.1.6)"]
 
 [[package]]
@@ -4049,4 +4049,4 @@ polars = ["polars"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "8dded87126e4c39835dc448b272a5f5b106ff15926ac79b9bf6225079aafef2f"
+content-hash = "1fa407ee15d7d182b181764035522bc149de6b710e2140f02c1dea06a07724d9"
