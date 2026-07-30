@@ -396,7 +396,7 @@ def test_json_in_select(ip):
 def test_close_connection(ip):
     # TODO: change this to testing run_prql
     connections = run_sql(ip, "%sql -l")
-    connection_name = list(connections)[0]
+    connection_name = next(iter(connections))
     run_sql(ip, f"%sql -x {connection_name}")
     connections_afterward = run_sql(ip, "%sql -l")
     assert connection_name not in connections_afterward
