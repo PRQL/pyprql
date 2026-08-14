@@ -907,6 +907,7 @@ description = "A platform independent file lock."
 optional = false
 python-versions = ">=3.8"
 groups = ["dev"]
+markers = "python_version < \"3.15\""
 files = [
     {file = "filelock-3.16.1-py3-none-any.whl", hash = "sha256:2082e5703d51fbf98ea75855d9d5527e33d8ff23099bec374a134febee6946b0"},
     {file = "filelock-3.16.1.tar.gz", hash = "sha256:c249fbfcd5db47e5e2d6d62198e565475ee65e4831e2561c8e313fa7eb961435"},
@@ -916,6 +917,19 @@ files = [
 docs = ["furo (>=2024.8.6)", "sphinx (>=8.0.2)", "sphinx-autodoc-typehints (>=2.4.1)"]
 testing = ["covdefaults (>=2.3)", "coverage (>=7.6.1)", "diff-cover (>=9.2)", "pytest (>=8.3.3)", "pytest-asyncio (>=0.24)", "pytest-cov (>=5)", "pytest-mock (>=3.14)", "pytest-timeout (>=2.3.1)", "virtualenv (>=20.26.4)"]
 typing = ["typing-extensions (>=4.12.2) ; python_version < \"3.11\""]
+
+[[package]]
+name = "filelock"
+version = "3.32.3"
+description = "A platform independent file lock."
+optional = false
+python-versions = ">=3.10"
+groups = ["dev"]
+markers = "python_version >= \"3.15\""
+files = [
+    {file = "filelock-3.32.3-py3-none-any.whl", hash = "sha256:7f0ca4bcc0e181c60dbbd8aa9ab5b120ebb99e4e064e83636340056f833a1f09"},
+    {file = "filelock-3.32.3.tar.gz", hash = "sha256:0ffa185a3540854c95caa7fa76b76cb219d907415e2c5dc9af25fd970563487f"},
+]
 
 [[package]]
 name = "gitdb"
@@ -1955,25 +1969,30 @@ files = [
 
 [[package]]
 name = "nox"
-version = "2026.7.11"
+version = "2026.8.10"
 description = "Flexible test automation."
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "nox-2026.7.11-py3-none-any.whl", hash = "sha256:f5e811693ee8374d269396204eb39990d2084da67ed968239f94301805c9a169"},
-    {file = "nox-2026.7.11.tar.gz", hash = "sha256:dec9bd2c854540a2d5c0b841eaaf1d23a7c26cd90af36d9f1f1668b34524bfd9"},
+    {file = "nox-2026.8.10-py3-none-any.whl", hash = "sha256:943f1ebcace1efb35d91ad2034007df1942d2a1bed75fb33e1bf0ed5a0df1cdb"},
+    {file = "nox-2026.8.10.tar.gz", hash = "sha256:13f45e46552eade9f4b60474133e31e1e0bb341234a3cc0c9d6fff17570ce8bb"},
 ]
 
 [package.dependencies]
 argcomplete = ">=1.9.4,<4"
 attrs = ">=24.1"
-colorlog = ">=2.6.1,<7"
+colorlog = ">=6.6,<7"
 dependency-groups = ">=1.1"
 humanize = ">=4"
 packaging = ">=22"
+platformdirs = ">=2"
+python-discovery = ">=1"
 tomli = {version = ">=1.1", markers = "python_version < \"3.11\""}
-virtualenv = ">=20.15"
+virtualenv = [
+    {version = ">=20.15", markers = "python_version < \"3.15\""},
+    {version = ">=21", markers = "python_version >= \"3.15\""},
+]
 
 [package.extras]
 pbs = ["pbs-installer[all] (>=2025.1.6)"]
@@ -2787,6 +2806,21 @@ files = [
 
 [package.dependencies]
 six = ">=1.5"
+
+[[package]]
+name = "python-discovery"
+version = "1.5.2"
+description = "Python interpreter discovery"
+optional = false
+python-versions = ">=3.8"
+groups = ["dev"]
+files = [
+    {file = "python_discovery-1.5.2-py3-none-any.whl", hash = "sha256:3e338c2d0f15dfaeea57493f4c2c6caebe0e998ea815c30ae8bf8ee21f1112d3"},
+    {file = "python_discovery-1.5.2.tar.gz", hash = "sha256:45fd4f20a4e3f9b7bf2e0817870bc8e3b320a19658da177af800768c82dbf354"},
+]
+
+[package.dependencies]
+filelock = ">=3.15.4"
 
 [[package]]
 name = "python-gitlab"
@@ -3878,6 +3912,7 @@ description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.7"
 groups = ["dev"]
+markers = "python_version < \"3.15\""
 files = [
     {file = "virtualenv-20.26.6-py3-none-any.whl", hash = "sha256:7345cc5b25405607a624d8418154577459c3e0277f5466dd79c49d5e492995f2"},
     {file = "virtualenv-20.26.6.tar.gz", hash = "sha256:280aede09a2a5c317e409a00102e7077c6432c5a38f0ef938e643805a7ad2c48"},
@@ -3891,6 +3926,25 @@ platformdirs = ">=3.9.1,<5"
 [package.extras]
 docs = ["furo (>=2023.7.26)", "proselint (>=0.13)", "sphinx (>=7.1.2,!=7.3)", "sphinx-argparse (>=0.4)", "sphinxcontrib-towncrier (>=0.2.1a0)", "towncrier (>=23.6)"]
 test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7)", "packaging (>=23.1)", "pytest (>=7.4)", "pytest-env (>=0.8.2)", "pytest-freezer (>=0.4.8) ; platform_python_implementation == \"PyPy\" or platform_python_implementation == \"CPython\" and sys_platform == \"win32\" and python_version >= \"3.13\"", "pytest-mock (>=3.11.1)", "pytest-randomly (>=3.12)", "pytest-timeout (>=2.1)", "setuptools (>=68)", "time-machine (>=2.10) ; platform_python_implementation == \"CPython\""]
+
+[[package]]
+name = "virtualenv"
+version = "21.7.4"
+description = "Virtual Python Environment builder"
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+markers = "python_version >= \"3.15\""
+files = [
+    {file = "virtualenv-21.7.4-py3-none-any.whl", hash = "sha256:376ec93cd6aab3044fa395d7db226db38043b7b5748948044b2a87168525e843"},
+    {file = "virtualenv-21.7.4.tar.gz", hash = "sha256:c9d960c95fa458171e58222a5ccab7465298e4b6559977865e627c4719f1e825"},
+]
+
+[package.dependencies]
+distlib = ">=0.3.7,<1"
+filelock = {version = ">=3.24.2,<4", markers = "python_version >= \"3.10\""}
+platformdirs = ">=3.9.1,<5"
+python-discovery = ">=1.4.2"
 
 [[package]]
 name = "wcwidth"
@@ -4048,4 +4102,4 @@ polars = ["polars"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "885981baf216a87c3414760175b3f8eb8be9b052dd74e7895e5dcabc1ac63993"
+content-hash = "ac731835fdd6c0553b676136f7e67ac1039c461e8d4f7ccc7bd3e5125210f8bd"
