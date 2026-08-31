@@ -39,7 +39,7 @@ pip install pyprql[polars]
 import pandas as pd
 import pyprql.pandas_accessor
 
-df = (...)
+df = ...
 results_df = df.prql.query("select {age, name, occupation} | filter age > 21")
 ```
 
@@ -49,7 +49,7 @@ results_df = df.prql.query("select {age, name, occupation} | filter age > 21")
 import polars as pl
 import pyprql.polars_namespace
 
-df = (...)
+df = ...
 results_df = df.prql.query("select {age, name, occupation} | filter age > 21")
 ```
 
@@ -75,6 +75,7 @@ This library exposes `prqlc.compile`, so we can simply generate SQL:
 
 ```python
 import pyprql
+
 pyprql.compile("from artists | select track")
 print(pyprql.compile("from artists | select track"))
 ```
